@@ -1,26 +1,23 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'; 
-import ProtectRoute from './components/auth/ProtectRoute';
-import Login from "./pages/Login";
-
-let user = false;
+import { BrowserRouter, Routes, Route } from 'react-router-dom'; 
+import AuthLayout from './components/auth/layout';
+import AuthLogin from './pages/auth/login';
+import AuthRegister from './pages/auth/register'; // Import the AuthRegister component
+import UnauthPages from './pages/unauth-page'; // Import the UnauthPages component
 
 const App = () => {
   return (
-    <Router>
-      <div>
+    <div className="flex flex-col overflow-hidden bg-white">
+      <BrowserRouter>
         <Routes>
-          <Route 
-            path="/login" 
-            element={
-              <ProtectRoute user={!user} redirect='/'>
-                <Login />
-              </ProtectRoute>
-            } 
-          />
+          <Route path="/auth" element={<AuthLayout />}>
+            <Route path="login" element={<AuthLogin />} />
+            <Route path="register" element={<AuthRegister />} />
+          </Route>
+          <Route path="/unauth-page" element={<UnauthPages />} />
         </Routes>
-      </div>
-    </Router>
+      </BrowserRouter>
+    </div>
   );
 };
 
