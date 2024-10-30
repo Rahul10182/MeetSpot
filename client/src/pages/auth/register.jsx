@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useFirebase } from '../../context/Firebase';
 import { useNavigate } from 'react-router-dom';
-import { FcGoogle } from 'react-icons/fc';
+import { FcGoogle } from "react-icons/fc";
 
 function AuthRegister() {
   const firebase = useFirebase();

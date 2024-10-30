@@ -4,9 +4,12 @@ import AuthLayout from './components/auth/layout';
 import AuthLogin from './pages/auth/login';
 import AuthRegister from './pages/auth/register'; // Import the AuthRegister component
 import UnauthPages from './pages/unauth-page'; // Import the UnauthPages component
+import Home from './pages/Home';
+import MeetingPoint from './components/Map/MeetingPoint';
 
 const App = () => {
   return (
+    
     <div className="flex flex-col overflow-hidden bg-white">
       <BrowserRouter>
         <Routes>
@@ -15,6 +18,9 @@ const App = () => {
             <Route path="register" element={<AuthRegister />} />
           </Route>
           <Route path="/unauth-page" element={<UnauthPages />} />
+          <Route path="/" element={<Home/>} />
+          <Route path="/meeting-point" element={<MeetingPoint />} />
+
         </Routes>
       </BrowserRouter>
     </div>
