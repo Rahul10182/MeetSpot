@@ -8,6 +8,8 @@ import MenuIcon from '@mui/icons-material/Menu';
 const Header = () => {
   const [anchorAccount, setAnchorAccount] = useState(null);
   const [isDrawerOpen, setDrawerOpen] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
   const navigate = useNavigate();
 
   const handleAccountMenuClick = (event) => {
@@ -32,6 +34,24 @@ const Header = () => {
       navigate('/auth/register');
     });
   };
+  const handleProfile = () => {
+    startTransition(() => {
+      navigate('/auth/profile');
+    });
+  };
+  const handleSettings = () => {
+    startTransition(() => {
+      navigate('/auth/settings');
+    });
+  };
+  const handleLogout = () => {
+    startTransition(() => {
+      localStorage.removeItem('loggedInUser'); // Clear session storage
+      setIsModalOpen(false);
+      navigate('/'); // Redirect to homepage
+    });
+  };
+
 
   const categories = ['Music', 'Business', 'Dating', 'MeetUp'];
 
@@ -92,9 +112,9 @@ const Header = () => {
           {/* Account Menu (Dropdown) */}
           {anchorAccount && (
             <div className="absolute right-0 mt-2 w-48 bg-white text-black rounded shadow-lg">
-              <div onClick={handleClose} className="px-4 py-2 hover:bg-gray-200 cursor-pointer">Profile</div>
-              <div onClick={handleClose} className="px-4 py-2 hover:bg-gray-200 cursor-pointer">Settings</div>
-              <div onClick={handleClose} className="px-4 py-2 hover:bg-gray-200 cursor-pointer">Logout</div>
+              <div onClick={handleProfile} className="px-4 py-2 hover:bg-gray-200 cursor-pointer">Profile</div>
+              <div onClick={handleLogout} className="px-4 py-2 hover:bg-gray-200 cursor-pointer">Logout</div>
+              <div onClick={handleSettings}  className="px-4 py-2 hover:bg-gray-200 cursor-pointer">Settings</div>
             </div>
           )}
         </div>

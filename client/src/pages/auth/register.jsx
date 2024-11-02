@@ -105,7 +105,7 @@ function AuthRegister() {
           <button
             type="button"
             onClick={handleGoogleSignUp}
-            className="group relative w-full flex justify-center items-center py-2 px-4 border border-transparent text-sm font-semibold rounded-full text-black bg-white border border-gray-300 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
+            className="group relative w-full flex justify-center items-center py-2 px-4 border-transparent text-sm font-semibold rounded-full text-black bg-white border border-gray-300 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
           >
             <FcGoogle className="text-xl mr-2" /> Sign Up with Google
           </button>
