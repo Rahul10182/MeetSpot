@@ -16,24 +16,24 @@ const Sliderbar = () => {
   };
 
   return (
-    <div className="p-8 bg-gray-100">
-      <h2 className="text-2xl font-bold text-center mb-8">Explore Meeting Places</h2>
+    <div className="p-8 bg-gradient-to-r from-blue-50 to-indigo-100">
+      <h2 className="text-3xl font-extrabold text-center text-blue-900 mb-10">Explore Meeting Places</h2>
       <Slider {...settings}>
         {dataHomes.map((place) => (
           <div key={place.id} className="p-4">
-            <div className="bg-white shadow-md rounded-lg overflow-hidden">
+            <div className="bg-white shadow-lg rounded-lg overflow-hidden hover:shadow-xl transition-shadow duration-300">
               <img
                 src={place.imgSrc}
                 alt={place.title}
-                className="w-full h-96 object-cover"
+                className="w-full h-96 object-cover rounded-t-lg"
               />
               <div>
-                <div className="p-4 flex justify-between items-center">
-                  <div className="flex-1 pr-4 mx-32">
-                    <h3 className="text-lg font-bold text-gray-800">{place.title}</h3>
-                    <p className="text-gray-600 mt-2">{place.description}</p>
+                <div className="p-6 flex flex-col md:flex-row md:justify-between items-center">
+                  <div className="flex-1 md:pr-8">
+                    <h3 className="text-xl font-semibold text-gray-800">{place.title}</h3>
+                    <p className="text-gray-600 mt-2 leading-relaxed">{place.description}</p>
                   </div>
-                  <button className="px-4 py-2 mx-32 bg-blue-600 text-white rounded hover:bg-blue-700">
+                  <button className="mt-4 md:mt-0 px-6 py-2 bg-blue-600 text-white font-semibold rounded-full hover:bg-blue-700 transition duration-300">
                     Let’s MeetUp
                   </button>
                 </div>

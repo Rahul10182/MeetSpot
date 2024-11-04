@@ -11,31 +11,36 @@ function AuthRegister() {
   const [error, setError] = useState(null);
   const navigate = useNavigate();
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (password !== conPassword) {
-      setError("Passwords do not match");
-      return;
+        setError("Passwords do not match");
+        return;
     }
 
-    firebase.signupUserWithEmailAndPassword(email, password)
-      .then(() => {
-        navigate('/');
-      })
-      .catch((err) => {
-        setError(err.message);
-      });
+      try {
+          const result = await firebase.signupUserWithEmailAndPassword(email, password);
+          if(result){
+            console.log(result)
+            navigate('/');
+          }
+      } catch (err) {
+          setError(err.message);
+      }
   };
 
-  const handleGoogleSignUp = () => {
-    firebase.signUpWithGoogle()
-      .then(() => {
-        navigate('/');
-      })
-      .catch((err) => {
+
+  const handleGoogleSignUp = async () => {
+    try {
+        const result = await firebase.signUpWithGoogle();
+        console.log(result);
+        if(result)
+          navigate('/');
+    } catch (err) {
         setError(err.message);
-      });
+    }
   };
+
 
   return (
     <div className="w-full max-w-md space-y-8 mx-auto">
