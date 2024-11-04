@@ -31,16 +31,36 @@ export const FirebaseProvider = (props) => {
 
     const putData = (key,data) => set(ref(database,key),data);
 
-    const signUpWithGoogle = () => {
-        signInWithPopup(FirebaseAuth,GoogleProvider);        
-    }
+    const signUpWithGoogle = async () => {
+        const auth = getAuth();
+        const provider = new GoogleAuthProvider();
+        const result = await signInWithPopup(auth, provider);
+        return result; 
+    };
 
-    const signInUser = () => {
-        signInWithEmailAndPassword(FirebaseAuth, email, password);
-    }
+    const signInUser = async () => {
+        const auth = getAuth(); 
+        const provider = new GoogleAuthProvider();
+    
+        try {
+            const result = await signInWithPopup(auth, provider); 
+            console.log("Sign-in result:", result); 
+            return result; 
+        } catch (error) {
+            console.error("Error during Google Sign-In:", error);
+            throw error; 
+        }
+    };
+
+
+    const signInUserEmail = async (email, password) => {
+        const auth = getAuth();
+        const result = await signInWithEmailAndPassword(FirebaseAuth, email, password);
+        return result; 
+    };
 
     return (
-        <FirebaseContext.Provider value = {{ signupUserWithEmailAndPassword, putData, signUpWithGoogle, signInUser }}>
+        <FirebaseContext.Provider value = {{ signupUserWithEmailAndPassword, putData, signUpWithGoogle, signInUser , signInUserEmail }}>
             {props.children}
         </FirebaseContext.Provider>
     );

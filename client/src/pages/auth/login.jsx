@@ -9,17 +9,18 @@ function AuthLogin() {
   const [password, setPassword] = useState('');
   const navigate = useNavigate();
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
-    firebase.signInUser(email, password)
-      .then(() => {
+    try {
+        const result = await firebase.signInUserEmail(email, password);
+        console.log(result);
         navigate('/');
-      })
-      .catch((err) => {
-        setError(err.message);
-      });
-  };
+    } catch (err) {
+        console.log(err.message);
+    }
+};
+
 
   return (
     <div className="space-y-8">
@@ -75,10 +76,23 @@ function AuthLogin() {
         </div>
       </form>
       <button
-            onClick={(e) => {
-              e.preventDefault();
-              firebase.signUpWithGoogle();
-            }}
+           onClick={async (e) => {
+            e.preventDefault();
+            try {
+                const result = await firebase.signUpWithGoogle();
+                console.log("Result from signUpWithGoogle:", result); 
+        
+                if (result) {
+                    navigate('/');
+                }         
+            } catch (err) {
+                console.error("Error signing in:", err); 
+                setError(err.message);
+            }
+        }}
+        
+        
+          
             className="w-full flex items-center justify-center py-3 px-4 text-sm font-semibold text-gray-800 bg-white border border-gray-300 rounded-full shadow-md hover:bg-gray-100 transition ease-in-out duration-150 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-300"
           >
             <FcGoogle className="text-lg mr-2" /> 

@@ -6,8 +6,8 @@ import AuthRegister from './pages/auth/register'; // Import the AuthRegister com
 import UnauthPages from './pages/unauth-page'; // Import the UnauthPages component
 import Home from './pages/Home';
 import MeetingPoint from './components/Map/MeetingPoint';
-import ProfileDetail from './pages/profile/ProfileDetail';
 import SettingsPage from './pages/profile/Settings';
+import UserDashboard from './pages/profile/ProfileDetail';
 
 const App = () => {
   return (
@@ -16,13 +16,11 @@ const App = () => {
       <BrowserRouter>
         <Routes>
           <Route path="/auth" element={<AuthLayout />}>
-
             <Route path="login" element={<AuthLogin />} />
             <Route path="settings" element={<SettingsPage />} />
-            <Route path="profile" element={<ProfileDetail/>} />
             <Route path="register" element={<AuthRegister />} />
-
           </Route>
+          <Route path="profile" element={<UserDashboard />} />
           <Route path="/unauth-page" element={<UnauthPages />} />
           <Route path="/" element={<Home/>} />
           <Route path="/meeting-point" element={<MeetingPoint />} />
