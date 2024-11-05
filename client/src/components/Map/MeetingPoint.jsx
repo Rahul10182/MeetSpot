@@ -1,81 +1,91 @@
 import React, { useEffect, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { useLocation } from 'react-router-dom';
 import { setLocation } from '../../store/location-slice/locationSlice';
 
-const MeetingPoint = () => {
-  const location = useLocation();
+// Coordinates for Prayagraj mini college
+const prayagrajCollegeCenter = { lat: 25.4358, lng: 81.8463 };
+
+const MeetingPointPage = () => {
   const dispatch = useDispatch();
-  
-  // Fetch the location data from the Redux store
-  const { lat, lng, name } = useSelector((state) => state.location);
+  const location = useSelector((state) => state.location);
+  const [map, setMap] = useState(null);
+  const [searchBox, setSearchBox] = useState(null);
 
-  const [apiLoaded, setApiLoaded] = useState(false);
-
-  // Dispatch location data if available in location.state
+  // Load Google Maps API script and initialize map
   useEffect(() => {
-    if (location.state?.lat && location.state?.lng && location.state?.name) {
-      dispatch(setLocation(location.state));
-    }
-  }, [location.state, dispatch]);
-
-  // Load Google Maps API
-  useEffect(() => {
-    const handleAPILoad = () => {
-      console.log("Google Maps API loaded.");
-      setApiLoaded(true);
+    const loadGoogleMapsAPI = () => {
+      if (!window.google) {
+        const script = document.createElement('script');
+        script.src = `https://maps.gomaps.pro/maps/api/js?key=AlzaSyWcyYg2Xqih4OF2nDQ32cuHLHaQ8GGQ5JZ&libraries=places`;
+        script.async = true;
+        script.defer = true;
+        script.onload = initializeMap;
+        document.body.appendChild(script);
+      } else {
+        initializeMap();
+      }
     };
 
-    if (!window.google) {
-      console.log("Loading Google Maps API script...");
-      const script = document.createElement('script');
-      script.src = `https://maps.googleapis.com/maps/api/js?key=AIzaSyCJbX_S3RKm2RP8_YbHDEfek6eKGa4s2D4&callback=initMap`;
-      script.async = true;
-      script.defer = true;
-      script.onload = handleAPILoad;
-      script.onerror = () => console.error("Failed to load Google Maps API script.");
-      document.body.appendChild(script);
-    } else {
-      console.log("Google Maps API already loaded.");
-      setApiLoaded(true);
-    }
-  }, []);
+    const initializeMap = () => {
+      const mapOptions = {
+        center: prayagrajCollegeCenter,
+        zoom: 14,
+      };
 
-  // Initialize the map if API is loaded and coordinates are available
-  useEffect(() => {
-    if (apiLoaded && lat && lng) {
-      console.log("Initializing map with coordinates:", { lat, lng });
-      
-      const map = new window.google.maps.Map(document.getElementById('map'), {
-        center: { lat: parseFloat(lat), lng: parseFloat(lng) },
-        zoom: 15,
-      });
+      const mapInstance = new window.google.maps.Map(document.getElementById('map'), mapOptions);
+      setMap(mapInstance);
 
-      new window.google.maps.Marker({
-        position: { lat: parseFloat(lat), lng: parseFloat(lng) },
-        map: map,
-        title: name,
+      // Set up Places search box
+      const input = document.getElementById('search-input');
+      const searchBoxInstance = new window.google.maps.places.SearchBox(input);
+      setSearchBox(searchBoxInstance);
+
+      // Update map center and add a marker when a place is selected
+      searchBoxInstance.addListener('places_changed', () => {
+        const places = searchBoxInstance.getPlaces();
+        if (places.length === 0) return;
+
+        const place = places[0];
+        const location = place.geometry.location;
+
+        mapInstance.setCenter(location);
+        new window.google.maps.Marker({
+          position: location,
+          map: mapInstance,
+          title: place.name,
+        });
+
+        dispatch(setLocation({
+          lat: location.lat(),
+          lng: location.lng(),
+          name: place.name,
+        }));
       });
-    } else {
-      console.log("Map not initialized. API loaded:", apiLoaded, "Coordinates:", { lat, lng });
-    }
-  }, [apiLoaded, lat, lng, name]);
+    };
+
+    loadGoogleMapsAPI();
+  }, [dispatch]);
 
   return (
-    <div className="flex flex-col justify-center items-center h-screen">
-      {lat && lng ? (
-        <>
-          <h2 className="text-xl mb-4">Location: {name}</h2>
-          <div
-            id="map"
-            style={{ width: '100%', height: '80vh', border: '1px solid #ccc' }}
-          />
-        </>
-      ) : (
-        <p>Location data not available</p>
-      )}
+    <div className="flex h-screen">
+      {/* Search Sliderbar */}
+      <div className="w-1/4 bg-gray-100 p-6 space-y-4">
+        <h2 className="text-2xl font-bold">Find a Location</h2>
+        <input
+          id="search-input"
+          type="text"
+          placeholder="Search for a location"
+          className="w-full p-2 border border-gray-300 rounded"
+        />
+      <div>
+          
+      </div>  
+      </div>
+
+      {/* Map */}
+      <div id="map" className="w-3/4" style={{ height: '100vh', border: '1px solid #ccc' }}></div>
     </div>
   );
 };
 
-export default MeetingPoint;
+export default MeetingPointPage;
