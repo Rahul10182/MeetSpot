@@ -9,14 +9,20 @@ import LogoutIcon from '@mui/icons-material/Logout';
 import { signOut, getAuth } from 'firebase/auth';
 
 const Header = () => {
-  
+
   const auth = getAuth();
   const user = auth.currentUser;
-  const username = "User"; 
+  if (user) {
+    console.log(user);
+  } else {
+    console.log("user nahi hai bhai");
+  }
+  const username = "User";
 
   const [anchorAccount, setAnchorAccount] = useState(null);
   const [isDrawerOpen, setDrawerOpen] = useState(false);
   const [searchVisible, setSearchVisible] = useState(false);
+  const [errors , setErrors] = useState(false);
 
   const navigate = useNavigate();
   const profileMenuRef = useRef(null);
@@ -37,18 +43,24 @@ const Header = () => {
 
   const handleLogout = () => {
     signOut(auth)
-    .then(() => {
-      console.log("Logout successful");
-      navigate('/');
-    })
-    .catch((error) => {
-      console.log(error);
-    });
+      .then(() => {
+        console.log("Logout successful");
+        navigate('/');
+      })
+      .catch((error) => {
+        console.log(error);
+      });
   };
 
   const categories = ['Music', 'Business', 'Dating', 'MeetUp'];
 
-  // Close the profile menu if clicked outside
+  useEffect(() => {
+    setErrors((prev) => !prev);
+    return () => {
+      
+    };
+  }, []);
+
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (profileMenuRef.current && !profileMenuRef.current.contains(event.target)) {
@@ -69,7 +81,8 @@ const Header = () => {
           <MenuIcon fontSize="large" />
         </button>
 
-        <h1 className="text-center text-4xl font-extrabold mx-4 whitespace-nowrap transition-all duration-200">MeetSpot</h1>
+        <a href='/'>
+          <h1 className="text-center text-4xl font-extrabold mx-4 whitespace-nowrap transition-all duration-200">MeetSpot</h1></a>
 
         <div className="flex items-center mr-4">
           {searchVisible && (
@@ -88,7 +101,7 @@ const Header = () => {
           </button>
         </div>
 
-        {user && (
+        {user?(
           <div className="relative flex items-center" ref={profileMenuRef}>
             <button className="text-white focus:outline-none" onClick={handleAccountMenuClick}>
               <AccountCircle fontSize="large" />
@@ -106,16 +119,14 @@ const Header = () => {
                 </div>
               </div>
             )}
-            <span className="text-lg mx-2">Hello, {username}</span>
+            <span className="text-lg mx-2">Hello, {user.displayName}</span>
           </div>
-        )}
-
-        {!user && (
+        ):(
           <div>
             <button className="bg-blue-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-pink-600 transition duration-300 mr-2" onClick={() => handleNavigation('/auth/login')}>
               Login
             </button>
-            <button className="bg-blue-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-pink-600 transition duration-300">
+            <button className="bg-blue-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-pink-600 transition duration-300" onClick={() => handleNavigation('/auth/register')}>
               SignUp
             </button>
           </div>

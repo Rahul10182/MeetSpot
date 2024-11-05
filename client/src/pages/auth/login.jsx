@@ -15,7 +15,6 @@ function AuthLogin() {
 
     try {
         const result = await firebase.signInUserEmail(email, password);
-        console.log(result);
         navigate('/');
     } catch (err) {
         console.log(err.message);
