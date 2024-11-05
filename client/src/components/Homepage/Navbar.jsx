@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { startTransition } from 'react';
 import SearchIcon from '@mui/icons-material/Search';
@@ -6,9 +6,12 @@ import AccountCircle from '@mui/icons-material/AccountCircle';
 import MenuIcon from '@mui/icons-material/Menu';
 import SettingsIcon from '@mui/icons-material/Settings';
 import LogoutIcon from '@mui/icons-material/Logout';
+import { signOut, getAuth } from 'firebase/auth';
 
 const Header = () => {
-  const user = true; 
+  
+  const auth = getAuth();
+  const user = auth.currentUser;
   const username = "User"; 
 
   const [anchorAccount, setAnchorAccount] = useState(null);
@@ -16,6 +19,7 @@ const Header = () => {
   const [searchVisible, setSearchVisible] = useState(false);
 
   const navigate = useNavigate();
+  const profileMenuRef = useRef(null);
 
   const handleAccountMenuClick = (event) => {
     setAnchorAccount(anchorAccount ? null : event.currentTarget);
@@ -32,10 +36,30 @@ const Header = () => {
   };
 
   const handleLogout = () => {
-    // Handle logout logic
+    signOut(auth)
+    .then(() => {
+      console.log("Logout successful");
+      navigate('/');
+    })
+    .catch((error) => {
+      console.log(error);
+    });
   };
 
   const categories = ['Music', 'Business', 'Dating', 'MeetUp'];
+
+  // Close the profile menu if clicked outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (profileMenuRef.current && !profileMenuRef.current.contains(event.target)) {
+        setAnchorAccount(null);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
 
   return (
     <div className="relative w-full z-50 bg-gradient-to-r from-blue-700 to-blue-900 text-white shadow-lg" style={{ marginTop: '0' }}>
@@ -53,7 +77,7 @@ const Header = () => {
               type="text"
               placeholder="Search…"
               className="bg-transparent text-white border-b-2 border-white rounded-lg p-2 pl-10 pr-10 flex-grow max-w-xs transition duration-200 ease-in-out focus:outline-none"
-              style={{ marginRight: '0.5rem' }} // Adjust spacing here
+              style={{ marginRight: '0.5rem' }}
             />
           )}
           <button
@@ -65,7 +89,7 @@ const Header = () => {
         </div>
 
         {user && (
-          <div className="relative flex items-center">
+          <div className="relative flex items-center" ref={profileMenuRef}>
             <button className="text-white focus:outline-none" onClick={handleAccountMenuClick}>
               <AccountCircle fontSize="large" />
             </button>
@@ -87,14 +111,14 @@ const Header = () => {
         )}
 
         {!user && (
-          <>
+          <div>
             <button className="bg-blue-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-pink-600 transition duration-300 mr-2" onClick={() => handleNavigation('/auth/login')}>
               Login
             </button>
             <button className="bg-blue-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-pink-600 transition duration-300">
               SignUp
             </button>
-          </>
+          </div>
         )}
       </div>
 

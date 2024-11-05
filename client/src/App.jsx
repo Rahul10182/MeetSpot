@@ -24,7 +24,6 @@ const App = () => {
           <Route path="/unauth-page" element={<UnauthPages />} />
           <Route path="/" element={<Home/>} />
           <Route path="/meeting-point" element={<MeetingPoint />} />
-
         </Routes>
       </BrowserRouter>
     </div>
