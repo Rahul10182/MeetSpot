@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useFirebase } from '../../context/Firebase';
 import { useNavigate } from 'react-router-dom';
 import { FcGoogle } from "react-icons/fc";
+import { getAuth, onAuthStateChanged } from 'firebase/auth';
 
 function AuthRegister() {
   const firebase = useFirebase();
@@ -10,6 +11,16 @@ function AuthRegister() {
   const [conPassword, setConPassword] = useState('');
   const [error, setError] = useState(null);
   const navigate = useNavigate();
+
+  const auth = getAuth();
+  onAuthStateChanged(auth, (user) => {
+    if (user) {
+      const uid = user.uid;
+      console.log(uid)
+    } else {
+      console.log("error");
+    }
+  });
 
   const handleSubmit = async (e) => {
     e.preventDefault();
