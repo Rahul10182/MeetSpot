@@ -22,12 +22,6 @@ const Home = () => {
           </div>
 
         </main>
-
-
-        <CurrentPlace/>
-
-        <SelectLocation/>
-
       <Footer/>
     </div>
   )
