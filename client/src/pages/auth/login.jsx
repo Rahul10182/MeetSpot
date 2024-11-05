@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
+import { getAuth, onAuthStateChanged, signOut } from "firebase/auth";
 import { useFirebase } from '../../context/Firebase';
 import { useNavigate } from 'react-router-dom';
-import { FcGoogle } from 'react-icons/fc'; // Import Google icon from react-icons
+import { FcGoogle } from 'react-icons/fc';
 
 function AuthLogin() {
   const firebase = useFirebase();
@@ -19,7 +20,18 @@ function AuthLogin() {
     } catch (err) {
         console.log(err.message);
     }
-};
+  };
+
+  const auth = getAuth();
+  onAuthStateChanged(auth, (user) => {
+    if (user) {
+      const uid = user.uid;
+      console.log(uid)
+    } else {
+      console.log("error");
+    }
+  });
+  
 
 
   return (
