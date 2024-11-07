@@ -12,12 +12,6 @@ const Header = () => {
 
   const auth = getAuth();
   const user = auth.currentUser;
-  if (user) {
-    console.log(user);
-  } else {
-    console.log("user nahi hai bhai");
-  }
-  const username = "User";
 
   const [anchorAccount, setAnchorAccount] = useState(null);
   const [isDrawerOpen, setDrawerOpen] = useState(false);
@@ -45,6 +39,11 @@ const Header = () => {
     signOut(auth)
       .then(() => {
         console.log("Logout successful");
+
+        localStorage.removeItem('isAuthenticated');
+        localStorage.removeItem('userName');
+        localStorage.removeItem('userEmail');
+
         navigate('/');
       })
       .catch((error) => {
@@ -54,12 +53,6 @@ const Header = () => {
 
   const categories = ['Music', 'Business', 'Dating', 'MeetUp'];
 
-  useEffect(() => {
-    setErrors((prev) => !prev);
-    return () => {
-      
-    };
-  }, []);
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -80,6 +73,7 @@ const Header = () => {
         <button className="focus:outline-none" onClick={toggleDrawer(true)}>
           <MenuIcon fontSize="medium" /> {/* Reduced font size */}
         </button>
+
         <button onClick={() => handleNavigation('/')} className="text-center text-3xl font-semibold mx-4 whitespace-nowrap transition-all duration-200 focus:outline-none">
           MeetSpot
         </button> {/* Made "MeetSpot" clickable to navigate to homepage */}
@@ -107,8 +101,9 @@ const Header = () => {
               <AccountCircle fontSize="medium" /> {/* Reduced font size */}
             </button>
             {anchorAccount && (
-              <div className="absolute right-0 mt-32 w-40 bg-gradient-to-r from-green-400 to-blue-500 text-white rounded-lg shadow-lg z-50 transition-all duration-200 ease-in-out">
-                <div onClick={() => handleNavigation('/profile')} className="flex items-center px-4 py-2 hover:bg-blue-600 cursor-pointer transition-colors duration-200">
+              <div className="absolute right-0 mt-40 w-40 bg-gradient-to-r from-green-400 to-blue-500 text-white rounded-lg shadow-lg z-50 transition-all duration-200 ease-in-out">
+                <div onClick={() => handleNavigation('/profile/dashboard')} className="flex items-center px-4 py-2 hover:bg-blue-600 cursor-pointer transition-colors duration-200">
+
                   <AccountCircle fontSize="small" className="mr-2" /> Profile
                 </div>
                 <div onClick={() => handleNavigation('/auth/settings')} className="flex items-center px-4 py-2 hover:bg-blue-600 cursor-pointer transition-colors duration-200">
@@ -119,7 +114,7 @@ const Header = () => {
                 </div>
               </div>
             )}
-            <span className="text-sm mx-2">Hello, {username}</span> {/* Reduced font size */}
+            <span className="text-lg mx-2">Hello, {user.displayName}</span>
 
           </div>
         ):(
@@ -127,8 +122,9 @@ const Header = () => {
             <button className="bg-blue-600 text-white font-bold py-1 px-5 mx-4 rounded-lg hover:bg-pink-600 transition duration-300 mr-2 text-xl" onClick={() => handleNavigation('/auth/login')}>
               Login
             </button>
-            <button className="bg-blue-600 text-white mx-4 font-bold py-1 px-5 rounded-lg hover:bg-pink-600 transition duration-300 text-xl" onClick={() => handleNavigation('/auth/register')}>
 
+            <button className="bg-blue-600 text-white mx-4 font-bold py-1 px-5 rounded-lg hover:bg-pink-600 transition duration-300 text-xl" onClick={() => handleNavigation('/auth/register')}>
+              
               SignUp
             </button>
           </div>

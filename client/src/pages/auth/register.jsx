@@ -32,7 +32,6 @@ function AuthRegister() {
       try {
           const result = await firebase.signupUserWithEmailAndPassword(email, password);
           if(result){
-            console.log(result)
             navigate('/');
           }
       } catch (err) {
@@ -44,7 +43,6 @@ function AuthRegister() {
   const handleGoogleSignUp = async () => {
     try {
         const result = await firebase.signUpWithGoogle();
-        console.log(result);
         if(result)
           navigate('/');
     } catch (err) {

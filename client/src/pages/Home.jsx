@@ -2,10 +2,13 @@ import React from 'react'
 import Navbar from "../components/Homepage/Navbar"
 import Sliderbar from '../components/Homepage/Sliderbar'
 import Footer from '../components/Homepage/Footer'
+import { getAuth } from 'firebase/auth'
 import Events from '../components/Homepage/Events'
 import Cards from '../components/Homepage/Cards'
 
 const Home = () => {
+  const auth = getAuth();
+  const user = auth.currentUser;
   return (
     <div className="flex flex-col min-h-screen">
       
