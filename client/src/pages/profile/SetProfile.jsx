@@ -1,0 +1,102 @@
+import { Avatar, Button, Divider, Paper, TextField, Typography } from '@mui/material'
+import React from 'react'
+
+const SetProfile = () => {
+    const userData = JSON.parse(localStorage.getItem('user'));
+    const name = userData?.fullName;
+    const email = userData?.email;
+  return (
+    <div>
+      <Paper elevation={3} className="p-8 rounded-lg bg-white">
+                    <div className="flex justify-between items-center mb-8">
+                        <div className="flex items-center space-x-4">
+                            <Avatar
+                                alt={name}
+                                src="/static/images/avatar/1.jpg"
+                                sx={{ width: 80, height: 80 }}
+                            />
+                            <div>
+                                <Typography variant="h6" className="font-semibold">
+                                    {name || "User"}
+                                </Typography>
+                                <Typography variant="body2" color="textSecondary">
+                                    {email}
+                                </Typography>
+                            </div>
+                        </div>
+                        <Button
+                            variant="contained"
+                            color="primary"
+                            className="rounded-full"
+                            // onClick={handleSaveChanges}
+                        >
+                            Save Changes
+                        </Button>
+                    </div>
+                    
+                    <Divider className="mb-6" />
+
+                    {/* Form Fields with Refs */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <TextField
+                            label="Full Name"
+                            variant="outlined"
+                            fullWidth
+                            placeholder={name || "Enter your full name"}
+                            // inputRef={fullNameRef}
+                        />
+                        <TextField
+                            label="Phone No"
+                            variant="outlined"
+                            fullWidth
+                            placeholder={"You haven't entered your phone number"}
+                            // inputRef={phoneRef}
+                        />
+                        <TextField
+                            label="Gender"
+                            variant="outlined"
+                            fullWidth
+                            placeholder="Select your gender"
+                            // inputRef={genderRef}
+                        />
+                        <TextField
+                            label="Country"
+                            variant="outlined"
+                            fullWidth
+                            placeholder="Select your country"
+                            // inputRef={countryRef}
+                        />
+                        <TextField
+                            label="Language"
+                            variant="outlined"
+                            fullWidth
+                            placeholder="Enter your preferred language"
+                            // inputRef={languageRef}
+                        />
+                        <TextField
+                            label="Time Zone"
+                            variant="outlined"
+                            fullWidth
+                            placeholder="Enter your time zone"
+                            // inputRef={timeZoneRef}
+                        />
+                    </div>
+
+                    <div className="mt-8">
+                        <Typography variant="body1" className="font-semibold mb-2">
+                            My Email Address
+                        </Typography>
+                        <div className="flex items-center space-x-3 mt-2">
+                            <Avatar className="bg-blue-100 text-blue-600">M</Avatar>
+                            <div>
+                                <Typography variant="body2">{email}</Typography>
+                                <Typography variant="caption" color="textSecondary">1 month ago</Typography>
+                            </div>
+                        </div>
+                    </div>
+                </Paper>
+    </div>
+  )
+}
+
+export default SetProfile

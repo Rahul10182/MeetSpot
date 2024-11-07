@@ -21,17 +21,6 @@ function AuthLogin() {
     }
   };
 
-  const auth = getAuth();
-  onAuthStateChanged(auth, (user) => {
-    if (user) {
-      const uid = user.uid;
-      console.log(uid)
-    } else {
-      console.log("error");
-    }
-  });
-  
-
 
   return (
     <div className="space-y-8">

@@ -1,11 +1,12 @@
 import React from 'react'
 import Navbar from "../components/Homepage/Navbar"
 import Sliderbar from '../components/Homepage/Sliderbar'
-import SelectLocation from '../components/Homepage/SelectLocation'
 import Footer from '../components/Homepage/Footer'
-import CurrentPlace from '../components/Homepage/CurrentPlace'
+import { getAuth } from 'firebase/auth'
 
 const Home = () => {
+  const auth = getAuth();
+  const user = auth.currentUser;
   return (
     <div className="flex flex-col min-h-screen">
       

@@ -12,12 +12,6 @@ const Header = () => {
 
   const auth = getAuth();
   const user = auth.currentUser;
-  if (user) {
-    console.log(user);
-  } else {
-    console.log("user nahi hai bhai");
-  }
-  const username = "User";
 
   const [anchorAccount, setAnchorAccount] = useState(null);
   const [isDrawerOpen, setDrawerOpen] = useState(false);
@@ -45,6 +39,9 @@ const Header = () => {
     signOut(auth)
       .then(() => {
         console.log("Logout successful");
+        localStorage.removeItem('isAuthenticated');
+        localStorage.removeItem('userName');
+        localStorage.removeItem('userEmail');
         navigate('/');
       })
       .catch((error) => {
@@ -53,13 +50,6 @@ const Header = () => {
   };
 
   const categories = ['Music', 'Business', 'Dating', 'MeetUp'];
-
-  useEffect(() => {
-    setErrors((prev) => !prev);
-    return () => {
-      
-    };
-  }, []);
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -108,7 +98,7 @@ const Header = () => {
             </button>
             {anchorAccount && (
               <div className="absolute right-0 mt-40 w-40 bg-gradient-to-r from-green-400 to-blue-500 text-white rounded-lg shadow-lg z-50 transition-all duration-200 ease-in-out">
-                <div onClick={() => handleNavigation('/profile')} className="flex items-center px-4 py-2 hover:bg-blue-600 cursor-pointer transition-colors duration-200">
+                <div onClick={() => handleNavigation('/profile/dashboard')} className="flex items-center px-4 py-2 hover:bg-blue-600 cursor-pointer transition-colors duration-200">
                   <AccountCircle fontSize="small" className="mr-2" /> Profile
                 </div>
                 <div onClick={() => handleNavigation('/auth/settings')} className="flex items-center px-4 py-2 hover:bg-blue-600 cursor-pointer transition-colors duration-200">
