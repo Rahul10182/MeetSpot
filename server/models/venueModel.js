@@ -21,8 +21,8 @@ const venueSchema = new mongoose.Schema({
         }
     },
     address: String,
-    
-});
+    //lastvisited: Date.now
+},{timestamps:true});
 
 // Create a geospatial index on the location field
 venueSchema.index({ location: '2dsphere' });

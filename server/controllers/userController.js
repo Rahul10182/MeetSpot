@@ -1,7 +1,5 @@
 import jwt from "jsonwebtoken";
 import { User } from "../models/userModel.js";
-import {Location} from "../models/locationModel.js";
-
 
 // User Registration
 export const register = async (req, res) => {
@@ -112,7 +110,7 @@ export const logout = async (req, res) => {
 // Update User Profile
 export const updateProfile = async (req, res) => {
     try {
-        const { fullName, location, phoneNumber, bio } = req.body;
+        const { fullName, phoneNumber, bio } = req.body;
         const userId = req.userId;
 
         let user = await User.findById(userId);
@@ -128,24 +126,6 @@ export const updateProfile = async (req, res) => {
         if (fullName) user.fullName = fullName;
         if (phoneNumber) user.profile.phoneNumber = phoneNumber;
         if (bio) user.profile.bio = bio;
-
-        // Update or create location
-        if (location && location.latitude && location.longitude) {
-            let userLocation;
-            
-            if (user.location) {
-                // Update existing location
-                userLocation = await Location.findByIdAndUpdate(
-                    user.location,
-                    { latitude: location.latitude, longitude: location.longitude },
-                    { new: true }
-                );
-            } else {
-                // Create new location and link it to the user
-                userLocation = await Location.create(location);
-                user.location = userLocation._id;
-            }
-        }
 
         await user.save();
 

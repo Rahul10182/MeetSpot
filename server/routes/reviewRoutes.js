@@ -5,12 +5,14 @@ import {
     deleteReview,
     getVenueReviews
 } from "../controllers/reviewController.js";
+import isAuthenticated from '../middlewares/Auth.js';
 
 const router = express.Router();
 
-router.post("/reviews", createReview);
-router.put("/reviews/:reviewId", updateReview);
-router.delete("/reviews/:reviewId", deleteReview);
-router.get("/venues/:venueId/reviews", getVenueReviews);
+router.route("/create").post(isAuthenticated, createReview);
+router.route("/update/:reviewId").put(isAuthenticated, updateReview);
+router.route("/delete/:reviewId").delete(isAuthenticated, deleteReview);
+
+router.route("/get/:venueId/reviews").get(isAuthenticated, getVenueReviews);
 
 export default router;
