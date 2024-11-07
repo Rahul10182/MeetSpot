@@ -9,14 +9,20 @@ import LogoutIcon from '@mui/icons-material/Logout';
 import { signOut, getAuth } from 'firebase/auth';
 
 const Header = () => {
-  
+
   const auth = getAuth();
   const user = auth.currentUser;
-  const username = "User"; 
+  if (user) {
+    console.log(user);
+  } else {
+    console.log("user nahi hai bhai");
+  }
+  const username = "User";
 
   const [anchorAccount, setAnchorAccount] = useState(null);
   const [isDrawerOpen, setDrawerOpen] = useState(false);
   const [searchVisible, setSearchVisible] = useState(false);
+  const [errors , setErrors] = useState(false);
 
   const navigate = useNavigate();
   const profileMenuRef = useRef(null);
@@ -37,18 +43,24 @@ const Header = () => {
 
   const handleLogout = () => {
     signOut(auth)
-    .then(() => {
-      console.log("Logout successful");
-      navigate('/');
-    })
-    .catch((error) => {
-      console.log(error);
-    });
+      .then(() => {
+        console.log("Logout successful");
+        navigate('/');
+      })
+      .catch((error) => {
+        console.log(error);
+      });
   };
 
   const categories = ['Music', 'Business', 'Dating', 'MeetUp'];
 
-  // Close the profile menu if clicked outside
+  useEffect(() => {
+    setErrors((prev) => !prev);
+    return () => {
+      
+    };
+  }, []);
+
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (profileMenuRef.current && !profileMenuRef.current.contains(event.target)) {
@@ -68,7 +80,6 @@ const Header = () => {
         <button className="focus:outline-none" onClick={toggleDrawer(true)}>
           <MenuIcon fontSize="medium" /> {/* Reduced font size */}
         </button>
-
         <button onClick={() => handleNavigation('/')} className="text-center text-3xl font-semibold mx-4 whitespace-nowrap transition-all duration-200 focus:outline-none">
           MeetSpot
         </button> {/* Made "MeetSpot" clickable to navigate to homepage */}
@@ -90,7 +101,7 @@ const Header = () => {
           </button>
         </div>
 
-        {user && (
+        {user?(
           <div className="relative flex items-center" ref={profileMenuRef}>
             <button className="text-white focus:outline-none" onClick={handleAccountMenuClick}>
               <AccountCircle fontSize="medium" /> {/* Reduced font size */}
@@ -109,15 +120,15 @@ const Header = () => {
               </div>
             )}
             <span className="text-sm mx-2">Hello, {username}</span> {/* Reduced font size */}
-          </div>
-        )}
 
-        {!user && (
+          </div>
+        ):(
           <div>
             <button className="bg-blue-600 text-white font-bold py-1 px-5 mx-4 rounded-lg hover:bg-pink-600 transition duration-300 mr-2 text-xl" onClick={() => handleNavigation('/auth/login')}>
               Login
             </button>
             <button className="bg-blue-600 text-white mx-4 font-bold py-1 px-5 rounded-lg hover:bg-pink-600 transition duration-300 text-xl" onClick={() => handleNavigation('/auth/register')}>
+
               SignUp
             </button>
           </div>

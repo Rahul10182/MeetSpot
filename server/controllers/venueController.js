@@ -53,7 +53,7 @@ export const getVenueSuggestions = async (req, res) => {
                 }
             });
 
-            console.log("Google Places API Response:", response.data);  // Debugging log
+            // console.log("Google Places API Response:", response.data);  // Debugging log
 
             venues = response.data.results.map(place => ({
                 venueId: place.place_id,
@@ -125,12 +125,12 @@ export const getVenueSuggestions = async (req, res) => {
                 ...venue,
                 user1Duration,
                 user2Duration,
-                diffDuration: Math.abs(user1Duration - user2Duration)
+                totalDuration: Math.abs(user1Duration + user2Duration)
             };
         }));
 
         // sort by total time taken
-        const sortedVenues = venueWithDurations.sort((a, b) => Math.abs(a.diffDuration - b.diffDuration));
+        const sortedVenues = venueWithDurations.sort((a, b) => Math.abs(a.totalDuration - b.totalDuration));
 
         res.status(200).json({
             message: "Venue suggestions are:",
