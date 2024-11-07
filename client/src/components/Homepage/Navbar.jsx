@@ -63,20 +63,22 @@ const Header = () => {
 
   return (
     <div className="relative w-full z-50 bg-gradient-to-r from-blue-700 to-blue-900 text-white shadow-lg" style={{ marginTop: '0' }}>
-      <div className="flex items-center justify-between p-4">
+      <div className="flex items-center justify-between p-3"> {/* Reduced padding from p-4 to p-3 */}
 
         <button className="focus:outline-none" onClick={toggleDrawer(true)}>
-          <MenuIcon fontSize="large" />
+          <MenuIcon fontSize="medium" /> {/* Reduced font size */}
         </button>
 
-        <h1 className="text-center text-4xl font-extrabold mx-4 whitespace-nowrap transition-all duration-200">MeetSpot</h1>
+        <button onClick={() => handleNavigation('/')} className="text-center text-3xl font-semibold mx-4 whitespace-nowrap transition-all duration-200 focus:outline-none">
+          MeetSpot
+        </button> {/* Made "MeetSpot" clickable to navigate to homepage */}
 
         <div className="flex items-center mr-4">
           {searchVisible && (
             <input
               type="text"
               placeholder="Search…"
-              className="bg-transparent text-white border-b-2 border-white rounded-lg p-2 pl-10 pr-10 flex-grow max-w-xs transition duration-200 ease-in-out focus:outline-none"
+              className="bg-transparent text-white border-b-2 border-white rounded-lg p-2 pl-8 pr-8 flex-grow max-w-xs transition duration-200 ease-in-out focus:outline-none"
               style={{ marginRight: '0.5rem' }}
             />
           )}
@@ -84,17 +86,17 @@ const Header = () => {
             className="bg-blue-600 text-white p-2 rounded-lg hover:bg-blue-500 transition duration-300 focus:outline-none"
             onClick={() => setSearchVisible((prev) => !prev)}
           >
-            <SearchIcon fontSize="large" />
+            <SearchIcon fontSize="medium" /> {/* Reduced font size */}
           </button>
         </div>
 
         {user && (
           <div className="relative flex items-center" ref={profileMenuRef}>
             <button className="text-white focus:outline-none" onClick={handleAccountMenuClick}>
-              <AccountCircle fontSize="large" />
+              <AccountCircle fontSize="medium" /> {/* Reduced font size */}
             </button>
             {anchorAccount && (
-              <div className="absolute right-0 mt-40 w-40 bg-gradient-to-r from-green-400 to-blue-500 text-white rounded-lg shadow-lg z-50 transition-all duration-200 ease-in-out">
+              <div className="absolute right-0 mt-32 w-40 bg-gradient-to-r from-green-400 to-blue-500 text-white rounded-lg shadow-lg z-50 transition-all duration-200 ease-in-out">
                 <div onClick={() => handleNavigation('/profile')} className="flex items-center px-4 py-2 hover:bg-blue-600 cursor-pointer transition-colors duration-200">
                   <AccountCircle fontSize="small" className="mr-2" /> Profile
                 </div>
@@ -106,16 +108,16 @@ const Header = () => {
                 </div>
               </div>
             )}
-            <span className="text-lg mx-2">Hello, {username}</span>
+            <span className="text-sm mx-2">Hello, {username}</span> {/* Reduced font size */}
           </div>
         )}
 
         {!user && (
           <div>
-            <button className="bg-blue-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-pink-600 transition duration-300 mr-2" onClick={() => handleNavigation('/auth/login')}>
+            <button className="bg-blue-600 text-white font-bold py-1 px-5 mx-4 rounded-lg hover:bg-pink-600 transition duration-300 mr-2 text-xl" onClick={() => handleNavigation('/auth/login')}>
               Login
             </button>
-            <button className="bg-blue-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-pink-600 transition duration-300">
+            <button className="bg-blue-600 text-white mx-4 font-bold py-1 px-5 rounded-lg hover:bg-pink-600 transition duration-300 text-xl" onClick={() => handleNavigation('/auth/register')}>
               SignUp
             </button>
           </div>

@@ -4,7 +4,7 @@ import Venue from "../models/venueModel.js"
 import calculateMidpoint from '../utils/midpointUtil.js';
 import { getDistance } from "../utils/getDistance.js"
 
-const GO_MAPS_API_KEY = "AlzaSyWcyYg2Xqih4OF2nDQ32cuHLHaQ8GGQ5JZ";
+const GO_MAPS_API_KEY = "AlzaSyk6pT6UN3zX7mvm6vOtGmO3TtIN9iKR-rH";
 
 
 export const getVenueSuggestions = async (req, res) => {
