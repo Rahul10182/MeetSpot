@@ -14,10 +14,6 @@ const userSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId, 
         ref: 'Review' 
     }],
-    location: { 
-        type: mongoose.Schema.Types.ObjectId, 
-        ref: 'Location' 
-    },
     profile: {
         bio: { type: String },
         phoneNumber: { type: Number },
