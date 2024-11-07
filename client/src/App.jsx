@@ -7,7 +7,7 @@ import AuthLogin from './pages/auth/login';
 import AuthRegister from './pages/auth/register'; 
 import UnauthPages from './pages/unauth-page'; 
 import Home from './pages/Home';
-import MeetingPoint from './components/Map/MeetingPoint';
+import MeetingPoint from './pages/MeetingPoint';
 import SettingsPage from './pages/profile/Settings';
 import UserDashboard from './pages/profile/ProfileDetail';
 import PrivateRoute from './pages/protectedRoute';

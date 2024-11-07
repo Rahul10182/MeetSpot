@@ -1,6 +1,6 @@
 import React from 'react'
 
-const SelectLocation = () => {
+const Events = () => {
   return (
     <div>
       
@@ -8,4 +8,4 @@ const SelectLocation = () => {
   )
 }
 
-export default SelectLocation
+export default Events

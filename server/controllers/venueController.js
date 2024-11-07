@@ -4,7 +4,7 @@ import Venue from "../models/venueModel.js"
 import calculateMidpoint from '../utils/midpointUtil.js';
 import { getDistance } from "../utils/getDistance.js"
 
-const GO_MAPS_API_KEY = "AlzaSyWcyYg2Xqih4OF2nDQ32cuHLHaQ8GGQ5JZ";
+const GO_MAPS_API_KEY = "AlzaSyk6pT6UN3zX7mvm6vOtGmO3TtIN9iKR-rH";
 
 
 export const getVenueSuggestions = async (req, res) => {
@@ -53,7 +53,7 @@ export const getVenueSuggestions = async (req, res) => {
                 }
             });
 
-            console.log("Google Places API Response:", response.data);  // Debugging log
+            // console.log("Google Places API Response:", response.data);  // Debugging log
 
             venues = response.data.results.map(place => ({
                 venueId: place.place_id,
@@ -125,12 +125,12 @@ export const getVenueSuggestions = async (req, res) => {
                 ...venue,
                 user1Duration,
                 user2Duration,
-                diffDuration: Math.abs(user1Duration - user2Duration)
+                totalDuration: Math.abs(user1Duration + user2Duration)
             };
         }));
 
         // sort by total time taken
-        const sortedVenues = venueWithDurations.sort((a, b) => Math.abs(a.diffDuration - b.diffDuration));
+        const sortedVenues = venueWithDurations.sort((a, b) => Math.abs(a.totalDuration - b.totalDuration));
 
         res.status(200).json({
             message: "Venue suggestions are:",

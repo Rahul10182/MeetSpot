@@ -5,6 +5,7 @@ import dotenv from "dotenv";
 import  connectDB from './config/database.js';
 import userRoutes from "./routes/authRoutes.js"
 import venueRoutes from "./routes/venueRoutes.js"
+import reviewRoutes from "./routes/reviewRoutes.js"
 
 dotenv.config();
 connectDB();
@@ -28,6 +29,7 @@ app.get('/', (req, res) => {
 
 app.use('/authenticate', userRoutes);
 app.use('/api/v1/venue', venueRoutes);
+app.use('/api/v1/review', reviewRoutes);
 
 app.listen(PORT, () => {
     console.log(`Server Is Running On Port ${PORT}`);

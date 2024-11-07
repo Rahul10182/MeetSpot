@@ -12,6 +12,16 @@ function AuthRegister() {
   const [error, setError] = useState(null);
   const navigate = useNavigate();
 
+  const auth = getAuth();
+  onAuthStateChanged(auth, (user) => {
+    if (user) {
+      const uid = user.uid;
+      console.log(uid)
+    } else {
+      console.log("error");
+    }
+  });
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (password !== conPassword) {
