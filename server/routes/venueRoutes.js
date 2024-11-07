@@ -6,7 +6,7 @@ import isAuthenticated from '../middlewares/Auth.js';
 const router = express.Router();
 
 router.route("/get").post( getVenueSuggestions);
-router.route("/select").post(isAuthenticated, selectVenue);
+router.route("/select").post( selectVenue);
 
 
 export default router;

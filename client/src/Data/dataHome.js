@@ -3,19 +3,19 @@ const dataHomes = [
       id: 1,
       title: "City Park Pavilion",
       description: "A serene spot in the heart of the city, perfect for group gatherings and casual meetings.",
-      imgSrc: "https://media.istockphoto.com/id/1415056777/photo/spacious-tent-in-the-garden-for-a-wedding-party.jpg?s=612x612&w=0&k=20&c=sZf98Yvxb87mSY96ylCyeBgiB_GM_8AzJFYy674iYZQ=", // Replace with an actual image URL
+      imgSrc: "https://media.gettyimages.com/id/899829138/photo/park-pedestrian-walkway-toward-modern-skyscrapers.jpg?s=612x612&w=0&k=20&c=MtDulMpQaJaFI1jbTw-weLm3xJCzgi2ic50bhG71n00=", // Replace with an actual image URL
     },
     {
       id: 2,
       title: "Riverside Cafe",
       description: "Enjoy beautiful river views while meeting with friends or colleagues at this cozy cafe.",
-      imgSrc: "https://media.gettyimages.com/id/1495733716/photo/cafe-on-the-bank-of-seine-river-on-a-sunny-day-paris-france.jpg?s=612x612&w=0&k=20&c=uG9BOV4UR6_NWceAJavb5AfaPhn4b3C1X_GU86vZEj4=", // Replace with an actual image URL
+      imgSrc: "https://media.istockphoto.com/id/1184219436/photo/sidewalk-restaurants-at-night-in-the-petite-france-historic-quarter-in-strasbourg-france.jpg?s=612x612&w=0&k=20&c=aVLLYO_KTTgFUXNJaxXHWUO3LlBjV71Z68RV5gqqDwk=", // Replace with an actual image URL
     },
     {
       id: 3,
       title: "Urban Garden",
       description: "A peaceful community garden that’s ideal for relaxing and meeting new people.",
-      imgSrc: "https://media.gettyimages.com/id/161099827/photo/city-park.jpg?s=612x612&w=0&k=20&c=Q0Zpg2mQK8ecsyjg2rilsFzNp5AMHn8x4olMOpURKz0=", // Replace with an actual image URL
+      imgSrc: "https://images.pexels.com/photos/5876680/pexels-photo-5876680.jpeg?auto=compress&cs=tinysrgb&w=600", // Replace with an actual image URL
     },
     {
       id: 4,

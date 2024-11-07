@@ -5,7 +5,7 @@ import AuthLogin from './pages/auth/login';
 import AuthRegister from './pages/auth/register'; // Import the AuthRegister component
 import UnauthPages from './pages/unauth-page'; // Import the UnauthPages component
 import Home from './pages/Home';
-import MeetingPoint from './components/Map/MeetingPoint';
+import MeetingPoint from './pages/MeetingPoint';
 import SettingsPage from './pages/profile/Settings';
 import UserDashboard from './pages/profile/ProfileDetail';
 

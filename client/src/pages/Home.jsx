@@ -1,9 +1,9 @@
 import React from 'react'
 import Navbar from "../components/Homepage/Navbar"
 import Sliderbar from '../components/Homepage/Sliderbar'
-import SelectLocation from '../components/Homepage/SelectLocation'
 import Footer from '../components/Homepage/Footer'
-import CurrentPlace from '../components/Homepage/CurrentPlace'
+import Events from '../components/Homepage/Events'
+import Cards from '../components/Homepage/Cards'
 
 const Home = () => {
   return (
@@ -11,7 +11,12 @@ const Home = () => {
       
       <Navbar/>
 
+      <br></br>
+
       <Sliderbar/>
+
+      <br></br>
+      <br></br>
 
         <main className="flex flex-grow container justify-center mx-auto px-4 py-8">
           <div className=' flex justify-center items-center flex-col'>
@@ -22,6 +27,23 @@ const Home = () => {
           </div>
 
         </main>
+        
+        <br></br>
+
+      
+      <Events/>
+
+
+
+      <div className=' text-gray-600 font-bold text-3xl flex justify-center '> There Are Some Beautiful Places In INDIA</div>
+
+      <Cards/>
+
+        <br></br>
+        <br></br>      
+        <br></br>      
+        <br></br>      
+
       <Footer/>
     </div>
   )
