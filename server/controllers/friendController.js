@@ -1,4 +1,3 @@
-
 import { User } from '../models/userModel.js'; 
 
 export const showFriends = async (req, res) => {
@@ -12,7 +11,7 @@ export const showFriends = async (req, res) => {
         const friendsData = user.friends.map(friend => ({
             name: friend.fullName,
             email: friend.email,
-            firebaseID: friend.fireBaseId // use 'fireBaseId' as defined in the schema
+            firebaseID: friend.fireBaseId 
         }));
 
         res.json(friendsData);
@@ -100,7 +99,6 @@ export const sentFrienReqest = async (req, res) => {
 
         res.json(friendsData);
     } catch (error) {
-        // Log error for debugging
         console.error('Error in createFriendRequest:', error.message);
         res.status(500).json({ error: error.message });
     }
@@ -143,9 +141,9 @@ export const acceptFriendRequest = async (req, res) => {
 
 export const rejectFriendRequest = async (req, res) => {
     try {
-        const { firebaseID1, firebaseID2 } = req.body;
+        const { userID, firebaseID2 } = req.body;
 
-        const user1 = await User.findOne({ fireBaseId: firebaseID1 });
+        const user1 = await User.findById(userID);
         const user2 = await User.findOne({ fireBaseId: firebaseID2 });
 
         if (!user1 || !user2) {
@@ -195,6 +193,3 @@ export const deleteFriend = async (req, res) => {
         res.status(500).json({ error: error.message });
     }
 };
-
-
-

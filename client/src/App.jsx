@@ -39,17 +39,18 @@ const App = () => {
           firebaseID: user.uid,
           email: user.email,
         };
+        setFirebaseId(user.uid);
         console.log(userData)
 
         localStorage.setItem('user', JSON.stringify(userData));
 
-        axios.post('http://localhost:3000/authenticate', userData)
+        axios.post('http://localhost:3000/api/v1/user/authenticate', userData)
           .then(response => {
           })
           .catch(error => {
             console.error('Error during authentication request:', error);
           });
-          setFirebaseId(user.uid);
+
         setAuthenticated(true);
       } else {
         setAuthenticated(false);
@@ -89,7 +90,7 @@ const App = () => {
           <Route path="/unauth-page" element={<UnauthPages />} />
           <Route path="/" element={<Home />} />
           <Route path="/meeting-point" element={<MeetingPoint />} />
-          <Route path="/chat" element={<ChatPage firebaseId={firebaseId} />} />
+          <Route path="/chat" element={<ChatPage firebaseID={firebaseId} />} />
         </Routes>
       </BrowserRouter>
     </div>
