@@ -6,5 +6,5 @@ import {authenticate} from "../controllers/userController.js";
 const router = express.Router();
 
 
-router.route("/").post(authenticate);
+router.route("/authenticate").post(authenticate);
 export default router;

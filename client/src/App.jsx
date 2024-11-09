@@ -17,6 +17,7 @@ import FriendList from './pages/profile/oldFriend';
 import FriendRequest from './pages/profile/reqFriend';
 import FriendRequestSent from './pages/profile/FriendReqSent';
 import ChatPage from './pages/ChatPage';
+import EventsPage from './pages/Eventpage';
 
 
 
@@ -43,7 +44,7 @@ const App = () => {
 
         localStorage.setItem('user', JSON.stringify(userData));
 
-        axios.post('http://localhost:3000/authenticate', userData)
+        axios.post('http://localhost:3000/api/v1/user/authenticate', userData)
           .then(response => {
           })
           .catch(error => {
@@ -90,6 +91,7 @@ const App = () => {
           <Route path="/" element={<Home />} />
           <Route path="/meeting-point" element={<MeetingPoint />} />
           <Route path="/chat" element={<ChatPage firebaseId={firebaseId} />} />
+          <Route path="/events" element={<EventsPage/>}  />
         </Routes>
       </BrowserRouter>
     </div>
