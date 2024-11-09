@@ -7,11 +7,17 @@ import MenuIcon from '@mui/icons-material/Menu';
 import SettingsIcon from '@mui/icons-material/Settings';
 import LogoutIcon from '@mui/icons-material/Logout';
 import { signOut, getAuth } from 'firebase/auth';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+
 
 const Header = () => {
 
   const auth = getAuth();
+  console.log(auth.currentUser);
   const user = auth.currentUser;
+  const userData = JSON.parse(localStorage.getItem('user'));
+  const name = userData?.fullName;
 
   const [anchorAccount, setAnchorAccount] = useState(null);
   const [isDrawerOpen, setDrawerOpen] = useState(false);
@@ -38,16 +44,16 @@ const Header = () => {
   const handleLogout = () => {
     signOut(auth)
       .then(() => {
-        console.log("Logout successful");
+        localStorage.removeItem('user');
 
-        localStorage.removeItem('isAuthenticated');
-        localStorage.removeItem('userName');
-        localStorage.removeItem('userEmail');
+        toast.success('You are Logged out');
 
         navigate('/');
+        
       })
       .catch((error) => {
         console.log(error);
+        toast.error('Failed to log out');
       });
   };
 
@@ -95,7 +101,7 @@ const Header = () => {
           </button>
         </div>
 
-        {user?(
+        {userData?(
           <div className="relative flex items-center" ref={profileMenuRef}>
             <button className="text-white focus:outline-none" onClick={handleAccountMenuClick}>
               <AccountCircle fontSize="medium" /> {/* Reduced font size */}
@@ -114,7 +120,7 @@ const Header = () => {
                 </div>
               </div>
             )}
-            <span className="text-lg mx-2">Hello, {user.displayName}</span>
+            <span className="text-lg mx-2">Hello, {name}</span>
 
           </div>
         ):(

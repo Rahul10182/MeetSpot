@@ -4,7 +4,7 @@ import Venue from "../models/venueModel.js"
 import calculateMidpoint from '../utils/midpointUtil.js';
 import { getDistance } from "../utils/getDistance.js"
 
-const GO_MAPS_API_KEY = "AlzaSyk6pT6UN3zX7mvm6vOtGmO3TtIN9iKR-rH";
+const GO_MAPS_API_KEY = "AlzaSywFl8hTnkxrZmvVDkLTfmgRzbUHXtpQg1F";
 
 
 export const getVenueSuggestions = async (req, res) => {
@@ -146,68 +146,82 @@ export const getVenueSuggestions = async (req, res) => {
 };
 
 
-// Store the selected venue in user's profile
+
 export const selectVenue = async (req, res) => {
-    const { userId, venueId, isNew, name, type, latitude, longitude, address } = req.body;
+  const { firebaseId, venueId, isNew, name, type, latitude, longitude, address } = req.body;
 
-    try {
-        // Find the user
-        const user = await User.findById(userId);
-        if (!user) {
-            return res.status(404).json({ message: 'User not found', success: false });
-        }
+  try {
 
-        let venue;
-
-        if (isNew) {
-            // Create a new venue if it is searched from api 
-            venue = new Venue({
-                name,
-                type,
-                location: {  // Correct GeoJSON format
-                    type: 'Point',
-                    coordinates: [longitude, latitude]  
-                },
-                address
-            });
-            await venue.save();
-        } else {
-            // if old venue already in database 
-            venue = await Venue.findById(venueId);
-            if (!venue) {
-                return res.status(404).json({
-                    message: 'Venue not found',
-                    success: false
-                });
-            }
-        }
-
-        //venue already visited
-        if (user.profile.venues.includes(venue._id)) {
-            return res.status(400).json({
-                message: 'Venue already selected',
-                success: false
-            });
-        }
-
-        // Add the venue to the user's profile
-        user.profile.venues.push(venue._id);
-        await user.save();
-
-        res.status(201).json({
-            message: "Venue selected successfully",
-            venue: {
-                venueId: venue._id,
-                name: venue.name,
-                type: venue.type,
-                latitude: venue.location.coordinates[1],  
-                longitude: venue.location.coordinates[0], 
-                address: venue.address
-            },
-            success: true
-        });
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ message: "Failed to select venue", success: false });
+    console.log(firebaseId);
+    console.log(venueId);
+    console.log(isNew);
+    console.log(name);
+    console.log(type);
+    console.log(latitude);
+    console.log(longitude);
+    console.log(address);
+    // Validate input
+    if (!firebaseId) return res.status(400).json({ message: "Firebase ID is required", success: false });
+    if (isNew && (!name || !type || !latitude || !longitude)) {
+      return res.status(400).json({ message: "Missing required fields for new venue", success: false });
     }
+
+    // Validate latitude and longitude
+    if (isNew && (typeof latitude !== 'number' || typeof longitude !== 'number')) {
+      return res.status(400).json({ message: "Latitude and Longitude must be numbers", success: false });
+    }
+
+    // Find the user
+    const user = await User.findOne({ fireBaseId : firebaseId});
+    if (!user) {
+      return res.status(404).json({ message: "User not found", success: false });
+    }
+
+    let venue;
+
+    if (isNew) {
+      // Create a new venue
+      venue = new Venue({
+        name,
+        type,
+        location: {
+          type: 'Point',
+          coordinates: [longitude, latitude],
+        },
+        address,
+      });
+      await venue.save();
+    } else {
+      // Retrieve existing venue
+      venue = await Venue.findById(venueId);
+      if (!venue) {
+        return res.status(404).json({ message: "Venue not found", success: false });
+      }
+    }
+
+    // Check if venue is already visited
+    if (user.profile.venues.includes(venue._id)) {
+      return res.status(400).json({ message: "Venue already selected", success: false });
+    }
+
+    // Add venue to user's profile
+    user.profile.venues.push(venue._id);
+    await user.save();
+
+    res.status(201).json({
+      message: "Venue selected successfully",
+      venue: {
+        venueId: venue._id,
+        name: venue.name,
+        type: venue.type,
+        latitude: venue.location.coordinates[1],
+        longitude: venue.location.coordinates[0],
+        address: venue.address,
+      },
+      success: true,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Failed to select venue", success: false });
+  }
 };

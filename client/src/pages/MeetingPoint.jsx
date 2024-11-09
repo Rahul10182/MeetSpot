@@ -17,7 +17,7 @@ const MeetingPointPage = () => {
     const loadGoMapsAPI = () => {
       if (!window.gomaps) {
         const script = document.createElement('script');
-        script.src = `https://maps.gomaps.pro/maps/api/js?key=AlzaSyk6pT6UN3zX7mvm6vOtGmO3TtIN9iKR-rH&libraries=places`;
+        script.src = `https://maps.gomaps.pro/maps/api/js?key=AlzaSywFl8hTnkxrZmvVDkLTfmgRzbUHXtpQg1F&libraries=places`;
         script.async = true;
         script.defer = true;
         script.onload = initializeMap;

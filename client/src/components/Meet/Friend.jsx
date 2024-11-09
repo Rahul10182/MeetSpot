@@ -3,6 +3,8 @@ import { useDispatch } from 'react-redux';
 import axios from 'axios';
 import { setLocation } from '../../store/location-slice/locationSlice';
 import { Box, TextField, Button, Typography, Card, CardContent, CircularProgress } from '@mui/material';
+const apiKey = "AlzaSywFl8hTnkxrZmvVDkLTfmgRzbUHXtpQg1F";
+
 
 const Friend = ({ map }) => {
   const dispatch = useDispatch();
@@ -20,6 +22,12 @@ const Friend = ({ map }) => {
   const [directionsRenderers, setDirectionsRenderers] = useState([]);
   const [loading, setLoading] = useState(false);
   const [successMessage, setSuccessMessage] = useState('');
+  const [errorMessage, setErrorMessage] = useState('');
+  const [activeSection, setActiveSection] = useState('SetLocations');
+  const [distances, setDistances] = useState({});
+
+  const userData = JSON.parse(localStorage.getItem('user'));
+  const firebaseId = userData?.firebaseID;
 
   useEffect(() => {
     if (!window.google || !map) return;
@@ -73,6 +81,20 @@ const Friend = ({ map }) => {
     setVenueMarkers([]);
   };
 
+  const fetchDistance = async (originLat, originLng, destLat, destLng) => {
+    const origin = `${originLat},${originLng}`;
+    const destination = `${destLat},${destLng}`;
+    const url = `https://maps.gomaps.pro/maps/api/distancematrix/json?origins=${origin}&destinations=${destination}&key=${apiKey}`;
+    try {
+      const response = await axios.get(url);
+      return response.data.rows[0].elements[0].distance.text;
+    } catch (error) {
+      console.error('Error fetching distance:', error);
+      return 'N/A';
+    }
+  };
+
+
   const addDirectionRenderer = (origin, destination) => {
     const directionsService = new window.google.maps.DirectionsService();
     const directionsRenderer = new window.google.maps.DirectionsRenderer({
@@ -111,17 +133,38 @@ const Friend = ({ map }) => {
         type: venueType,
       });
 
-      setVenues(response.data.venues);
+      const venuesWithDistances = await Promise.all(
+        response.data.venues.map(async (venue) => {
+          const userDistance = await fetchDistance(
+            userLocation.latitude,
+            userLocation.longitude,
+            venue.latitude,
+            venue.longitude
+          );
+          const friendDistance = await fetchDistance(
+            friendLocation.latitude,
+            friendLocation.longitude,
+            venue.latitude,
+            venue.longitude
+          );
+          return { ...venue, userDistance, friendDistance };
+        })
+      );
+
+
+      // setVenues(response.data.venues);
+      setVenues(venuesWithDistances);
       setOpenVenueBox(true);
 
-      clearVenueMarkers(); // Clear previous markers
-      const newVenueMarkers = response.data.venues.map((venue) =>
-        new window.google.maps.Marker({
+      clearVenueMarkers();
+      const newVenueMarkers = response.data.venues.map((venue) => {
+        const marker = new window.google.maps.Marker({
           position: { lat: venue.latitude, lng: venue.longitude },
           map,
           title: venue.name,
-        })
-      );
+        });
+        return marker;
+      });
       setVenueMarkers(newVenueMarkers);
     } catch (error) {
       alert('Error fetching venues.');
@@ -130,14 +173,18 @@ const Friend = ({ map }) => {
     }
   };
 
-  const handleSelectVenue = (venue, marker) => {
+  const handleSelectVenue = (venue) => {
     clearPreviousRenderers();
     clearVenueMarkers();
 
-    setSelectedVenue(venue);
+    const venueMarker = new window.google.maps.Marker({
+      position: { lat: venue.latitude, lng: venue.longitude },
+      map,
+      title: venue.name,
+    });
 
-    marker.setMap(map);
-    setVenueMarkers([marker]);
+    setSelectedVenue(venue);
+    setVenueMarkers([venueMarker]);
 
     const venueLocation = new window.google.maps.LatLng(venue.latitude, venue.longitude);
     const userLocationCoords = new window.google.maps.LatLng(userLocation.latitude, userLocation.longitude);
@@ -146,100 +193,195 @@ const Friend = ({ map }) => {
     addDirectionRenderer(userLocationCoords, venueLocation);
     addDirectionRenderer(friendLocationCoords, venueLocation);
 
+    map.setCenter(venueLocation);
+
     setVenues([venue]);
   };
 
   const handleConfirmVenue = async () => {
+    if (!selectedVenue) {
+      console.error('No venue selected');
+      return;
+    }
+  
+    const venuePayload = {
+      firebaseId,
+      venueId: selectedVenue.id || selectedVenue.venueId,
+      isNew: true,
+      name: selectedVenue.name,
+      type: selectedVenue.type,
+      latitude: selectedVenue.latitude,
+      longitude: selectedVenue.longitude,
+      address: selectedVenue.address,
+    };
+  
     try {
-      await axios.post('http://localhost:3000/api/v1/venue/select', selectedVenue);
-      setSuccessMessage(`Your meeting is scheduled at ${selectedVenue.name}`);
+      const response = await axios.post('http://localhost:3000/api/v1/venue/select', venuePayload);
+  
+      // Set success message and navigate to FixMeeting section
+      setSuccessMessage(
+        `Meeting is fixed at this venue: ${selectedVenue.name}. Your distance: ${selectedVenue.userDistance}, Friend's distance: ${selectedVenue.friendDistance}`
+      );
+
+      setErrorMessage(''); // Clear any previous error messages
+      setActiveSection('FixMeeting'); // Switch to FixMeeting section
+  
+      // Remove only the selected card
+      setVenues((prevVenues) => prevVenues.filter((v) => v !== selectedVenue));
+      setSelectedVenue(null); // Reset the selection
     } catch (error) {
-      alert('Error confirming the venue.');
+      setErrorMessage('Error confirming the venue.');
+      console.error('AxiosError:', error);
+      console.error('Response:', error.response?.data);
+    }
+  };
+  
+
+  const handleSidebarClick = (section) => {
+    setActiveSection(section);
+    if (section === 'FixMeeting') {
+      setSuccessMessage('');
     }
   };
 
   return (
-    <Box sx={{ display: 'flex', padding: 2 }}>
-      <Box sx={{ width: openVenueBox ? '50%' : '100%', paddingRight: 2 }}>
-        <Typography variant="h5" gutterBottom align="center">
+    <Box sx={{  display: 'flex', height: '100vh' }}>
+      <Box
+        sx={{
+          display: 'flex',
+          flexDirection: 'column',
+          width: '25%',
+          backgroundColor: '#f5f5f5',
+          padding: 2,
+          gap: 4,
+        }}
+      >
+        <Button
+          variant={activeSection === 'SetLocations' ? 'contained' : 'outlined'}
+          onClick={() => handleSidebarClick('SetLocations')}
+          sx={{ marginBottom: 1 }}
+          className=' focus:outline-none'
+        >
           Set Locations
-        </Typography>
-
-        <Box sx={{ marginBottom: 2 }}>
-          <Typography variant="h6">Your Location</Typography>
-          <TextField
-            inputRef={userInputRef}
-            fullWidth
-            label="Search for your location"
-            variant="outlined"
-            size="small"
-          />
-        </Box>
-
-        <Box sx={{ marginBottom: 2 }}>
-          <Typography variant="h6">Friend's Location</Typography>
-          <TextField
-            inputRef={friendInputRef}
-            fullWidth
-            label="Search for friend's location"
-            variant="outlined"
-            size="small"
-          />
-        </Box>
-
-        <Box sx={{ marginBottom: 2 }}>
-          <Typography variant="h6">Venue Type</Typography>
-          <TextField
-            inputRef={venueTypeRef}
-            fullWidth
-            label="E.g., Cafe, Park, etc."
-            variant="outlined"
-            size="small"
-          />
-        </Box>
-
-        <Button variant="contained" fullWidth onClick={handleFindVenue}>
-          Find Venues
+        </Button>
+        <Button
+          variant={activeSection === 'SelectVenue' ? 'contained' : 'outlined'}
+          onClick={() => handleSidebarClick('SelectVenue')}
+          sx={{ marginBottom: 1 }}
+        >
+          Select Venue
+        </Button>
+        <Button
+          variant={activeSection === 'FixMeeting' ? 'contained' : 'outlined'}
+          onClick={handleConfirmVenue}
+          sx={{ marginBottom: 1 }}
+          disabled={!selectedVenue}
+        >
+          Fix Meeting
         </Button>
       </Box>
+    
+      <Box sx={{ flex: 1, padding: 2 }}>
+        {activeSection === 'SetLocations' && (
+          <Box sx={{ padding: 2 }}>
+            <Typography variant="h5" gutterBottom align="center" >
+              Set Locations
+            </Typography>
 
-      {openVenueBox && (
-        <Box sx={{ width: '50%', paddingLeft: 2, maxHeight: '400px', overflowY: 'auto' }}>
-          <Typography variant="h5" gutterBottom align="center">
-            Venue Suggestions
-          </Typography>
+            <Box sx={{ marginBottom: 2 }}>
+              <Typography variant="h6">Your Location</Typography>
+              <TextField
+                fullWidth
+                label="Search for your location"
+                variant="outlined"
+                size="small"
+                inputRef={userInputRef}
+              />
+            </Box>
 
-          {loading ? (
-            <CircularProgress />
-          ) : venues.length === 0 ? (
-            <Typography>No venues found</Typography>
-          ) : (
-            venues.map((venue, index) => (
-              <Card
-                key={venue.id}
-                sx={{ marginBottom: 2, cursor: 'pointer', backgroundColor: 'white' }}
-                onClick={() => handleSelectVenue(venue, venueMarkers[index])}
-              >
-                <CardContent>
-                  <Typography variant="h6">{venue.name}</Typography>
-                  <Typography>{venue.address}</Typography>
-                  {selectedVenue?.id === venue.id && (
-                    <Button variant="contained" fullWidth onClick={handleConfirmVenue} sx={{ marginTop: 1 }}>
-                      Select This Venue
-                    </Button>
-                  )}
-                </CardContent>
-              </Card>
-            ))
-          )}
-        </Box>
-      )}
+            <Box sx={{ marginBottom: 2 }}>
+              <Typography variant="h6">Friend's Location</Typography>
+              <TextField
+                fullWidth
+                label="Search for friend's location"
+                variant="outlined"
+                size="small"
+                inputRef={friendInputRef}
+              />
+            </Box>
 
-      {successMessage && (
-        <Typography variant="h6" color="success" align="center" sx={{ marginTop: 2 }}>
-          {successMessage}
-        </Typography>
-      )}
+            <Box sx={{ marginBottom: 2 }}>
+              <Typography variant="h6">Venue Type</Typography>
+              <TextField
+                fullWidth
+                label="E.g., Cafe, Park, etc."
+                variant="outlined"
+                size="small"
+                inputRef={venueTypeRef}
+              />
+            </Box>
+
+            <Button
+              variant="contained"
+              onClick={handleFindVenue}
+              sx={{ width: '100%' }}
+              disabled={loading}
+            >
+              {loading ? <CircularProgress size={24} /> : 'Find Venue'}
+            </Button>
+            {errorMessage && (
+              <Typography color="error" variant="body2" align="center" sx={{ marginTop: 1 }}>
+                {errorMessage}
+              </Typography>
+            )}
+          </Box>
+        )}
+
+        {activeSection === 'SelectVenue' && openVenueBox && (
+          <Box sx={{maxHeight: '400px', // Adjust this height as needed
+              overflowY: 'auto',  // Enables vertical scrolling
+              padding: 2,         // Optional padding
+              border: '1px solid #ccc', }}>
+            <Typography variant="h6" gutterBottom align="center">
+              Select Venue
+            </Typography>
+
+            {venues.length > 0 ? (
+              venues.map((venue) => (
+                <Card
+                  key={venue.id || venue.venueId}
+                  sx={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    marginBottom: 2,
+                    cursor: 'pointer',
+                  }}
+                  onClick={() => handleSelectVenue(venue)}
+                >
+                  <CardContent>
+                    <Typography variant="h6">{venue.name}</Typography>
+                    <Typography variant="body2">{venue.type}</Typography>
+                    <Typography variant="body2">{venue.address}</Typography>
+                    <Typography variant="body2">{venue.details}</Typography> {/* Full data */}
+                  </CardContent>
+                </Card>
+              ))
+            ) : (
+              <Typography variant="body1" color="textSecondary" align="center">
+                No venues found.
+              </Typography>
+            )}
+          </Box>
+        )}
+
+        {activeSection === 'FixMeeting' && successMessage && (
+          <Box sx={{ padding: 2 }}>
+            <Typography variant="h6" color="success.main" align="center">
+              {successMessage}
+            </Typography>
+          </Box>
+        )}
+      </Box>
     </Box>
   );
 };

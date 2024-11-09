@@ -80,20 +80,11 @@ const SetProfile = () => {
                             placeholder="Enter your time zone"
                             // inputRef={timeZoneRef}
                         />
+                        <br></br>
+                        <br></br>
                     </div>
 
-                    <div className="mt-8">
-                        <Typography variant="body1" className="font-semibold mb-2">
-                            My Email Address
-                        </Typography>
-                        <div className="flex items-center space-x-3 mt-2">
-                            <Avatar className="bg-blue-100 text-blue-600">M</Avatar>
-                            <div>
-                                <Typography variant="body2">{email}</Typography>
-                                <Typography variant="caption" color="textSecondary">1 month ago</Typography>
-                            </div>
-                        </div>
-                    </div>
+                    
                 </Paper>
     </div>
   )
