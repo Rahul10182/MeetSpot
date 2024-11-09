@@ -8,7 +8,6 @@ import AuthRegister from './pages/auth/register';
 import UnauthPages from './pages/unauth-page'; 
 import Home from './pages/Home';
 import MeetingPoint from './pages/MeetingPoint';
-import SettingsPage from './pages/profile/Settings';
 import UserDashboard from './pages/profile/ProfileDetail';
 import PrivateRoute from './pages/protectedRoute';
 import SetProfile from './pages/profile/SetProfile';
@@ -27,11 +26,17 @@ const App = () => {
     
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (user) {
+        var nameis = user.displayName;
+        if(!user.displayName){
+          nameis = "user"
+        }
         const userData = {
-          fullName: user.displayName,
+          fullName: nameis,
           firebaseID: user.uid,
           email: user.email,
         };
+
+        console.log(userData)
 
         localStorage.setItem('user', JSON.stringify(userData));
 
