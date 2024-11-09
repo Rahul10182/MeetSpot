@@ -12,19 +12,17 @@ const venueSchema = new mongoose.Schema({
     location: {
         type: {
             type: String, 
-            enum: ['Point'],  // This specifies the type of GeoJSON object
+            enum: ['Point'], 
             required: true
         },
         coordinates: {  
-            type: [Number],  // Array of numbers
+            type: [Number], 
             required: true
         }
     },
     address: String,
-    //lastvisited: Date.now
 },{timestamps:true});
 
-// Create a geospatial index on the location field
 venueSchema.index({ location: '2dsphere' });
 
 const Venue = mongoose.model('Venue', venueSchema);
