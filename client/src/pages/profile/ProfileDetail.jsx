@@ -103,13 +103,13 @@ const UserDashboard = () => {
                 <AppBar position="static" color="transparent" elevation={0} className="bg-blue-500 shadow-sm mb-6">
                     <Toolbar className="flex justify-between">
                         <div>
-                        <Avatar
+                        {/* <Avatar
                             className="mx-auto mb-4 bg-pink-500"
                             alt={name}
                             src="/static/images/avatar/1.jpg"
                             sx={{ width: 72, height: 72 ,backgroundColor: '#FFB6C1'}}
                             
-                        />
+                        /> */}
                         <Typography variant="h5" className="font-semibold text-blue-800">
                             Welcome, {name || "User"}
                         </Typography>

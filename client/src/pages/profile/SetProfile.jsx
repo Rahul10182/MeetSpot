@@ -13,7 +13,7 @@ const SetProfile = () => {
                             <Avatar
                                 alt={name}
                                 src="/static/images/avatar/1.jpg"
-                                sx={{ width: 80, height: 80 }}
+                                sx={{ width: 80, height: 80 ,backgroundColor: '#FFB6C1'}}
                             />
                             <div>
                                 <Typography variant="h6" className="font-semibold">
