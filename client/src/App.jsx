@@ -17,6 +17,7 @@ import FriendList from './pages/profile/oldFriend';
 import FriendRequest from './pages/profile/reqFriend';
 import FriendRequestSent from './pages/profile/FriendReqSent';
 import ChatPage from './pages/ChatPage';
+import EventsPage from './pages/Eventpage';
 
 
 
@@ -83,6 +84,8 @@ const App = () => {
                 <Route path="old" element={<FriendList />} />
                 <Route path="new" element={<FriendRequest />} />
                 <Route path="sentreq" element={<FriendRequestSent />} />
+                 <Route path="/chat" element={<ChatPage firebaseId={firebaseId} />} />
+                <Route path="/events" element={<EventsPage/>}  />
               </Route>
             </Route>
           </Route>
@@ -90,7 +93,8 @@ const App = () => {
           <Route path="/unauth-page" element={<UnauthPages />} />
           <Route path="/" element={<Home />} />
           <Route path="/meeting-point" element={<MeetingPoint />} />
-          <Route path="/chat" element={<ChatPage firebaseID={firebaseId} />} />
+          
+
         </Routes>
       </BrowserRouter>
     </div>

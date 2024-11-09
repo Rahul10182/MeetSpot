@@ -2,6 +2,7 @@ import cookieParser from "cookie-parser";
 import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
+
 import connectDB from './config/database.js';
 import userRoutes from "./routes/authRoutes.js";
 import venueRoutes from "./routes/venueRoutes.js";
@@ -41,7 +42,7 @@ app.use(cors(corsOptions));
 // Routes
 app.use('/search', userSearch);
 app.use('/api/v1/user', userRoutes);
-app.use('/eventRegister', eventRoutes);
+app.use('/event', eventRoutes);
 app.use('/friend', friendRoute);
 app.use('/api/v1/venue', venueRoutes);
 app.use('/api/v1/review', reviewRoutes);

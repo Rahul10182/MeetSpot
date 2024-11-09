@@ -34,9 +34,26 @@ const UserDashboard = () => {
         }
     };
 
-    const handleAddFriend = (userId) => {
-        console.log(`Added friend with ID: ${userId}`);
+    const handleAddFriend = async (userId) => {
+        const currentUser = JSON.parse(localStorage.getItem('user'));
+        const firebaseID1 = currentUser?.firebaseID;
+    
+        try {
+            const response = await axios.post('http://localhost:3000/friend/sendreq', {
+                firebaseID1: firebaseID1,
+                firebaseID2: userId       
+            });
+            
+            if (response.status === 201) {
+                console.log(`Friend request sent to user with ID: ${userId}`);
+            } else {
+                console.log(`Failed to send friend request: ${response.data.message}`);
+            }
+        } catch (error) {
+            console.error('Error sending friend request:', error);
+        }
     };
+    
 
     useEffect(() => {
         const handleClickOutside = (event) => {
