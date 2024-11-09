@@ -11,7 +11,10 @@ import { signOut, getAuth } from 'firebase/auth';
 const Header = () => {
 
   const auth = getAuth();
+  console.log(auth.currentUser);
   const user = auth.currentUser;
+  const userData = JSON.parse(localStorage.getItem('user'));
+  const name = userData?.fullName;
 
   const [anchorAccount, setAnchorAccount] = useState(null);
   const [isDrawerOpen, setDrawerOpen] = useState(false);
@@ -38,11 +41,7 @@ const Header = () => {
   const handleLogout = () => {
     signOut(auth)
       .then(() => {
-        console.log("Logout successful");
-
-        localStorage.removeItem('isAuthenticated');
-        localStorage.removeItem('userName');
-        localStorage.removeItem('userEmail');
+        localStorage.removeItem('user');
 
         navigate('/');
       })
@@ -95,7 +94,7 @@ const Header = () => {
           </button>
         </div>
 
-        {user?(
+        {userData?(
           <div className="relative flex items-center" ref={profileMenuRef}>
             <button className="text-white focus:outline-none" onClick={handleAccountMenuClick}>
               <AccountCircle fontSize="medium" /> {/* Reduced font size */}
@@ -114,7 +113,7 @@ const Header = () => {
                 </div>
               </div>
             )}
-            <span className="text-lg mx-2">Hello, {user.displayName}</span>
+            <span className="text-lg mx-2">Hello, {name}</span>
 
           </div>
         ):(
