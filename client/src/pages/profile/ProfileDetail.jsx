@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState ,useEffect,useRef} from 'react';
 import {
     Avatar, Typography, TextField, Divider, AppBar, Toolbar,
-    List, ListItem, ListItemText, ListItemIcon, Card, CardContent, Button
+    List, ListItem, ListItemText, ListItemIcon, Card, CardContent, Button,InputAdornment
 } from '@mui/material';
-import { Settings, Dashboard, Notifications, AccountCircle, Event } from '@mui/icons-material';
+import { Settings, Dashboard, Notifications, AccountCircle, Event,Search } from '@mui/icons-material';
 import { useNavigate, Outlet } from 'react-router-dom';
 import axios from 'axios';
 
@@ -16,6 +16,7 @@ const UserDashboard = () => {
 
     const [searchQuery, setSearchQuery] = useState('');
     const [searchResults, setSearchResults] = useState([]);
+    const searchRef = useRef(null);
 
     const handleSearchChange = async (e) => {
         const query = e.target.value;
@@ -37,26 +38,45 @@ const UserDashboard = () => {
         console.log(`Added friend with ID: ${userId}`);
     };
 
+    useEffect(() => {
+        const handleClickOutside = (event) => {
+            if (searchRef.current && !searchRef.current.contains(event.target)) {
+                // Clear search query and hide results when clicking outside
+                setSearchQuery('');
+                setSearchResults([]);
+            }
+        };
+
+        // Bind the event listener
+        document.addEventListener('click', handleClickOutside);
+
+        // Cleanup the event listener on component unmount
+        return () => {
+            document.removeEventListener('click', handleClickOutside);
+        };
+    }, []);
+
+    
     return (
-        <div className="min-h-screen flex bg-gray-50 relative">
-            <aside className="w-64 bg-gradient-to-b from-indigo-600 to-purple-600 text-white shadow-lg p-6">
+        <div className="min-h-screen flex bg-blue-300 relative">
+            <aside className="w-64 bg-gradient-to-b from-indigo-600 to-purple-500 text-white shadow-lg p-6">
                 <div className="text-center mb-8">
-                    <Avatar
-                        className="mx-auto mb-4"
-                        alt={name}
-                        src="/static/images/avatar/1.jpg"
-                        sx={{ width: 72, height: 72 }}
-                    />
-                    <Typography variant="body1" className="font-medium text-sm">
-                        {name || "Anonymous"}
-                    </Typography>
-                    <Typography variant="body2" className="text-indigo-200">
-                        {email}
-                    </Typography>
+
+                <button 
+                    onClick={() => navigate('/')} // Corrected navigation
+                    className="text-center text-3xl font-semibold mx-4 whitespace-nowrap transition-all duration-200 focus:outline-none"
+                >
+                    MeetSpot
+                </button>
+                <br></br>
+                <br></br>
+                <br></br>
+                <br></br>
+
                 </div>
                 <Divider className="my-4 border-indigo-400" />
                 <nav>
-                    <List>
+                    <List className=' cursor-pointer'>
                         {[{ text: 'Dashboard', icon: <Dashboard />, path: '/profile/dashboard' },
                           { text: 'Friends', icon: <AccountCircle />, path: '/profile/friends/old' },
                           { text: 'Notifications', icon: <Notifications />, path: '/profile/notifications' },
@@ -80,27 +100,42 @@ const UserDashboard = () => {
             </aside>
 
             <main className="flex-1 p-8">
-                <AppBar position="static" color="transparent" elevation={0} className="bg-white shadow-sm mb-6">
+                <AppBar position="static" color="transparent" elevation={0} className="bg-blue-500 shadow-sm mb-6">
                     <Toolbar className="flex justify-between">
-                        <Typography variant="h5" className="font-semibold text-gray-800">
+                        <div>
+                        {/* <Avatar
+                            className="mx-auto mb-4 bg-pink-500"
+                            alt={name}
+                            src="/static/images/avatar/1.jpg"
+                            sx={{ width: 72, height: 72 ,backgroundColor: '#FFB6C1'}}
+                            
+                        /> */}
+                        <Typography variant="h5" className="font-semibold text-blue-800">
                             Welcome, {name || "User"}
                         </Typography>
-                        <div className="flex items-center space-x-4 relative">
+                        
+                        </div>
+                        <div className="flex items-center space-x-4 relative" ref={searchRef}>
                             <TextField
                                 variant="outlined"
                                 size="small"
-                                placeholder="Search for people"
-                                className="bg-gray-100 rounded-full"
+                                placeholder="Search for friend"
+                                className="bg-gray-100 rounded w-80"
                                 value={searchQuery}
                                 onChange={handleSearchChange} 
                                 InputProps={{
-                                    startAdornment: <span className="material-icons text-gray-400 ml-2"></span>,
+                                    startAdornment: (
+                                        <InputAdornment position="start">
+                                            <Search className="text-gray-400" />
+                                        </InputAdornment>
+                                    ),
                                 }}
+
                             />
-                            <Avatar alt={name} src="/static/images/avatar/1.jpg" />
+                            {/* <Avatar alt={name} src="/static/images/avatar/1.jpg" /> */}
                             
                             {searchResults.length > 0 && (
-                                <div className="absolute left-0 right-0 bg-white shadow-lg mt-72 rounded-md z-10 max-h-60 overflow-y-auto w-full sm:w-80">
+                                <div className="absolute left-0 right-0 bg-white shadow-lg mt-72 rounded-md z-10 max-h-60 overflow-y-auto w-72 sm:w-80">
                                     {searchResults.map((user) => (
                                         <Card key={user._id} className="mb-2">
                                             <CardContent>

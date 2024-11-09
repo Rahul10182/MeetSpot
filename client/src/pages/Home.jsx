@@ -5,6 +5,7 @@ import Footer from '../components/Homepage/Footer'
 import { getAuth } from 'firebase/auth'
 import Events from '../components/Homepage/Events'
 import Cards from '../components/Homepage/Cards'
+import MeetSpace from '../components/Homepage/MeetSpace'
 
 const Home = () => {
   const auth = getAuth();
@@ -20,6 +21,11 @@ const Home = () => {
 
       <br></br>
       <br></br>
+
+      <div> 
+          <MeetSpace  />
+      </div>
+      
 
         <main className="flex flex-grow container justify-center mx-auto px-4 py-8">
           <div className=' flex justify-center items-center flex-col'>

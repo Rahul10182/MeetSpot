@@ -38,8 +38,8 @@ const EventPlannerForm = () => {
   };
 
   return (
-    <div className="bg-gradient-to-br from-blue-50 to-indigo-100 min-h-screen flex items-center justify-center p-6">
-      <Box className="bg-white shadow-xl rounded-xl w-full max-w-md p-10 space-y-6 transition-all duration-300 transform hover:-translate-y-1 hover:shadow-2xl">
+    <div className="bg-gradient-to-br bg-blue-300 min-h-screen flex items-center justify-center p-6">
+      <Box className="bg-white shadow-4xl rounded-xl border-2 w-full max-w-md p-10 space-y-6 transition-all duration-300 transform hover:-translate-y-1 hover:shadow-2xl">
         
         <Typography variant="h5" component="h2" className="text-center font-extrabold text-gray-800 mb-4">
           Event Planner
