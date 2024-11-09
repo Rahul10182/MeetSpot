@@ -1,16 +1,20 @@
 import express from "express";
-import {
-    createFriendRequest,
-    acceptFriendRequest,
-    blockFriend,
-    getFriends
-} from "../controllers/friendController.js";
+import { acceptFriendRequest, deleteFriend, rejectFriendRequest, sendFriendRequest, sentFrienReqest, showFriendRequest, showFriends } from '../controllers/friendController.js';
 
 const router = express.Router();
 
-router.post("/request", createFriendRequest);
-router.put("/accept/:requestId", acceptFriendRequest);
-router.put("/block/:requestId", blockFriend);
-router.get("/:firebaseId", getFriends);
+router.route("/old").post(showFriends);
+
+router.route("/new").post(showFriendRequest);
+
+router.route("/sendreq").post(sendFriendRequest);
+
+router.route("/sentreq").post(sentFrienReqest);
+
+router.route("/accept").post(acceptFriendRequest);
+
+router.route("/reject").post(rejectFriendRequest);
+
+router.route("/delete").post(deleteFriend);
 
 export default router;

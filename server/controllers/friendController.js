@@ -1,50 +1,104 @@
-import { Friend } from "../models/friendModel.js";
-import { User } from "../models/userModel.js"
 
-// Create a friend request
-export const createFriendRequest = async (req, res) => {
+import { User } from '../models/userModel.js'; 
+
+export const showFriends = async (req, res) => {
     try {
-        const { userId, friendId } = req.body;
+        const { firebaseID } = req.body;
 
-        // Look up the user and friend by their emails to get their ObjectIds
-        const user = await User.findOne({ email: userId });
-        if (!user) {
-            return res.status(404).json({ message: "User not found" });
+        const user = await User.findOne({
+            fireBaseId: firebaseID
+        }).populate('friends', 'fullName email fireBaseId');
+
+        const friendsData = user.friends.map(friend => ({
+            name: friend.fullName,
+            email: friend.email,
+            firebaseID: friend.fireBaseId // use 'fireBaseId' as defined in the schema
+        }));
+
+        res.json(friendsData);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+};
+
+
+export const showFriendRequest = async (req, res) => {
+    try {
+        const { firebaseID } = req.body;
+
+        const user = await User.findOne({
+            fireBaseId : firebaseID
+        }).populate('friendRequests', 'fullName email fireBaseId');
+
+        const friendsData = user.friendRequests.map(friend => ({
+            name: friend.fullName,
+            email: friend.email,
+            firebaseID: friend.fireBaseId
+        }));
+        
+        res.json(friendsData);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+};
+
+export const sendFriendRequest = async (req, res) => {
+    try {
+        const { firebaseID1, userId } = req.body; 
+
+        const user1 = await User.findOne({ fireBaseId: firebaseID1 });
+        const user2 = await User.findOne({  id : userId});
+
+        if (!user1 || !user2) {
+            return res.status(404).json({ message: "User not found." });
         }
 
-        const friend = await User.findOne({ email: friendId });
-        if (!friend) {
-            return res.status(404).json({ message: "Friend not found" });
+        const requestAlreadySent = user2.friendRequests.some(friendRequest => friendRequest.toString() === user1._id.toString());
+        if (requestAlreadySent) {
+            return res.status(400).json({ message: "Friend Request Already Sent" });
         }
 
-        // Check if the friend relationship already exists
-        const existingRequest = await Friend.findOne({
-            user: user._id,    // Use ObjectId for the user
-            friend: friend._id  // Use ObjectId for the friend
-        });
+        const requestPending = user1.friendRequests.some(friendRequest => friendRequest.toString() === user2._id.toString());
+        if (requestPending) {
+            user1.friends.push(user2._id);
+            user2.friends.push(user1._id);
 
-        if (existingRequest) {
-            return res.status(400).json({ message: "Friend request already exists" });
+            user1.friendRequests = user1.friendRequests.filter(friendRequest => friendRequest.toString() !== user2._id.toString());
+            user2.friendRequests = user2.friendRequests.filter(friendRequest => friendRequest.toString() !== user1._id.toString());
+
+            await user1.save();
+            await user2.save();
+
+            return res.status(200).json({ message: "Friend Request Accepted" });
         }
 
-        // Create a new friend request using ObjectIds
-        const newFriendRequest = new Friend({
-            user: user._id,
-            friend: friend._id,
-            status: "pending"
-        });
+        user1.sentFriendRequests.push(user2._id);
+        user2.friendRequests.push(user1._id);
 
-        // Update the friends array in the User model
-        await User.findByIdAndUpdate(user._id, {
-            $addToSet: { friends: friend._id }  // Adds friend to user's friends array if not already present
-        });
+        await user1.save();
+        await user2.save();
 
-        await User.findByIdAndUpdate(friend._id, {
-            $addToSet: { friends: user._id }  // Adds user to friend's friends array if not already present
-        });
+        return res.status(201).json({ message: "Friend Request Sent" });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+};
 
-        await newFriendRequest.save();
-        res.status(201).json(newFriendRequest);
+
+export const sentFrienReqest = async (req, res) => {
+    try {
+        const { firebaseID } = req.body;
+
+        const user = await User.findOne({
+            fireBaseId : firebaseID
+        }).populate('sentFriendRequests', 'fullName email');
+
+        const friendsData = user.sentFriendRequests.map(friend => ({
+            name: friend.fullName,
+            email: friend.email
+        }));
+
+        res.json(friendsData);
     } catch (error) {
         // Log error for debugging
         console.error('Error in createFriendRequest:', error.message);
@@ -53,82 +107,90 @@ export const createFriendRequest = async (req, res) => {
 };
 
 
-// Accept a friend request
+
 export const acceptFriendRequest = async (req, res) => {
     try {
-        const { requestId } = req.params;
+        const { firebaseID1, firebaseID2 } = req.body;
 
-        // Find the friend request document by its ID
-        const friendRequest = await Friend.findById(requestId);
-        if (!friendRequest) {
-            return res.status(404).json({ message: "Friend request not found" });
+        if (firebaseID1 === firebaseID2) {
+            return res.status(400).json({ message: "You cannot send a friend request to yourself." });
         }
 
-        // Set the status of the friend request to 'accepted'
-        friendRequest.status = "accepted";
-        await friendRequest.save();
+        const user1 = await User.findOne({ fireBaseId: firebaseID1 });
+        const user2 = await User.findOne({ fireBaseId: firebaseID2 });
 
-        // Create a reciprocal friend request if it does not already exist
-        const reciprocalFriendshipExists = await Friend.findOne({
-            user: friendRequest.friend,
-            friend: friendRequest.user
-        });
-
-        if (!reciprocalFriendshipExists) {
-            await Friend.create({
-                user: friendRequest.friend,
-                friend: friendRequest.user,
-                status: "accepted"
-            });
+        if (!user1 || !user2) {
+            return res.status(404).json({ message: "User not found." });
         }
 
-        res.status(200).json({ message: "Friend request accepted", friendRequest });
+        user1.friends.push(user2._id);
+        user2.friends.push(user1._id);
+
+        user2.friendRequests = user2.friendRequests.filter(id => !id.equals(user1._id));
+        user2.sentFriendRequests = user2.sentFriendRequests.filter(id => !id.equals(user1._id));
+        user1.friendRequests = user1.friendRequests.filter(id => !id.equals(user2._id));
+        user1.sentFriendRequests = user1.sentFriendRequests.filter(id => !id.equals(user2._id));
+
+        await user1.save();
+        await user2.save();
+
+        res.status(200).json({ message: "Friend request accepted." });
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
 };
 
-// Block a friend
-export const blockFriend = async (req, res) => {
-    try {
-        const { requestId } = req.params;
 
-        const friendRequest = await Friend.findById(requestId);
-        if (!friendRequest) {
-            return res.status(404).json({ message: "Friend request not found" });
+export const rejectFriendRequest = async (req, res) => {
+    try {
+        const { firebaseID1, firebaseID2 } = req.body;
+
+        const user1 = await User.findOne({ fireBaseId: firebaseID1 });
+        const user2 = await User.findOne({ fireBaseId: firebaseID2 });
+
+        if (!user1 || !user2) {
+            return res.status(404).json({ message: "User not found." });
         }
 
-        friendRequest.status = "blocked";
-        await friendRequest.save();
+        user1.friendRequests = user1.friendRequests.filter(id => !id.equals(user2._id));
 
-        res.status(200).json({ message: "Friend blocked", friendRequest });
+        user2.sentFriendRequests = user2.sentFriendRequests.filter(id => !id.equals(user1._id));
+
+        await user1.save();
+        await user2.save();
+
+        res.status(200).json({ message: "Friend request rejected." });
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
 };
 
-// Updated getFriends controller
-
-export const getFriends = async (req, res) => {
+export const deleteFriend = async (req, res) => {
     try {
-        const { firebaseId } = req.params;
+        const { firebaseID1, firebaseID2 } = req.body;
 
-        // Find the user by their firebaseId
-        const user = await User.findOne({ fireBaseId: firebaseId });
-        
-        if (!user) {
-            return res.status(404).json({ error: "User not found." });
+        const user1 = await User.findOne({ fireBaseId: firebaseID1 });
+        const user2 = await User.findOne({ fireBaseId: firebaseID2 });
+
+        if (!user1 || !user2) {
+            return res.status(404).json({ message: "User not found." });
         }
 
-        // // Fetch friends by the user's _id
-        // const friends = await Friend.find({
-        //     user: user._id,  // Use user._id from the found user document
-        //     status: "accepted"
-        // })
-        // .populate("friend", "fullName email");  // Populate the friend's details
+        const isFriendInUser1 = user1.friends.includes(user2._id);
+        const isFriendInUser2 = user2.friends.includes(user1._id);
 
-        const friends = await Friend.find({ user: user._id }).populate('friend', 'fullName email');
-        res.status(200).json(friends);
+        if (isFriendInUser1 && isFriendInUser2) {
+            user1.friends = user1.friends.filter(id => !id.equals(user2._id));
+
+            user2.friends = user2.friends.filter(id => !id.equals(user1._id));
+
+            await user1.save();
+            await user2.save();
+
+            res.status(200).json({ message: "Friend deleted successfully." });
+        } else {
+            res.status(400).json({ message: "Users are not friends." });
+        }
     } catch (error) {
         res.status(500).json({ error: error.message });
     }

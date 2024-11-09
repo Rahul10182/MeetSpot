@@ -1,7 +1,7 @@
 import axios from "axios";
 
 export const getDistance = async (originLat, originLng, destLat, destLng) => {
-    const apiKey = "AlzaSyk6pT6UN3zX7mvm6vOtGmO3TtIN9iKR-rH";  //do not change it to process.env. apiKey As it is not woring that 
+    const apiKey = "AlzaSywFl8hTnkxrZmvVDkLTfmgRzbUHXtpQg1F";  //do not change it to process.env. apiKey As it is not woring that 
     const origin = `${originLat},${originLng}`;
     const destination = `${destLat},${destLng}`;
     const url = `https://maps.gomaps.pro/maps/api/distancematrix/json?origins=${origin}&destinations=${destination}&key=${apiKey}`;

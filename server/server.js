@@ -2,16 +2,10 @@ import cookieParser from "cookie-parser";
 import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
-import connectDB from './config/database.js';
-import userRoutes from "./routes/authRoutes.js";
-import venueRoutes from "./routes/venueRoutes.js";
-import reviewRoutes from "./routes/reviewRoutes.js";
-import chatRoutes from "./routes/chatRoutes.js";
-import messageRoutes from "./routes/messageRoutes.js";
-import friendRoutes from "./routes/friendRoutes.js";
-import { createServer } from 'http';
-import { Server } from 'socket.io';
-import { Message } from './models/messageModel.js'; // Import for real-time chat
+import  connectDB from './config/database.js';
+import userRoutes from "./routes/authRoutes.js"
+import venueRoutes from "./routes/venueRoutes.js"
+import reviewRoutes from "./routes/reviewRoutes.js"
 
 dotenv.config();
 connectDB();
@@ -37,7 +31,10 @@ const corsOptions = {
 app.use(cors(corsOptions));
 
 // Routes
+app.use('/search', userSearch);
 app.use('/api/v1/user', userRoutes);
+app.use('/eventRegister', eventRoutes);
+app.use('/friend', friendRoute);
 app.use('/api/v1/venue', venueRoutes);
 app.use('/api/v1/review', reviewRoutes);
 app.use('/api/v1/chat', chatRoutes);
