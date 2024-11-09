@@ -6,4 +6,5 @@ const router = express.Router();
 
 router.route("/").post(authenticate);
 
+
 export default router;
