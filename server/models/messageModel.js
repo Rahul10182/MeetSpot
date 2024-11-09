@@ -7,11 +7,9 @@ const messageSchema = new mongoose.Schema({
     required: true
   },
   sender: {
-    type: String, // Ensure it's ObjectId for better linking
-     // Reference to the User model
+    type:String,
     required: true
   },
-
   content: {
     type: String,
     required: true
@@ -22,5 +20,4 @@ const messageSchema = new mongoose.Schema({
   }
 });
 
-const Message = mongoose.model('Message', messageSchema);
-export default Message
+export const Message = mongoose.model('Message', messageSchema);

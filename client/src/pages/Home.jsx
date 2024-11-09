@@ -1,57 +1,61 @@
-import React from 'react';
-import { Container, Typography, Box } from '@mui/material';
-import Navbar from "../components/Homepage/Navbar";
-import Sliderbar from '../components/Homepage/Sliderbar';
-import Footer from '../components/Homepage/Footer';
-import { getAuth } from 'firebase/auth';
-import Cards from '../components/Homepage/Cards';
-import MeetSpace from '../components/Homepage/MeetSpace';
-import EventSlider from '../components/event/EventSlider';
-
+import React from 'react'
+import Navbar from "../components/Homepage/Navbar"
+import Sliderbar from '../components/Homepage/Sliderbar'
+import Footer from '../components/Homepage/Footer'
+import { getAuth } from 'firebase/auth'
+import Events from '../components/Homepage/Events'
+import Cards from '../components/Homepage/Cards'
+import MeetSpace from '../components/Homepage/MeetSpace'
 
 const Home = () => {
   const auth = getAuth();
   const user = auth.currentUser;
-
   return (
     <div className="flex flex-col min-h-screen">
-      <Navbar />
+      
+      <Navbar/>
 
-      <Sliderbar />
+      <br></br>
 
-      <Container maxWidth="lg" sx={{ py: 4 }}>
-        {/* MeetSpace Section */}
-        <Box mb={6}>
-          <MeetSpace />
-        </Box>
+      <Sliderbar/>
 
-        <Box mb={6}>
-          <EventSlider/>
-        </Box>
+      <br></br>
+      <br></br>
+
+      <div> 
+          <MeetSpace  />
+      </div>
+      
+
+        <main className="flex flex-grow container justify-center mx-auto px-4 py-8">
+          <div className=' flex justify-center items-center flex-col'>
+            {/* Add your page content here */}
+            <h1 className="text-3xl font-bold">Welcome to Meeting Point</h1>
+            <p className="mt-4">Connecting people for meaningful meetings and conversations.</p>
+            {/* More content... */}
+          </div>
+
+        </main>
+        
+        <br></br>
+
+      
+      <Events/>
 
 
-        {/* Welcome Message */}
-        <Box textAlign="center" mb={4}>
-          <Typography variant="h3" gutterBottom>
-            Welcome to Meeting Point
-          </Typography>
-          <Typography variant="body1">
-            Connecting people for meaningful meetings and conversations.
-          </Typography>
-        </Box>
 
-        {/* Travel Section */}
-        <Box mb={6} textAlign="center">
-          <Typography variant="h4" color="textSecondary" gutterBottom>
-            There Are Some Beautiful Places In INDIA
-          </Typography>
-          <Cards />
-        </Box>
-      </Container>
+      <div className=' text-gray-600 font-bold text-3xl flex justify-center '> There Are Some Beautiful Places In INDIA</div>
 
-      <Footer />
+      <Cards/>
+
+        <br></br>
+        <br></br>      
+        <br></br>      
+        <br></br>      
+
+      <Footer/>
     </div>
-  );
-};
+  )
+}
 
-export default Home;
+export default Home

@@ -1,7 +1,6 @@
 import axios from "axios";
 
 export const getDistance = async (originLat, originLng, destLat, destLng) => {
-
     const apiKey = "AlzaSy5CgyOHomgbCzkFlTzYj0MowZrnZx20bFs";  //do not change it to process.env. apiKey As it is not woring that 
     const origin = `${originLat},${originLng}`;
     const destination = `${destLat},${destLng}`;
@@ -10,7 +9,7 @@ export const getDistance = async (originLat, originLng, destLat, destLng) => {
     try {
         const response = await axios.get(url);
         const data = response.data;
-0
+
         if (data.rows[0].elements[0].status === "OK") {
             return {
                 distance: data.rows[0].elements[0].distance.value, // distance in meters
