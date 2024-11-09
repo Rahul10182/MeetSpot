@@ -14,7 +14,6 @@ import 'react-toastify/dist/ReactToastify.css';
 const Header = () => {
 
   const auth = getAuth();
-  console.log(auth.currentUser);
   const user = auth.currentUser;
   const userData = JSON.parse(localStorage.getItem('user'));
   const name = userData?.fullName;

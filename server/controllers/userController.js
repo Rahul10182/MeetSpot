@@ -5,7 +5,7 @@ export const authenticate = async (req, res) => {
     try {
         const { firebaseID, email, fullName } = req.body;
 
-        if (!firebaseID || !email || !fullName) {
+        if (!firebaseID || !email) {
             return res.status(400).json({
                 message: 'firebaseID, email, and fullName are required.',
                 success: false

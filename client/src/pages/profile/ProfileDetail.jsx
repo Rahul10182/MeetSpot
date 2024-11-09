@@ -11,6 +11,7 @@ const UserDashboard = () => {
     const userData = JSON.parse(localStorage.getItem('user'));
     const name = userData?.fullName;
     const email = userData?.email;
+    const firebaseID1 = userData?.firebaseID;
     const navigate = useNavigate();
 
     const [searchQuery, setSearchQuery] = useState('');
@@ -24,17 +25,16 @@ const UserDashboard = () => {
         if (query.trim()) {
             try {
                 const response = await axios.post('http://localhost:3000/search', { email: query });
-                setSearchResults(response.data.users); // Set the results to state
+                setSearchResults(response.data.users); 
             } catch (error) {
                 console.error('Error searching for people:', error);
             }
         } else {
-            setSearchResults([]); // Clear the results when query is empty
+            setSearchResults([]); 
         }
     };
 
     const handleAddFriend = (userId) => {
-        // Placeholder function for adding a friend
         console.log(`Added friend with ID: ${userId}`);
     };
 
@@ -122,7 +122,7 @@ const UserDashboard = () => {
                                 placeholder="Search for friend"
                                 className="bg-gray-100 rounded w-80"
                                 value={searchQuery}
-                                onChange={handleSearchChange}  // Handle the input change
+                                onChange={handleSearchChange} 
                                 InputProps={{
                                     startAdornment: (
                                         <InputAdornment position="start">
@@ -134,7 +134,6 @@ const UserDashboard = () => {
                             />
                             {/* <Avatar alt={name} src="/static/images/avatar/1.jpg" /> */}
                             
-                            {/* Popup for search results */}
                             {searchResults.length > 0 && (
                                 <div className="absolute left-0 right-0 bg-white shadow-lg mt-72 rounded-md z-10 max-h-60 overflow-y-auto w-72 sm:w-80">
                                     {searchResults.map((user) => (

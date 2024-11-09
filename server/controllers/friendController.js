@@ -43,10 +43,14 @@ export const showFriendRequest = async (req, res) => {
 
 export const sendFriendRequest = async (req, res) => {
     try {
-        const { firebaseID1, firebaseID2 } = req.body;
+        const { firebaseID1, userId } = req.body; 
 
         const user1 = await User.findOne({ fireBaseId: firebaseID1 });
-        const user2 = await User.findOne({ fireBaseId: firebaseID2 });
+        const user2 = await User.findOne({  id : userId});
+
+        if (!user1 || !user2) {
+            return res.status(404).json({ message: "User not found." });
+        }
 
         const requestAlreadySent = user2.friendRequests.some(friendRequest => friendRequest.toString() === user1._id.toString());
         if (requestAlreadySent) {
@@ -55,8 +59,8 @@ export const sendFriendRequest = async (req, res) => {
 
         const requestPending = user1.friendRequests.some(friendRequest => friendRequest.toString() === user2._id.toString());
         if (requestPending) {
-            user1.friends.push(user2._id);  
-            user2.friends.push(user1._id);  
+            user1.friends.push(user2._id);
+            user2.friends.push(user1._id);
 
             user1.friendRequests = user1.friendRequests.filter(friendRequest => friendRequest.toString() !== user2._id.toString());
             user2.friendRequests = user2.friendRequests.filter(friendRequest => friendRequest.toString() !== user1._id.toString());
@@ -67,8 +71,8 @@ export const sendFriendRequest = async (req, res) => {
             return res.status(200).json({ message: "Friend Request Accepted" });
         }
 
-        user1.sentFriendRequests.push(user2._id); 
-        user2.friendRequests.push(user1._id); 
+        user1.sentFriendRequests.push(user2._id);
+        user2.friendRequests.push(user1._id);
 
         await user1.save();
         await user2.save();
@@ -78,6 +82,7 @@ export const sendFriendRequest = async (req, res) => {
         res.status(500).json({ error: error.message });
     }
 };
+
 
 export const sentFrienReqest = async (req, res) => {
     try {
