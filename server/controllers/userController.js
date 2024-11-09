@@ -47,3 +47,44 @@ export const authenticate = async (req, res) => {
         });
     }
 };
+
+// Controller to get user details using firebaseId
+export const getUserFireBaseId = async (req, res) => {
+    try {
+        const { firebaseId } = req.body; // Get firebaseId from the request body
+
+        // Find the user by firebaseId
+        const user = await User.findOne({ fireBaseId:firebaseId });
+
+        if (!user) {
+            return res.status(404).json({ message: "User not found" });
+        }
+
+        // Return the user data
+        res.status(200).json(user);
+    } catch (error) {
+        // Catch any errors and return a 500 status
+        res.status(500).json({ error: error.message });
+    }
+};
+
+//
+export const getFireBaseId = async (req, res) => {
+    try {
+        const { selectedFriendId } = req.body; 
+
+        // Find the user by firebaseId
+        const user = await User.findOne({ _id: selectedFriendId });
+
+        if (!user) {
+            return res.status(404).json({ message: "User not found" });
+        }
+
+        // Return the user data
+        res.status(200).json(user.fireBaseId);
+    } catch (error) {
+        // Catch any errors and return a 500 status
+        res.status(500).json({ error: error.message });
+    }
+};
+
