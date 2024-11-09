@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Card, CardContent, Avatar, IconButton, Typography } from '@mui/material';
-import { CheckCircle, Delete, SentimentDissatisfied } from '@mui/icons-material';
+import { Delete, SentimentDissatisfied } from '@mui/icons-material';
 
 const FriendRequestSent = () => {
   const [friends, setFriends] = useState([]);
@@ -9,17 +9,26 @@ const FriendRequestSent = () => {
   const firebaseID = userData?.firebaseID;
 
   useEffect(() => {
-    const fetchFriends = async () => {
-      try {
-        const response = await axios.post('http://localhost:3000/friend/sentreq', { firebaseID });
-        setFriends(response.data);
-      } catch (error) {
-        console.error('Error fetching friends:', error);
-      }
-    };
-
     fetchFriends();
-  }, []); 
+  }, []);
+
+  const fetchFriends = async () => {
+    try {
+      const response = await axios.post('http://localhost:3000/friend/sentreq', { firebaseID });
+      setFriends(response.data);
+    } catch (error) {
+      console.error('Error fetching friends:', error);
+    }
+  };
+
+  const handleReject = async (user2ID) => {
+    try {
+      await axios.post('http://localhost:3000/friend/reject', { firebaseID1: firebaseID, firebaseID2: user2ID });
+      fetchFriends();
+    } catch (error) {
+      console.error('Error rejecting friend request:', error);
+    }
+  };
 
   return (
     <div className="w-full max-w-md bg-white shadow-lg rounded-lg p-4">
@@ -31,14 +40,9 @@ const FriendRequestSent = () => {
               <h3 className="text-lg font-medium">{friend.name}</h3>
               <p>{friend.email}</p>
             </CardContent>
-            <div className="flex space-x-2">
-              <IconButton color="success" aria-label="Approve">
-                <CheckCircle />
-              </IconButton>
-              <IconButton color="error" aria-label="Delete">
-                <Delete />
-              </IconButton>
-            </div>
+            <IconButton color="error" aria-label="Reject" onClick={() => handleReject(friend.id)}>
+              <Delete />
+            </IconButton>
           </Card>
         ))
       ) : (

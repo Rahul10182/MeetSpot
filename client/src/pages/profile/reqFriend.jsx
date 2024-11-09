@@ -9,17 +9,35 @@ const FriendRequest = () => {
   const firebaseID = userData?.firebaseID;
 
   useEffect(() => {
-    const fetchFriends = async () => {
-      try {
-        const response = await axios.post('http://localhost:3000/friend/new', { firebaseID });
-        setFriends(response.data);
-      } catch (error) {
-        console.error('Error fetching friend requests:', error);
-      }
-    };
-
     fetchFriends();
-  }, []); 
+  }, []);
+
+  const fetchFriends = async () => {
+    try {
+      const response = await axios.post('http://localhost:3000/friend/new', { firebaseID });
+      setFriends(response.data);
+    } catch (error) {
+      console.error('Error fetching friend requests:', error);
+    }
+  };
+
+  const handleApprove = async (userID) => {
+    try {
+      await axios.post('http://localhost:3000/friend/accept', { firebaseID, userID });
+      fetchFriends();
+    } catch (error) {
+      console.error('Error approving friend request:', error);
+    }
+  };
+
+  const handleReject = async (userID) => {
+    try {
+      await axios.post('http://localhost:3000/friend/reject', { firebaseID, userID });
+      fetchFriends(); 
+    } catch (error) {
+      console.error('Error rejecting friend request:', error);
+    }
+  };
 
   return (
     <div className="w-full max-w-md bg-white shadow-lg rounded-lg p-4">
@@ -32,10 +50,10 @@ const FriendRequest = () => {
               <p>{friend.email}</p>
             </CardContent>
             <div className="flex space-x-2">
-              <IconButton color="success" aria-label="Approve">
+              <IconButton color="success" aria-label="Approve" onClick={() => handleApprove(friend.id)}>
                 <CheckCircle />
               </IconButton>
-              <IconButton color="error" aria-label="Delete">
+              <IconButton color="error" aria-label="Delete" onClick={() => handleReject(friend.id)}>
                 <Delete />
               </IconButton>
             </div>
