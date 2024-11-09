@@ -1,9 +1,9 @@
 import { User } from "../models/userModel.js";
+import Venue from "../models/venueModel.js";
 import axios from "axios";
-import Venue from "../models/venueModel.js"
+// import {Venue} from "../models/venueModel.js"
 import calculateMidpoint from '../utils/midpointUtil.js';
 import { getDistance } from "../utils/getDistance.js"
-
 
 const GO_MAPS_API_KEY = "AlzaSy5CgyOHomgbCzkFlTzYj0MowZrnZx20bFs";
 
@@ -224,5 +224,27 @@ export const selectVenue = async (req, res) => {
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Failed to select venue", success: false });
+  }
+};
+
+export const getUserVenues = async (req, res) => {
+  try {
+    const { firebaseID } = req.body; 
+    const user = await User.findOne({ fireBaseId: firebaseID }).populate('profile.venues'); 
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found." });
+    }
+
+    if (!user.profile.venues || user.profile.venues.length === 0) {
+      return res.status(404).json({ message: "No venues found for this user." });
+    }
+
+    const venues = user.profile.venues; 
+
+    res.json(venues); 
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Failed to fetch venues." });
   }
 };

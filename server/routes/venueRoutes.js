@@ -1,12 +1,10 @@
 import express from 'express'
-import { getVenueSuggestions, selectVenue } from '../controllers/venueController.js';
-import isAuthenticated from '../middlewares/Auth.js';
-
+import { getUserVenues, getVenueSuggestions, selectVenue } from '../controllers/venueController.js';
 
 const router = express.Router();
 
 router.route("/get").post( getVenueSuggestions);
 router.route("/select").post( selectVenue);
-
+router.route("/visited").get(getUserVenues);
 
 export default router;

@@ -7,6 +7,7 @@ const FriendRequest = () => {
   const [friends, setFriends] = useState([]);
   const userData = JSON.parse(localStorage.getItem('user'));
   const firebaseID = userData?.firebaseID;
+  const firebaseID1 = firebaseID;
 
   useEffect(() => {
     fetchFriends();
@@ -21,18 +22,18 @@ const FriendRequest = () => {
     }
   };
 
-  const handleApprove = async (userID) => {
+  const handleApprove = async (firebaseID2) => {
     try {
-      await axios.post('http://localhost:3000/friend/accept', { firebaseID, userID });
+      await axios.post('http://localhost:3000/friend/accept', { firebaseID1, firebaseID2 });
       fetchFriends();
     } catch (error) {
       console.error('Error approving friend request:', error);
     }
   };
 
-  const handleReject = async (userID) => {
+  const handleReject = async (firebaseID2) => {
     try {
-      await axios.post('http://localhost:3000/friend/reject', { firebaseID, userID });
+      await axios.post('http://localhost:3000/friend/reject', { firebaseID2, firebaseID1 });
       fetchFriends(); 
     } catch (error) {
       console.error('Error rejecting friend request:', error);
@@ -50,10 +51,10 @@ const FriendRequest = () => {
               <p>{friend.email}</p>
             </CardContent>
             <div className="flex space-x-2">
-              <IconButton color="success" aria-label="Approve" onClick={() => handleApprove(friend.id)}>
+              <IconButton color="success" aria-label="Approve" onClick={() => handleApprove(friend.firebaseID)}>
                 <CheckCircle />
               </IconButton>
-              <IconButton color="error" aria-label="Delete" onClick={() => handleReject(friend.id)}>
+              <IconButton color="error" aria-label="Delete" onClick={() => handleReject(friend.firebaseID)}>
                 <Delete />
               </IconButton>
             </div>

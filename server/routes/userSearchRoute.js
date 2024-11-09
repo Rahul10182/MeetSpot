@@ -13,7 +13,7 @@ router.post('/', async (req, res) => {
 
         const users = await User.find({
             email: { $regex: email, $options: 'i' }
-        }).select('fullName email'); // Only return the name and email
+        }).select('fullName email fireBaseId'); 
 
         if (users.length === 0) {
             return res.status(404).json({ message: 'No users found matching the email.' });

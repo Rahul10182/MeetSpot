@@ -2,18 +2,10 @@ import React, { useState, useEffect } from 'react';
 import io from 'socket.io-client';
 import axios from 'axios';
 import { Box, Typography, TextField, Button, Paper, List, ListItem, ListItemText } from '@mui/material';
-import Namebar from './Namebar';
 
 const socket = io('http://localhost:3000');  // Initialize the socket connection
 
-const ChatWindow = ({ userfirebaseId, friendfirebaseId, friendName, friendEmail }) => {
-
-  // console.log("in chatwindow");
-  // console.log("in chatwindow ",userfirebaseId);
-  // console.log(friendfirebaseId);
-  // console.log(friendName);
-  // console.log(friendEmail);
-
+const ChatWindow = ({ userfirebaseId, friendfirebaseId }) => {
   const [messages, setMessages] = useState([]);
   const [message, setMessage] = useState('');
   const [chatId, setChatId] = useState("");
@@ -23,7 +15,7 @@ const ChatWindow = ({ userfirebaseId, friendfirebaseId, friendName, friendEmail 
       axios.post('http://localhost:3000/api/v1/chat/get', { userfirebaseId, friendfirebaseId })
         .then(response => {
           console.log('Chat history response:', response.data);
-          setMessages(response.data.messages || []);
+          setMessages(response.data.lastMessage ? [response.data.lastMessage] : []);
           setChatId(response.data._id);  // Set chatId after fetching it from the backend
           socket.emit('joinChat', { chatId: response.data._id });  // Emit joinChat event with chatId
         })
@@ -54,13 +46,8 @@ const ChatWindow = ({ userfirebaseId, friendfirebaseId, friendName, friendEmail 
     }
   };
 
-  
-
   return (
     <Paper elevation={3} sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
-
-      <Namebar friendName={friendName} friendEmail={friendEmail}/>
-
       <Box sx={{ padding: 2, flex: '1 1 auto', overflowY: 'auto' }}>
         <Typography variant="h6" gutterBottom>Chat</Typography>
 
@@ -101,7 +88,7 @@ const ChatWindow = ({ userfirebaseId, friendfirebaseId, friendName, friendEmail 
           value={message}
           onChange={(e) => setMessage(e.target.value)}
         />
-        <Button className='w-40 bg-blue-900' variant="contained"  onClick={sendMessage}>Send</Button>
+        <Button variant="contained" color="primary" onClick={sendMessage}>Send</Button>
       </Box>
     </Paper>
   );
