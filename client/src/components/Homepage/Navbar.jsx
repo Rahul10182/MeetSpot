@@ -7,6 +7,9 @@ import MenuIcon from '@mui/icons-material/Menu';
 import SettingsIcon from '@mui/icons-material/Settings';
 import LogoutIcon from '@mui/icons-material/Logout';
 import { signOut, getAuth } from 'firebase/auth';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+
 
 const Header = () => {
 
@@ -43,10 +46,14 @@ const Header = () => {
       .then(() => {
         localStorage.removeItem('user');
 
+        toast.success('You are Logged out');
+
         navigate('/');
+        
       })
       .catch((error) => {
         console.log(error);
+        toast.error('Failed to log out');
       });
   };
 
