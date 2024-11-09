@@ -16,6 +16,7 @@ const FriendList = () => {
   const fetchFriends = async () => {
     try {
       const response = await axios.post('http://localhost:3000/friend/old', { firebaseID });
+      console.log(response.data)
       setFriends(response.data);
     } catch (error) {
       console.error('Error fetching friends:', error);

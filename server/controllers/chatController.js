@@ -1,4 +1,4 @@
-import { Chat } from "../models/chatModel.js";
+import  Chat  from "../models/chatModel.js";
 import { User } from "../models/userModel.js";
 
 // Create or retrieve an existing chat between two users
@@ -20,6 +20,10 @@ export const getOrCreateChat = async (req, res) => {
       participants: { $all: [userId, friendId] }
     })
     .populate('participants', '_id name')
+    .populate({
+      path: 'messages',
+      populate: { path: 'sender', select: '_id name' }  // Populate sender in each message
+    })
     .populate('lastMessage');
 
     if (!chat) {

@@ -1,4 +1,3 @@
-
 import { User } from '../models/userModel.js'; 
 
 export const showFriends = async (req, res) => {
@@ -100,7 +99,6 @@ export const sentFrienReqest = async (req, res) => {
 
         res.json(friendsData);
     } catch (error) {
-        // Log error for debugging
         console.error('Error in createFriendRequest:', error.message);
         res.status(500).json({ error: error.message });
     }
@@ -195,6 +193,3 @@ export const deleteFriend = async (req, res) => {
         res.status(500).json({ error: error.message });
     }
 };
-
-
-
