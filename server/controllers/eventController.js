@@ -29,6 +29,7 @@ export const createEvent = async (req, res) => {
 
     if (!eventName || !location || !beginDate || !endDate || !firebaseID) {
       return res.status(400).json({ message: "Please provide all required fields." });
+
     }
 
     const newEvent = new Event({

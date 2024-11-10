@@ -1,3 +1,4 @@
+
 import mongoose from 'mongoose';
 
 const messageSchema = new mongoose.Schema({
@@ -7,9 +8,10 @@ const messageSchema = new mongoose.Schema({
     required: true
   },
   sender: {
-    type:String,
+    type: String,
     required: true
   },
+
   content: {
     type: String,
     required: true
@@ -20,4 +22,5 @@ const messageSchema = new mongoose.Schema({
   }
 });
 
-export const Message = mongoose.model('Message', messageSchema);
+const Message = mongoose.model('Message', messageSchema);
+export default Message

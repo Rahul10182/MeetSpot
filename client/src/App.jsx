@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
@@ -17,7 +18,7 @@ import FriendList from './pages/profile/oldFriend';
 import FriendRequest from './pages/profile/reqFriend';
 import FriendRequestSent from './pages/profile/FriendReqSent';
 import ChatPage from './pages/ChatPage';
-import UserVenues from './pages/profile/VenueDetail';
+import EventsPage from './pages/Eventpage';
 
 
 
@@ -40,6 +41,8 @@ const App = () => {
           firebaseID: user.uid,
           email: user.email,
         };
+        setFirebaseId(user.uid);
+        console.log(userData)
 
         localStorage.setItem('user', JSON.stringify(userData));
 
@@ -49,8 +52,7 @@ const App = () => {
           .catch(error => {
             console.error('Error during authentication request:', error);
           });
-          setFirebaseId(user.uid);
-          console.log(firebaseId);
+
         setAuthenticated(true);
       } else {
         setAuthenticated(false);
@@ -83,8 +85,8 @@ const App = () => {
                 <Route path="old" element={<FriendList />} />
                 <Route path="new" element={<FriendRequest />} />
                 <Route path="sentreq" element={<FriendRequestSent />} />
+                 
               </Route>
-              <Route path="venues" element={<UserVenues />} />
             </Route>
           </Route>
 
@@ -92,6 +94,9 @@ const App = () => {
           <Route path="/" element={<Home />} />
           <Route path="/meeting-point" element={<MeetingPoint />} />
           <Route path="/chat" element={<ChatPage firebaseID={firebaseId} />} />
+          <Route path="/events" element={<EventsPage/>}  />
+          
+
         </Routes>
       </BrowserRouter>
     </div>
