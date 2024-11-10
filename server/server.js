@@ -8,6 +8,7 @@ import venueRoutes from "./routes/venueRoutes.js"
 import eventRoutes from "./routes/eventRouter.js"
 import friendRoute from "./routes/friendRoutes.js"
 import chatRoutes from "./routes/chatRoutes.js"
+import notifcationRoutes from "./routes/notificationRoutes.js"
 import { Server } from "socket.io";
 import {createServer} from "http";
 import userSearch from "./routes/userSearchRoute.js"
@@ -43,6 +44,7 @@ app.use('/eventRegister', eventRoutes);
 app.use('/friend', friendRoute);
 app.use('/api/v1/venue', venueRoutes);
 app.use('/api/v1/chat', chatRoutes);
+app.use("/notifications", notifcationRoutes);
 
 // Socket.io for real-time chat
 io.on('connection', (socket) => {
