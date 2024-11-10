@@ -1,9 +1,9 @@
-import React, { useState ,useEffect,useRef} from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
     Avatar, Typography, TextField, Divider, AppBar, Toolbar,
-    List, ListItem, ListItemText, ListItemIcon, Card, CardContent, Button,InputAdornment
+    List, ListItem, ListItemText, ListItemIcon, Card, CardContent, Button, InputAdornment
 } from '@mui/material';
-import { Settings, Dashboard, Notifications, AccountCircle, Event,Search } from '@mui/icons-material';
+import { Settings, Dashboard, Notifications, AccountCircle, Event, Search, LocationOn } from '@mui/icons-material';
 import { useNavigate, Outlet } from 'react-router-dom';
 import axios from 'axios';
 
@@ -11,6 +11,7 @@ const UserDashboard = () => {
     const userData = JSON.parse(localStorage.getItem('user'));
     const name = userData?.fullName;
     const email = userData?.email;
+    const firebaseID1 = userData?.firebaseID;
     const navigate = useNavigate();
 
     const [searchQuery, setSearchQuery] = useState('');
@@ -24,33 +25,48 @@ const UserDashboard = () => {
         if (query.trim()) {
             try {
                 const response = await axios.post('http://localhost:3000/search', { email: query });
-                setSearchResults(response.data.users); // Set the results to state
+                setSearchResults(response.data.users); 
             } catch (error) {
                 console.error('Error searching for people:', error);
             }
         } else {
-            setSearchResults([]); // Clear the results when query is empty
+            setSearchResults([]); 
         }
     };
 
-    const handleAddFriend = (userId) => {
-        // Placeholder function for adding a friend
-        console.log(`Added friend with ID: ${userId}`);
+    const handleAddFriend = async (userId) => {
+        const currentUser = JSON.parse(localStorage.getItem('user'));
+        const firebaseID1 = currentUser?.firebaseID;
+    
+        try {
+            const response = await axios.post('http://localhost:3000/friend/sendreq', {
+                firebaseID1: firebaseID1,
+                firebaseID2 : userId
+            });
+            
+            if (response.status === 201) {
+                console.log(`Friend request sent to user with ID: ${userId}`);
+                // Optionally remove user from searchResults after adding
+                setSearchResults(prevResults => prevResults.filter(user => user._id !== userId));
+            } else {
+                console.log(`Failed to send friend request: ${response.data.message}`);
+            }
+        } catch (error) {
+            console.error('Error sending friend request:', error);
+        }
     };
+    
 
     useEffect(() => {
         const handleClickOutside = (event) => {
             if (searchRef.current && !searchRef.current.contains(event.target)) {
-                // Clear search query and hide results when clicking outside
                 setSearchQuery('');
                 setSearchResults([]);
             }
         };
 
-        // Bind the event listener
         document.addEventListener('click', handleClickOutside);
 
-        // Cleanup the event listener on component unmount
         return () => {
             document.removeEventListener('click', handleClickOutside);
         };
@@ -63,7 +79,7 @@ const UserDashboard = () => {
                 <div className="text-center mb-8">
 
                 <button 
-                    onClick={() => navigate('/')} // Corrected navigation
+                    onClick={() => navigate('/')} 
                     className="text-center text-3xl font-semibold mx-4 whitespace-nowrap transition-all duration-200 focus:outline-none"
                 >
                     MeetSpot
@@ -81,7 +97,7 @@ const UserDashboard = () => {
                           { text: 'Friends', icon: <AccountCircle />, path: '/profile/friends/old' },
                           { text: 'Notifications', icon: <Notifications />, path: '/profile/notifications' },
                           { text: 'Create Event', icon: <Event />, path: '/profile/createevent' },
-                          { text: 'Settings', icon: <Settings />, path: '/profile/settings' }]
+                          { text: 'Venues', icon: <LocationOn />, path: '/profile/venues' }]
                           .map((item, index) => (
                             <ListItem
                                 button
@@ -103,13 +119,6 @@ const UserDashboard = () => {
                 <AppBar position="static" color="transparent" elevation={0} className="bg-blue-500 shadow-sm mb-6">
                     <Toolbar className="flex justify-between">
                         <div>
-                        <Avatar
-                            className="mx-auto mb-4 bg-pink-500"
-                            alt={name}
-                            src="/static/images/avatar/1.jpg"
-                            sx={{ width: 72, height: 72 ,backgroundColor: '#FFB6C1'}}
-                            
-                        />
                         <Typography variant="h5" className="font-semibold text-blue-800">
                             Welcome, {name || "User"}
                         </Typography>
@@ -122,7 +131,7 @@ const UserDashboard = () => {
                                 placeholder="Search for friend"
                                 className="bg-gray-100 rounded w-80"
                                 value={searchQuery}
-                                onChange={handleSearchChange}  // Handle the input change
+                                onChange={handleSearchChange} 
                                 InputProps={{
                                     startAdornment: (
                                         <InputAdornment position="start">
@@ -132,9 +141,7 @@ const UserDashboard = () => {
                                 }}
 
                             />
-                            {/* <Avatar alt={name} src="/static/images/avatar/1.jpg" /> */}
                             
-                            {/* Popup for search results */}
                             {searchResults.length > 0 && (
                                 <div className="absolute left-0 right-0 bg-white shadow-lg mt-72 rounded-md z-10 max-h-60 overflow-y-auto w-72 sm:w-80">
                                     {searchResults.map((user) => (
@@ -147,7 +154,7 @@ const UserDashboard = () => {
                                                     color="primary" 
                                                     fullWidth 
                                                     className="mt-2"
-                                                    onClick={() => handleAddFriend(user._id)}
+                                                    onClick={() => handleAddFriend(user.fireBaseId)}
                                                 >
                                                     Add Friend
                                                 </Button>

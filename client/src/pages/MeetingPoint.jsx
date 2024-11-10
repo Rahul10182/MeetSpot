@@ -4,7 +4,7 @@ import { setLocation } from '../store/location-slice/locationSlice';
 import Friend from '../components/Meet/Friend';
 import Navbar from "../components/Homepage/Navbar";
 
-// Coordinates for Prayagraj mini college
+// Coordinates for Prayagraj
 const prayagrajCollegeCenter = { lat: 25.4358, lng: 81.8463 };
 
 const MeetingPointPage = () => {
@@ -17,7 +17,7 @@ const MeetingPointPage = () => {
     const loadGoMapsAPI = () => {
       if (!window.gomaps) {
         const script = document.createElement('script');
-        script.src = `https://maps.gomaps.pro/maps/api/js?key=AlzaSywFl8hTnkxrZmvVDkLTfmgRzbUHXtpQg1F&libraries=places`;
+        script.src = `https://maps.gomaps.pro/maps/api/js?key=AlzaSy5CgyOHomgbCzkFlTzYj0MowZrnZx20bFs&libraries=places`;
         script.async = true;
         script.defer = true;
         script.onload = initializeMap;
@@ -56,17 +56,15 @@ const MeetingPointPage = () => {
   
   return (
     <div className="flex flex-col h-screen">
-      {/* Navbar at the top */}
+
       <Navbar />
 
-      {/* Page Content: Sidebar and Map */}
       <div className="flex flex-grow">
-        {/* Sidebar with Friend component */}
+
         <div className="w-2/5 bg-gray-100 p-6">
           <Friend map={map} />
         </div>
 
-        {/* Map */}
         <div
           id="map"
           className="flex-grow"

@@ -1,10 +1,11 @@
+
 import mongoose from 'mongoose';
 
 const venueSchema = new mongoose.Schema({
   name: {
     type: String,
     required: [true, 'Venue name is required'],
-    trim: true,  // Removes extra spaces
+    trim: true,  
   },
   type: {
     type: String,
@@ -14,7 +15,7 @@ const venueSchema = new mongoose.Schema({
   location: {
     type: {
       type: String,
-      enum: ['Point'],  // GeoJSON type must be 'Point'
+      enum: ['Point'], 
       required: true,
     },
 
@@ -23,7 +24,7 @@ const venueSchema = new mongoose.Schema({
       required: [true, 'Coordinates are required'],
       validate: {
         validator: function (coords) {
-          return coords.length === 2;  // Ensures array contains exactly [longitude, latitude]
+          return coords.length === 2;  
         },
         message: 'Coordinates must contain exactly two values: [longitude, latitude]',
       },
@@ -36,7 +37,7 @@ const venueSchema = new mongoose.Schema({
   },
   lastVisited: {
     type: Date,
-    default: null,  // Default to null if not visited yet
+    default: null, 
   },
 }, { timestamps: true });
 
