@@ -35,6 +35,8 @@ const EventsPage = () => {
     setFriendEmail('');
   };
 
+  
+
   const handleRegister = async () => {
     try {
       await axios.post('http://localhost:3000/event/register', {
@@ -42,6 +44,9 @@ const EventsPage = () => {
         userEmail,
         friendEmail,
       });
+      console.log(selectedEvent._id);
+      console.log(userEmail);
+      console.log(friendEmail)
       alert('Registration successful, notification sent!');
       handleCloseModal();
     } catch (error) {

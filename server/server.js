@@ -74,9 +74,10 @@ io.on('connection', (socket) => {
       await message.populate('sender', '_id name');
 
       await Chat.findByIdAndUpdate(chatId, {
-        $push: { messages: message._id },  // Append to messages array
-        lastMessage: message._id           // Update last message
+        $set: { lastMessage: message._id },
+        $push: { messages: message._id },
       });
+  
   
 
       // Emit the message to the users in the same chat room
