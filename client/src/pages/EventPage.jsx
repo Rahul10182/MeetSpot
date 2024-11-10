@@ -36,6 +36,8 @@ const EventsPage = () => {
     setFriendEmail('');
   };
 
+  
+
   const handleRegister = async () => {
     if (!userEmail || !friendEmail) {
       alert("Both emails are required.");
@@ -48,6 +50,9 @@ const EventsPage = () => {
         userEmail,
         friendEmail,
       });
+      console.log(selectedEvent._id);
+      console.log(userEmail);
+      console.log(friendEmail)
       alert('Registration successful, notification sent!');
       handleCloseModal();
     } catch (error) {

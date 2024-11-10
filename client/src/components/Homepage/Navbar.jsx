@@ -20,7 +20,8 @@ const Header = () => {
   const user = auth.currentUser;
   const userData = JSON.parse(localStorage.getItem('user'));
   const name = userData?.fullName;
-  const firebaseID = userData?.fireBaseId;
+  const firebaseID = userData?.firebaseID;
+  // console.log(firebaseID);
 
   const [anchorAccount, setAnchorAccount] = useState(null);
   const [isDrawerOpen, setDrawerOpen] = useState(false);
@@ -41,6 +42,7 @@ const Header = () => {
       if (open && firebaseID) {
         try {
           const response = await axios.post(`http://localhost:3000/notifications/${firebaseID}`);
+          console.log(response.data);
           setNotifications(response.data || []);
         } catch (error) {
           console.error('Failed to fetch notifications', error);

@@ -15,7 +15,7 @@ import { createServer } from "http";
 import userSearch from "./routes/userSearchRoute.js";
 import Message from "./models/messageModel.js"; 
 import Chat from "./models/chatModel.js";
-
+import notificationRoutes from "./routes/notificationRoutes.js"
 dotenv.config();
 connectDB();
 
@@ -46,7 +46,7 @@ app.use('/eventRegister', eventRoutes);
 app.use('/friend', friendRoute);
 app.use('/api/v1/venue', venueRoutes);
 app.use('/api/v1/chat', chatRoutes);
-app.use("/notifications", notifcationRoutes);
+app.use("/notifications", notificationRoutes);
 
 // Socket.io for real-time chat
 io.on('connection', (socket) => {
@@ -72,6 +72,13 @@ io.on('connection', (socket) => {
       await message.save();
       await message.populate('sender', '_id name');
 
+      await Chat.findByIdAndUpdate(chatId, {
+        $set: { lastMessage: message._id },
+        $push: { messages: message._id },
+      });
+  
+  
+
       // Emit the message to the users in the same chat room
       socket.to(chatId).emit('newMessage', message);  // Consistent event name 'newMessage'
     } catch (error) {
@@ -85,5 +92,5 @@ io.on('connection', (socket) => {
 });
 
 server.listen(PORT, () => {
-  // console.log(Server running on port ${PORT});
+  console.log(`Server running on port ${PORT}`);
 });
