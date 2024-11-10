@@ -24,6 +24,7 @@ const FriendList = ({ firebaseID, onFriendSelect }) => {
     }
   }, [firebaseID]);
 
+
   const handleSearch = (event) => {
     setSearchQuery(event.target.value);
   };

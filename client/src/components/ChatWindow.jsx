@@ -16,8 +16,8 @@ const ChatWindow = ({ userfirebaseId, friendfirebaseId }) => {
         .then(response => {
           console.log('Chat history response:', response.data);
           setMessages(response.data.lastMessage ? [response.data.lastMessage] : []);
-          setChatId(response.data._id);  // Set chatId after fetching it from the backend
-          socket.emit('joinChat', { chatId: response.data._id });  // Emit joinChat event with chatId
+          setChatId(response.data._id);  
+          socket.emit('joinChat', { chatId: response.data._id });
         })
         .catch(error => console.error('Error fetching chat history:', error));
 
