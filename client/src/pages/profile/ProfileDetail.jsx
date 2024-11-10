@@ -58,16 +58,13 @@ const UserDashboard = () => {
     useEffect(() => {
         const handleClickOutside = (event) => {
             if (searchRef.current && !searchRef.current.contains(event.target)) {
-                // Clear search query and hide results when clicking outside
                 setSearchQuery('');
                 setSearchResults([]);
             }
         };
 
-        // Bind the event listener
         document.addEventListener('click', handleClickOutside);
 
-        // Cleanup the event listener on component unmount
         return () => {
             document.removeEventListener('click', handleClickOutside);
         };
@@ -80,7 +77,7 @@ const UserDashboard = () => {
                 <div className="text-center mb-8">
 
                 <button 
-                    onClick={() => navigate('/')} // Corrected navigation
+                    onClick={() => navigate('/')} 
                     className="text-center text-3xl font-semibold mx-4 whitespace-nowrap transition-all duration-200 focus:outline-none"
                 >
                     MeetSpot

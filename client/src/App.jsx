@@ -84,8 +84,7 @@ const App = () => {
                 <Route path="old" element={<FriendList />} />
                 <Route path="new" element={<FriendRequest />} />
                 <Route path="sentreq" element={<FriendRequestSent />} />
-                 <Route path="/chat" element={<ChatPage firebaseId={firebaseId} />} />
-                <Route path="/events" element={<EventsPage/>}  />
+                 
               </Route>
             </Route>
           </Route>
@@ -93,6 +92,8 @@ const App = () => {
           <Route path="/unauth-page" element={<UnauthPages />} />
           <Route path="/" element={<Home />} />
           <Route path="/meeting-point" element={<MeetingPoint />} />
+          <Route path="/chat" element={<ChatPage firebaseId={firebaseId} />} />
+          <Route path="/events" element={<EventsPage/>}  />
           
 
         </Routes>

@@ -7,8 +7,7 @@ const messageSchema = new mongoose.Schema({
     required: true
   },
   sender: {
-    type: String, // Ensure it's ObjectId for better linking
-     // Reference to the User model
+    type: String,
     required: true
   },
 

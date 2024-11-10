@@ -25,6 +25,7 @@ const Friend = ({ map }) => {
   const [errorMessage, setErrorMessage] = useState('');
   const [activeSection, setActiveSection] = useState('SetLocations');
   const [distances, setDistances] = useState({});
+  const [trafficSpots, setTrafficSpots] = useState([]);
 
   const userData = JSON.parse(localStorage.getItem('user'));
   const firebaseId = userData?.firebaseID;
@@ -69,6 +70,10 @@ const Friend = ({ map }) => {
     friendSearchBox.addListener('places_changed', () =>
       handlePlaceSelect(friendSearchBox, setFriendMarker, setFriendLocation, 'F')
     );
+
+  
+
+
   }, [map, dispatch]);
 
   const clearPreviousRenderers = () => {
@@ -95,28 +100,7 @@ const Friend = ({ map }) => {
   };
 
 
-  const addDirectionRenderer = (origin, destination) => {
-    const directionsService = new window.google.maps.DirectionsService();
-    const directionsRenderer = new window.google.maps.DirectionsRenderer({
-      map,
-      suppressMarkers: true,
-    });
-    directionsService.route(
-      {
-        origin,
-        destination,
-        travelMode: 'DRIVING',
-      },
-      (response, status) => {
-        if (status === 'OK') {
-          directionsRenderer.setDirections(response);
-        } else {
-          alert(`Directions request failed: ${status}`);
-        }
-      }
-    );
-    setDirectionsRenderers((prev) => [...prev, directionsRenderer]);
-  };
+  
 
   const handleFindVenue = async () => {
     if (!userLocation || !friendLocation) {
@@ -173,6 +157,53 @@ const Friend = ({ map }) => {
     }
   };
 
+
+  const addTrafficSpots = (path) => {
+    const newSpots = path.map((point) => {
+      const marker = new window.google.maps.Marker({
+        position: point,
+        map,
+        icon: {
+          path: window.google.maps.SymbolPath.CIRCLE,
+          scale: 5,
+          fillColor: 'red',
+          fillOpacity: 0.8,
+          strokeColor: 'red',
+        },
+      });
+      return marker;
+    });
+
+    setTrafficSpots((prev) => [...prev, ...newSpots]);
+  };
+
+
+
+  const addDirectionRenderer = (origin, destination) => {
+    const directionsService = new window.google.maps.DirectionsService();
+    const directionsRenderer = new window.google.maps.DirectionsRenderer({
+      map,
+      suppressMarkers: true,
+    });
+    directionsService.route(
+      {
+        origin,
+        destination,
+        travelMode: 'DRIVING',
+      },
+      (response, status) => {
+        if (status === 'OK') {
+          directionsRenderer.setDirections(response);
+          const path = response.routes[0].overview_path;
+          addTrafficSpots(path);
+        } else {
+          alert(`Directions request failed: ${status}`);
+        }
+      }
+    );
+    setDirectionsRenderers((prev) => [...prev, directionsRenderer]);
+  };
+
   const handleSelectVenue = (venue) => {
     clearPreviousRenderers();
     clearVenueMarkers();
@@ -224,7 +255,7 @@ const Friend = ({ map }) => {
       );
 
       setErrorMessage(''); // Clear any previous error messages
-      setActiveSection('FixMeeting'); // Switch to FixMeeting section
+      setActiveSection('FixMeeting'); 
   
       // Remove only the selected card
       setVenues((prevVenues) => prevVenues.filter((v) => v !== selectedVenue));
@@ -338,9 +369,9 @@ const Friend = ({ map }) => {
         )}
 
         {activeSection === 'SelectVenue' && openVenueBox && (
-          <Box sx={{maxHeight: '400px', // Adjust this height as needed
-              overflowY: 'auto',  // Enables vertical scrolling
-              padding: 2,         // Optional padding
+          <Box sx={{maxHeight: '400px',
+              overflowY: 'auto', 
+              padding: 2,         
               border: '1px solid #ccc', }}>
             <Typography variant="h6" gutterBottom align="center">
               Select Venue

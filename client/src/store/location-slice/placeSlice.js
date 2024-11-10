@@ -1,4 +1,3 @@
-// placesSlice.js
 import { createSlice } from '@reduxjs/toolkit';
 
 const initialState = {
@@ -10,10 +9,10 @@ const placesSlice = createSlice({
   initialState,
   reducers: {
     setPlaces: (state, action) => {
-      state.places = action.payload; // Set the array of places
+      state.places = action.payload; 
     },
     clearPlaces: (state) => {
-      state.places = []; // Clear the places
+      state.places = []; 
     },
   },
 });

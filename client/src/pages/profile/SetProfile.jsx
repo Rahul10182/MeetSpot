@@ -36,7 +36,6 @@ const SetProfile = () => {
                     
                     <Divider className="mb-6" />
 
-                    {/* Form Fields with Refs */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <TextField
                             label="Full Name"

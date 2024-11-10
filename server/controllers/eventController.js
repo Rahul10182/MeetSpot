@@ -25,12 +25,10 @@ export const createEvent = async (req, res) => {
             firebaseID
         } = req.body;
 
-        // Validate required fields
         if (!eventName || !location || !beginDate || !endDate || !firebaseID) {
             return res.status(400).json({ message: 'Please provide all required fields.' });
         }
 
-        // Create a new event instance
         const newEvent = new Event({
             eventName,
             eventType,

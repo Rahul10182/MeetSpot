@@ -45,7 +45,7 @@ const FriendList = ({ firebaseID, onFriendSelect }) => {
 
         <div>
                   <button 
-                onClick={() => navigate('/')} // Corrected navigation
+                onClick={() => navigate('/')}
                     className="text-center text-white h-20 text-3xl font-semibold mx-28 whitespace-nowrap transition-all duration-200 focus:outline-none"
                 >
                     MeetSpot
@@ -63,11 +63,11 @@ const FriendList = ({ firebaseID, onFriendSelect }) => {
               backgroundColor: '#ffffff', 
               width: '80%', 
               borderRadius: '8px',
-              margin: '30px',  // Centers the TextField horizontally
+              margin: '30px',  
               
               '& .MuiOutlinedInput-root': {
-                height: 56, // Increased height
-                borderRadius: '8px', // Rounded corners for input
+                height: 56,
+                borderRadius: '8px', 
                 border: '1px solid #3498db', 
               },
               '& .MuiInputBase-input::placeholder': {
@@ -85,8 +85,8 @@ const FriendList = ({ firebaseID, onFriendSelect }) => {
 
 
       <Box sx={{ 
-          maxHeight: '60vh', // You can adjust the height as needed
-          overflowY: 'auto', // Enables vertical scrolling
+          maxHeight: '60vh', 
+          overflowY: 'auto', 
       }}>
 
       {/* Friends List */}
