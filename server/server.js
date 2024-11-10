@@ -14,16 +14,16 @@ import { Server } from "socket.io";
 import { createServer } from "http";
 import userSearch from "./routes/userSearchRoute.js";
 import Message from "./models/messageModel.js"; 
-import Chat from "./models/chatModel.js";
+// import Chat from "./models/chatModel.js";
 
 dotenv.config();
 connectDB();
 
 const app = express();
-const server = createServer(app); // Create a server with express
+const server = createServer(app);
 const io = new Server(server, {
   cors: {
-    origin: [process.env.CLIENT_URL || 'http://localhost:5173'],  // Use env variable or localhost for CORS
+    origin: [process.env.CLIENT_URL || 'http://localhost:5173'],
     credentials: true,
   },
 });
@@ -39,7 +39,6 @@ const corsOptions = {
 };
 app.use(cors(corsOptions));
 
-// Routes
 app.use('/search', userSearch);
 app.use('/api/v1/user', userRoutes);
 app.use('/eventRegister', eventRoutes);
@@ -48,32 +47,27 @@ app.use('/api/v1/venue', venueRoutes);
 app.use('/api/v1/chat', chatRoutes);
 app.use("/notifications", notifcationRoutes);
 
-// Socket.io for real-time chat
 io.on('connection', (socket) => {
   console.log('User connected', socket.id);
 
-  // Join specific chat rooms for a user
   socket.on('joinChat', ({ chatId }) => {
     socket.join(chatId);
-    // console.log(User joined chat: ${chatId});
+    console.log('User joined chat: ${chatId}');
   });
 
-  // Listen for chat messages
   socket.on('chatMessage', async ({ chatId, senderId, content, timestamp }) => {
     try {
-      // Save the message to the database
       const message = new Message({
         chat: chatId,
         sender: senderId,
         content: content,
-        timestamp: timestamp,  // Now timestamp is passed correctly
+        timestamp: timestamp,  
       });
 
       await message.save();
       await message.populate('sender', '_id name');
 
-      // Emit the message to the users in the same chat room
-      socket.to(chatId).emit('newMessage', message);  // Consistent event name 'newMessage'
+      socket.to(chatId).emit('newMessage', message);  
     } catch (error) {
       console.error('Error sending message:', error);
     }
@@ -85,5 +79,5 @@ io.on('connection', (socket) => {
 });
 
 server.listen(PORT, () => {
-  // console.log(Server running on port ${PORT});
+  console.log('Server running on port ${PORT}');
 });
