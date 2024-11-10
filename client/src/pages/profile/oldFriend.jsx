@@ -5,6 +5,7 @@ import {
   Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Button 
 } from '@mui/material';
 import { Message, Delete, SentimentVeryDissatisfied } from '@mui/icons-material';
+import { useNavigate } from 'react-router-dom';
 
 const FriendList = () => {
   const [friends, setFriends] = useState([]);
@@ -12,6 +13,7 @@ const FriendList = () => {
   const [selectedFriend, setSelectedFriend] = useState(null);
   const userData = JSON.parse(localStorage.getItem('user'));
   const firebaseID = userData?.firebaseID;
+  const navigate = useNavigate();
 
   const fetchFriends = async () => {
     try {
@@ -63,7 +65,7 @@ const FriendList = () => {
                 <p>{friend.email}</p>
               </CardContent>
               <div className="flex space-x-2">
-                <IconButton color="primary" aria-label="Message">
+                <IconButton color="primary" aria-label="Message" onClick={() => navigate('/chat')}>
                   <Message />
                 </IconButton>
                 <IconButton color="error" aria-label="Delete" onClick={() => handleDeleteClick(friend)}>

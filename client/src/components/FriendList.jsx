@@ -20,7 +20,7 @@ const FriendList = ({ firebaseID, searchQuery, onFriendSelect }) => {
   }, [firebaseID]);
 
   const filteredFriends = friends.filter(friend =>
-    friend.friend.fullName?.toLowerCase().includes(searchQuery.toLowerCase())
+    friend.fullName?.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   console.log("Filtered friends:", filteredFriends); 
