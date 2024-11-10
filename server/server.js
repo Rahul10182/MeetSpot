@@ -2,15 +2,15 @@ import cookieParser from "cookie-parser";
 import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
-
-import connectDB from './config/database.js';
-import userRoutes from "./routes/authRoutes.js";
-import venueRoutes from "./routes/venueRoutes.js";
-import reviewRoutes from "./routes/reviewRoutes.js";
-import eventRoutes from "./routes/eventRouter.js";
-import friendRoute from "./routes/friendRoutes.js";
-import chatRoutes from "./routes/chatRoutes.js";
+import  connectDB from './config/database.js';
+import userRoutes from "./routes/authRoutes.js"
+import venueRoutes from "./routes/venueRoutes.js"
+import eventRoutes from "./routes/eventRouter.js"
+import friendRoute from "./routes/friendRoutes.js"
+import chatRoutes from "./routes/chatRoutes.js"
+import notifcationRoutes from "./routes/notificationRoutes.js"
 import { Server } from "socket.io";
+
 import { createServer } from "http";
 import userSearch from "./routes/userSearchRoute.js";
 import Message from "./models/messageModel.js"; 
@@ -42,11 +42,11 @@ app.use(cors(corsOptions));
 // Routes
 app.use('/search', userSearch);
 app.use('/api/v1/user', userRoutes);
-app.use('/event', eventRoutes);
+app.use('/eventRegister', eventRoutes);
 app.use('/friend', friendRoute);
 app.use('/api/v1/venue', venueRoutes);
-app.use('/api/v1/review', reviewRoutes);
 app.use('/api/v1/chat', chatRoutes);
+app.use("/notifications", notifcationRoutes);
 
 // Socket.io for real-time chat
 io.on('connection', (socket) => {
@@ -55,7 +55,7 @@ io.on('connection', (socket) => {
   // Join specific chat rooms for a user
   socket.on('joinChat', ({ chatId }) => {
     socket.join(chatId);
-    console.log(`User joined chat: ${chatId}`);
+    // console.log(User joined chat: ${chatId});
   });
 
   // Listen for chat messages
@@ -72,12 +72,6 @@ io.on('connection', (socket) => {
       await message.save();
       await message.populate('sender', '_id name');
 
-      await Chat.findByIdAndUpdate(chatId, {
-        $push: { messages: message._id },  // Append to messages array
-        lastMessage: message._id           // Update last message
-      });
-  
-
       // Emit the message to the users in the same chat room
       socket.to(chatId).emit('newMessage', message);  // Consistent event name 'newMessage'
     } catch (error) {
@@ -91,5 +85,5 @@ io.on('connection', (socket) => {
 });
 
 server.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+  // console.log(Server running on port ${PORT});
 });
