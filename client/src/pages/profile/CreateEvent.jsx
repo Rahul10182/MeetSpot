@@ -18,6 +18,8 @@ const EventPlannerForm = () => {
     endTime: '',
     firebaseID,
   });
+  console.log(firebaseID);
+  console.log(formData);
   const [showSuccess, setShowSuccess] = useState(false);
 
   const handleChange = (e) => {
