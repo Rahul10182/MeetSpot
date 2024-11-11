@@ -2,6 +2,10 @@ import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { startTransition } from 'react';
 import SearchIcon from '@mui/icons-material/Search';
+import Tooltip from '@mui/material/Tooltip';
+import CalendarTodayIcon from '@mui/icons-material/CalendarToday'; // Import new icon
+import MeetingIcon from '@mui/icons-material/VideoCall'; // Import for the new icon
+
 import AccountCircle from '@mui/icons-material/AccountCircle';
 import SettingsIcon from '@mui/icons-material/Settings';
 import LogoutIcon from '@mui/icons-material/Logout';
@@ -125,6 +129,14 @@ const Header = () => {
 
         {/* Notification, Events, and User's name */}
         <div className="flex items-center space-x-4 ml-4">
+        <Tooltip title="Scheduled Meetings" arrow>
+            <button
+              className="bg-blue-600 text-white p-2 rounded-lg hover:bg-blue-500 transition duration-300 focus:outline-none"
+              onClick={() => handleNavigation('/profile/meetings')}
+            >
+              <CalendarTodayIcon fontSize="medium" />
+            </button>
+          </Tooltip>
           <button
             className="bg-blue-600 text-white p-2 rounded-lg hover:bg-blue-500 transition duration-300 focus:outline-none"
             onClick={() => toggleDrawer(!isDrawerOpen)}
@@ -190,7 +202,10 @@ const Header = () => {
           )}
         </div>
       </div>
-    
+
+
+
+
 
       {/* Notifications Drawer */ }
       <Drawer anchor="right" open={isDrawerOpen} onClose={() => setDrawerOpen(false)}>

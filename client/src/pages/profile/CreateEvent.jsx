@@ -61,7 +61,7 @@ const EventPlannerForm = () => {
   };
 
   return (
-    <div className="bg-gradient-to-br bg-blue-300 min-h-screen flex items-center justify-center p-6">
+    <div className="bg-gradient-to-br bg-slate-300 min-h-screen flex items-center justify-center p-6">
       <Box className="bg-white shadow-4xl rounded-xl border-2 w-full max-w-md p-10 space-y-6">
         {showSuccess ? (
           <Typography variant="h6" component="p" className="text-center text-green-600 font-semibold">

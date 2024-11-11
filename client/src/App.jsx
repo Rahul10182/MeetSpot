@@ -18,7 +18,8 @@ import FriendRequest from './pages/profile/reqFriend';
 import FriendRequestSent from './pages/profile/FriendReqSent';
 import ChatPage from './pages/ChatPage';
 import EventsPage from './pages/Eventpage';
-
+import ScheduledMeetings from "./pages/ScheduledMeetings"
+import ShowMeet from './pages/ShowMeet';
 
 
 const App = () => {
@@ -77,8 +78,12 @@ const App = () => {
           </Route>
 
           <Route element={<PrivateRoute authenticated={authenticated} />}>
+          
             <Route path="/profile" element={<UserDashboard />}>
               <Route path="dashboard" element={<SetProfile />} />
+              <Route path="meetings" element={<ScheduledMeetings/>}>
+                
+              </Route>
               <Route path="createevent" element={<EventPlannerForm />} />
               <Route path="friends" element={<FriendPage />}>
                 <Route path="old" element={<FriendList />} />
@@ -88,7 +93,7 @@ const App = () => {
               </Route>
             </Route>
           </Route>
-
+          <Route path ="/show-meet" element={<ShowMeet/>}></Route>
           <Route path="/unauth-page" element={<UnauthPages />} />
           <Route path="/" element={<Home />} />
           <Route path="/meeting-point" element={<MeetingPoint />} />

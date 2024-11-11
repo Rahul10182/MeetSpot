@@ -3,7 +3,7 @@ import { useDispatch } from 'react-redux';
 import axios from 'axios';
 import { setLocation } from '../../store/location-slice/locationSlice';
 import { Box, TextField, Button, Typography, Card, CardContent, CircularProgress } from '@mui/material';
-const apiKey = "AlzaSy5CgyOHomgbCzkFlTzYj0MowZrnZx20bFs";
+const apiKey = "AlzaSyP6exizIh22-UNatVUUC-PtIH_dU7nZf2s";
 
 
 const Friend = ({ map }) => {
