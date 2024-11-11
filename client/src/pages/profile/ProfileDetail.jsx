@@ -3,13 +3,10 @@ import {
     Avatar, Typography, TextField, Divider, AppBar, Toolbar,
     List, ListItem, ListItemText, ListItemIcon, Card, CardContent, Button, InputAdornment
 } from '@mui/material';
-<<<<<<< HEAD
 import { Settings, Dashboard, Notifications, AccountCircle, Event,Search } from '@mui/icons-material';
 import CalendarTodayIcon from '@mui/icons-material/CalendarToday'; // Import new icon
 
-=======
 import { Settings, Dashboard, Notifications, AccountCircle, Event, Search, LocationOn } from '@mui/icons-material';
->>>>>>> 1d477846daff1d849aa785baab70e5385df4c99d
 import { useNavigate, Outlet } from 'react-router-dom';
 import axios from 'axios';
 
@@ -103,12 +100,9 @@ const UserDashboard = () => {
                           { text: 'Friends', icon: <AccountCircle />, path: '/profile/friends/old' },
                           { text: 'Notifications', icon: <Notifications />, path: '/profile/notifications' },
                           { text: 'Create Event', icon: <Event />, path: '/profile/createevent' },
-<<<<<<< HEAD
                           { text: 'Settings', icon: <Settings />, path: '/profile/settings' },
-                          { text: 'Meetings', icon: <CalendarTodayIcon fontSize="medium" />, path: '/profile/meetings' }]
-=======
+                          { text: 'Meetings', icon: <CalendarTodayIcon fontSize="medium" />, path: '/profile/meetings'},
                           { text: 'Venues', icon: <LocationOn />, path: '/profile/venues' }]
->>>>>>> 1d477846daff1d849aa785baab70e5385df4c99d
                           .map((item, index) => (
                             <ListItem
                                 button
