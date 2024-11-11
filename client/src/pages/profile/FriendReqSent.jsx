@@ -22,8 +22,10 @@ const FriendRequestSent = () => {
   };
 
   const handleReject = async (user2ID) => {
+    console.log(user2ID)
+    console.log(firebaseID)
     try {
-      await axios.post('http://localhost:3000/friend/reject', { firebaseID1: firebaseID, firebaseID2: user2ID });
+      await axios.post('http://localhost:3000/friend/reject', { firebaseID2: firebaseID, firebaseID1: user2ID });
       fetchFriends();
     } catch (error) {
       console.error('Error rejecting friend request:', error);
@@ -33,18 +35,20 @@ const FriendRequestSent = () => {
   return (
     <div className="w-full max-w-md bg-white shadow-lg rounded-lg p-4">
       {friends.length > 0 ? (
-        friends.map((friend, index) => (
-          <Card key={index} className="flex items-center mb-4 p-2">
-            <Avatar alt={friend.name} className="mr-4" />
-            <CardContent className="flex-1">
-              <h3 className="text-lg font-medium">{friend.name}</h3>
-              <p>{friend.email}</p>
-            </CardContent>
-            <IconButton color="error" aria-label="Reject" onClick={() => handleReject(friend.id)}>
-              <Delete />
-            </IconButton>
-          </Card>
-        ))
+        <div className="overflow-y-auto" style={{ maxHeight: '250px' }}>
+          {friends.map((friend, index) => (
+            <Card key={index} className="flex items-center mb-4 p-2">
+              <Avatar alt={friend.name} className="mr-4" />
+              <CardContent className="flex-1">
+                <h3 className="text-lg font-medium">{friend.name}</h3>
+                <p>{friend.email}</p>
+              </CardContent>
+              <IconButton color="error" aria-label="Reject" onClick={() => handleReject(friend.firebaseID1)}>
+                <Delete />
+              </IconButton>
+            </Card>
+          ))}
+        </div>
       ) : (
         <div className="flex flex-col items-center text-gray-500">
           <SentimentDissatisfied style={{ fontSize: 50, marginBottom: 10 }} />

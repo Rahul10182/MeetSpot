@@ -37,6 +37,9 @@ const UserDashboard = () => {
     const handleAddFriend = async (userId) => {
         const currentUser = JSON.parse(localStorage.getItem('user'));
         const firebaseID1 = currentUser?.firebaseID;
+        console.log(userId)
+        console.log(firebaseID1)
+
     
         try {
             const response = await axios.post('http://localhost:3000/friend/sendreq', {
@@ -160,7 +163,7 @@ const UserDashboard = () => {
                                                     color="primary" 
                                                     fullWidth 
                                                     className="mt-2"
-                                                    onClick={() => handleAddFriend(user._id)}
+                                                    onClick={() => handleAddFriend(user.fireBaseId)}
                                                 >
                                                     Add Friend
                                                 </Button>

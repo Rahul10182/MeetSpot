@@ -23,7 +23,7 @@ const FriendRequest = () => {
 
   const handleApprove = async (userID) => {
     try {
-      await axios.post('http://localhost:3000/friend/accept', { firebaseID, userID });
+      await axios.post('http://localhost:3000/friend/accept', { firebaseID1: firebaseID, firebaseID2 : userID });
       fetchFriends();
     } catch (error) {
       console.error('Error approving friend request:', error);
@@ -32,7 +32,7 @@ const FriendRequest = () => {
 
   const handleReject = async (userID) => {
     try {
-      await axios.post('http://localhost:3000/friend/reject', { firebaseID, userID });
+      await axios.post('http://localhost:3000/friend/reject', { firebaseID1: firebaseID, firebaseID2 : userID });
       fetchFriends(); 
     } catch (error) {
       console.error('Error rejecting friend request:', error);
@@ -50,10 +50,10 @@ const FriendRequest = () => {
               <p>{friend.email}</p>
             </CardContent>
             <div className="flex space-x-2">
-              <IconButton color="success" aria-label="Approve" onClick={() => handleApprove(friend.id)}>
+              <IconButton color="success" aria-label="Approve" onClick={() => handleApprove(friend.firebaseID)}>
                 <CheckCircle />
               </IconButton>
-              <IconButton color="error" aria-label="Delete" onClick={() => handleReject(friend.id)}>
+              <IconButton color="error" aria-label="Delete" onClick={() => handleReject(friend.firebaseID)}>
                 <Delete />
               </IconButton>
             </div>
