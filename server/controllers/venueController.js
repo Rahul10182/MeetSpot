@@ -226,3 +226,23 @@ export const selectVenue = async (req, res) => {
     res.status(500).json({ message: "Failed to select venue", success: false });
   }
 };
+// Controller to fetch all venues for a specific user
+export const getUserVenues = async (req, res) => {
+  try {
+      const { firebaseID } = req.params; // Get fireBaseId from query params
+      console.log(firebaseID);
+
+      // Find the user by fireBaseId and populate their venues
+      const fireBaseId = firebaseID
+      const user = await User.findOne({ fireBaseId }).populate('profile.venues');
+
+      if (!user) {
+          return res.status(404).json({ message: "User not found" });
+      }
+
+      return res.status(200).json({ venues: user.profile.venues });
+  } catch (error) {
+      console.error("Error fetching venues:", error);
+      return res.status(500).json({ message: "Internal server error" });
+  }
+};

@@ -17,7 +17,6 @@ const venueSchema = new mongoose.Schema({
       enum: ['Point'], 
       required: true,
     },
-
     coordinates: {
       type: [Number],
       required: [true, 'Coordinates are required'],
@@ -37,6 +36,21 @@ const venueSchema = new mongoose.Schema({
   lastVisited: {
     type: Date,
     default: null, 
+  },
+  time: { 
+    type: String, 
+    required: [true, 'Time is required'], 
+    trim: true, 
+  },
+  photo: {
+    type: String, 
+    default: "", // Default empty string if no photo is provided
+    validate: {
+      validator: function (url) {
+        return /^(http|https):\/\/[^ "]+$/.test(url);  
+      },
+      message: 'Invalid URL format for photo',
+    },
   },
 }, { timestamps: true });
 
