@@ -14,8 +14,9 @@ import { Server } from "socket.io";
 import { createServer } from "http";
 import userSearch from "./routes/userSearchRoute.js";
 import Message from "./models/messageModel.js"; 
-import Chat from "./models/chatModel.js";
+import {Chat} from "./models/chatModel.js";
 import notificationRoutes from "./routes/notificationRoutes.js"
+
 dotenv.config();
 connectDB();
 
@@ -90,5 +91,5 @@ io.on('connection', (socket) => {
 });
 
 server.listen(PORT, () => {
-  // console.log(Server running on port ${PORT});
+  console.log(`Server running on port ${PORT}`);
 });
