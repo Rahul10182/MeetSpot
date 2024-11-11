@@ -18,8 +18,6 @@ const EventPlannerForm = () => {
     endTime: '',
     firebaseID
   });
-  console.log(firebaseID);
-  console.log(formData);
   const [showSuccess, setShowSuccess] = useState(false);
 
   const handleChange = (e) => {
@@ -41,7 +39,7 @@ const EventPlannerForm = () => {
   };
 
   return (
-    <div className="bg-gradient-to-br bg-slate-300 min-h-screen flex items-center justify-center p-6">
+    <div className="bg-gradient-to-br bg-blue-300 min-h-screen flex items-center justify-center p-6">
       <Box className="bg-white shadow-4xl rounded-xl border-2 w-full max-w-md p-10 space-y-6">
         {showSuccess ? (
           <Typography variant="h6" component="p" className="text-center text-green-600 font-semibold">
@@ -200,17 +198,17 @@ const EventPlannerForm = () => {
           />
         </div>
 
-        <Button
-          fullWidth
-          variant="contained"
-          color="primary"
-          className="mt-6 transition-all duration-300 transform hover:bg-blue-600"
-          style={{ padding: "12px 0", fontWeight: "bold" }}
-          onClick={handleSubmit}
-        >
-          Submit
-        </Button>
-        </>
+            <Button
+              fullWidth
+              variant="contained"
+              color="primary"
+              className="mt-6"
+              style={{ padding: "12px 0", fontWeight: "bold" }}
+              onClick={handleSubmit}
+            >
+              Submit
+            </Button>
+          </>
         )}
       </Box>
     </div>

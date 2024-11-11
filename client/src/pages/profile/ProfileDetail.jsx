@@ -4,9 +4,6 @@ import {
     List, ListItem, ListItemText, ListItemIcon, Card, CardContent, Button, InputAdornment
 } from '@mui/material';
 import { Settings, Dashboard, Notifications, AccountCircle, Event,Search } from '@mui/icons-material';
-import CalendarTodayIcon from '@mui/icons-material/CalendarToday'; // Import new icon
-
-import { Settings, Dashboard, Notifications, AccountCircle, Event, Search, LocationOn } from '@mui/icons-material';
 import { useNavigate, Outlet } from 'react-router-dom';
 import axios from 'axios';
 
@@ -100,9 +97,7 @@ const UserDashboard = () => {
                           { text: 'Friends', icon: <AccountCircle />, path: '/profile/friends/old' },
                           { text: 'Notifications', icon: <Notifications />, path: '/profile/notifications' },
                           { text: 'Create Event', icon: <Event />, path: '/profile/createevent' },
-                          { text: 'Settings', icon: <Settings />, path: '/profile/settings' },
-                          { text: 'Meetings', icon: <CalendarTodayIcon fontSize="medium" />, path: '/profile/meetings'},
-                          { text: 'Venues', icon: <LocationOn />, path: '/profile/venues' }]
+                          { text: 'Settings', icon: <Settings />, path: '/profile/settings' }]
                           .map((item, index) => (
                             <ListItem
                                 button

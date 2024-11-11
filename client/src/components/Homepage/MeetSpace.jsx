@@ -2,7 +2,7 @@ import React from 'react';
 import { Button, Grid, Typography, Box } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import Typewriter from 'typewriter-effect';
+import { Typewriter } from 'react-simple-typewriter';
 
 const MeetSpace = () => {
   const navigate = useNavigate();
@@ -16,9 +16,6 @@ const MeetSpace = () => {
         borderRadius: '12px',
         boxShadow: '0 6px 15px rgba(0, 0, 0, 0.2)',
         overflow: 'hidden',
-        height: '100vh',
-        display: 'flex',
-        flexDirection: 'column',
       }}
     >
       <Grid 
