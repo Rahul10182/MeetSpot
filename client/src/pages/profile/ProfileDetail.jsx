@@ -1,9 +1,11 @@
-import React, { useState ,useEffect,useRef} from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
     Avatar, Typography, TextField, Divider, AppBar, Toolbar,
-    List, ListItem, ListItemText, ListItemIcon, Card, CardContent, Button,InputAdornment
+    List, ListItem, ListItemText, ListItemIcon, Card, CardContent, Button, InputAdornment
 } from '@mui/material';
-import { Settings, Dashboard, Notifications, AccountCircle, Event,Search } from '@mui/icons-material';
+import CalendarTodayIcon from '@mui/icons-material/CalendarToday'; // Import new icon
+
+import { Settings, Dashboard, Notifications, AccountCircle, Event, Search, LocationOn } from '@mui/icons-material';
 import { useNavigate, Outlet } from 'react-router-dom';
 import axios from 'axios';
 
@@ -41,11 +43,13 @@ const UserDashboard = () => {
         try {
             const response = await axios.post('http://localhost:3000/friend/sendreq', {
                 firebaseID1: firebaseID1,
-                firebaseID2: userId       
+                firebaseID2 : userId
             });
             
             if (response.status === 201) {
                 console.log(`Friend request sent to user with ID: ${userId}`);
+                // Optionally remove user from searchResults after adding
+                setSearchResults(prevResults => prevResults.filter(user => user._id !== userId));
             } else {
                 console.log(`Failed to send friend request: ${response.data.message}`);
             }
@@ -72,7 +76,7 @@ const UserDashboard = () => {
 
     
     return (
-        <div className="min-h-screen flex bg-blue-300 relative">
+        <div className="min-h-screen flex bg-slate-300 relative">
             <aside className="w-64 bg-gradient-to-b from-indigo-600 to-purple-500 text-white shadow-lg p-6">
                 <div className="text-center mb-8">
 
@@ -95,7 +99,9 @@ const UserDashboard = () => {
                           { text: 'Friends', icon: <AccountCircle />, path: '/profile/friends/old' },
                           { text: 'Notifications', icon: <Notifications />, path: '/profile/notifications' },
                           { text: 'Create Event', icon: <Event />, path: '/profile/createevent' },
-                          { text: 'Settings', icon: <Settings />, path: '/profile/settings' }]
+                          { text: 'Settings', icon: <Settings />, path: '/profile/settings' },
+                          { text: 'Meetings', icon: <CalendarTodayIcon fontSize="medium" />, path: '/profile/ScheduledMeetings'},
+                          { text: 'Venues', icon: <LocationOn />, path: '/profile/venues' }]
                           .map((item, index) => (
                             <ListItem
                                 button
@@ -117,13 +123,6 @@ const UserDashboard = () => {
                 <AppBar position="static" color="transparent" elevation={0} className="bg-blue-500 shadow-sm mb-6">
                     <Toolbar className="flex justify-between">
                         <div>
-                        {/* <Avatar
-                            className="mx-auto mb-4 bg-pink-500"
-                            alt={name}
-                            src="/static/images/avatar/1.jpg"
-                            sx={{ width: 72, height: 72 ,backgroundColor: '#FFB6C1'}}
-                            
-                        /> */}
                         <Typography variant="h5" className="font-semibold text-blue-800">
                             Welcome, {name || "User"}
                         </Typography>
@@ -146,7 +145,6 @@ const UserDashboard = () => {
                                 }}
 
                             />
-                            {/* <Avatar alt={name} src="/static/images/avatar/1.jpg" /> */}
                             
                             {searchResults.length > 0 && (
                                 <div className="absolute left-0 right-0 bg-white shadow-lg mt-72 rounded-md z-10 max-h-60 overflow-y-auto w-72 sm:w-80">
@@ -160,7 +158,7 @@ const UserDashboard = () => {
                                                     color="primary" 
                                                     fullWidth 
                                                     className="mt-2"
-                                                    onClick={() => handleAddFriend(user._id)}
+                                                    onClick={() => handleAddFriend(user.fireBaseId)}
                                                 >
                                                     Add Friend
                                                 </Button>

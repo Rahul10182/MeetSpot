@@ -10,7 +10,7 @@ import  ChatBubbleIcon  from '@mui/icons-material/ChatBubble';
 import  AccountCircleIcon  from '@mui/icons-material/AccountCircle';
 
 
-const ShowMeet = () => {
+const ShowMeetings = () => {
   const [userLocation, setUserLocation] = useState(null);
   const [routeData, setRouteData] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -304,4 +304,4 @@ const ShowMeet = () => {
   );
 };
 
-export default ShowMeet;
+export default ShowMeetings;

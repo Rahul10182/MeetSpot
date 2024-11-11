@@ -6,7 +6,7 @@ import DirectionsWalkIcon from '@mui/icons-material/DirectionsWalk';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 
-const Meetings = () => {
+const ScheduledMeetings = () => {
   const [venues, setVenues] = useState([]);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
@@ -90,4 +90,4 @@ const Meetings = () => {
   );
 };
 
-export default Meetings;
+export default ScheduledMeetings;
