@@ -18,6 +18,7 @@ import FriendRequest from './pages/profile/reqFriend';
 import FriendRequestSent from './pages/profile/FriendReqSent';
 import ChatPage from './pages/ChatPage';
 import EventsPage from './pages/Eventpage';
+import MeetSpotPage from './pages/MeetSpotPage';
 
 
 
@@ -94,6 +95,7 @@ const App = () => {
           <Route path="/meeting-point" element={<MeetingPoint />} />
           <Route path="/chat" element={<ChatPage firebaseID={firebaseId} />} />
           <Route path="/events" element={<EventsPage/>}  />
+          <Route path="/test" element={<MeetSpotPage/>}  />
           
 
         </Routes>
