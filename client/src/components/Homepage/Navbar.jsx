@@ -42,6 +42,7 @@ const Header = () => {
       if (open && firebaseID) {
         try {
           const response = await axios.post(`http://localhost:3000/notifications/${firebaseID}`);
+          // console.log(firebaseID)
           console.log(response.data);
           setNotifications(response.data || []);
         } catch (error) {
@@ -139,7 +140,6 @@ const Header = () => {
             <EventIcon fontSize="medium" />
           </button>
 
-          {/* User name and account icon */}
           {userData ? (
             <div className="relative flex items-center ml-4" ref={profileMenuRef}>
               <span className="text-lg mx-2 whitespace-nowrap overflow-hidden text-ellipsis">{`Hello, ${name}`}</span>
@@ -191,36 +191,57 @@ const Header = () => {
         </div>
       </div>
     
-
-      {/* Notifications Drawer */ }
-      <Drawer anchor="right" open={isDrawerOpen} onClose={() => setDrawerOpen(false)}>
-        <div className="w-80 p-4">
-          <h2 className="text-lg font-semibold mb-4 text-center">Notifications</h2>
-          <ul className="overflow-y-auto max-h-96">
-            {notifications.length > 0 ? (
-              notifications.map((notification, index) => (
-                <li
-                  key={notification._id}
-                  className={`p-2 border-b border-gray-300 last:border-b-0 ${
-                    seenNotifications.has(notification._id) ? 'bg-green-200' : ''
+      <Drawer
+      anchor="right"
+      open={isDrawerOpen}
+      onClose={() => setDrawerOpen(false)}
+      sx={{
+        '& .MuiDrawer-paper': {
+          width: '320px',
+          padding: '20px',
+          backgroundColor: '#f8f9fa',
+          borderRadius: '8px',
+          boxShadow: '0 4px 10px rgba(0, 0, 0, 0.1)',
+          transition: 'all 0.3s ease',
+        },
+      }}
+    >
+      <div className="w-full">
+        <h2 className="text-xl font-semibold mb-6 text-center text-gray-800">Notifications</h2>
+        <ul className="overflow-y-auto max-h-[calc(100vh-200px)]">
+          {notifications.length > 0 ? (
+            notifications.map((notification, index) => (
+              <li
+                key={notification._id}
+                className={`p-4 mb-3 rounded-lg transition-all duration-300 ${
+                  seenNotifications.has(notification._id) ? 'bg-green-100' : 'bg-white hover:bg-blue-50'
+                } shadow-sm border border-gray-200 cursor-pointer`}
+                onClick={() => handleNotificationClick(index, notification._id)}
+              >
+                <p className="text-sm text-gray-700">{notification.message}</p>
+                <span
+                  className={`text-xs text-gray-500 block mt-1 ${
+                    seenNotifications.has(notification._id) ? 'text-green-600' : 'text-gray-400'
                   }`}
-                  onClick={() => handleNotificationClick(index, notification._id)}
                 >
-                  {notification.message}
-                </li>
-              ))
-            ) : (
-              <p className="text-center text-gray-500">No new notifications</p>
-            )}
-          </ul>
+                  {seenNotifications.has(notification._id) ? 'Read' : 'New'}
+                </span>
+              </li>
+            ))
+          ) : (
+            <p className="text-center text-gray-500 mt-8">No new notifications</p>
+          )}
+        </ul>
+        <div className="mt-6 flex justify-center">
           <button
-            className="mt-4 w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-500 transition duration-300"
+            className="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-500 transition duration-300"
             onClick={() => setDrawerOpen(false)}
           >
             Close
           </button>
         </div>
-      </Drawer>
+      </div>
+    </Drawer>
 
       <ToastContainer />
     </div >

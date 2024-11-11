@@ -16,7 +16,7 @@ const EventsBar = () => {
     try {
       const response = await axios.get('http://localhost:3000/event/getall');
       setEvents(response.data || []);
-      console.log("Events Fetched");
+      // console.log("Events Fetched");
     } catch (error) {
       console.error('Error fetching events:', error);
     }

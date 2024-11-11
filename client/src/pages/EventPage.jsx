@@ -12,6 +12,7 @@ const EventsPage = () => {
 
   const fetchEvents = async () => {
     try {
+      
       const response = await axios.get('http://localhost:3000/event/getall');
       setEvents(response.data || []);
       console.log("Events Fetched");
@@ -36,6 +37,9 @@ const EventsPage = () => {
   };
 
   const handleRegister = async () => {
+    console.log(selectedEvent._id)
+    console.log(userEmail)
+    console.log(friendEmail)
     try {
       await axios.post('http://localhost:3000/event/register', {
         eventId: selectedEvent._id,

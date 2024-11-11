@@ -18,6 +18,7 @@ import FriendRequest from './pages/profile/reqFriend';
 import FriendRequestSent from './pages/profile/FriendReqSent';
 import ChatPage from './pages/ChatPage';
 import EventsPage from './pages/Eventpage';
+import Notifications from './pages/profile/Notifications';
 
 
 
@@ -84,8 +85,8 @@ const App = () => {
                 <Route path="old" element={<FriendList />} />
                 <Route path="new" element={<FriendRequest />} />
                 <Route path="sentreq" element={<FriendRequestSent />} />
-                 
               </Route>
+              <Route path="notifications" element={<Notifications firebaseID = {firebaseId}/>} />
             </Route>
           </Route>
 
