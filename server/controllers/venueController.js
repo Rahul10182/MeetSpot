@@ -285,24 +285,3 @@ export const getUserVenues = async (req, res) => {
 };
 
 
-export const getUserVenues = async (req, res) => {
-  try {
-    const { firebaseID } = req.body; 
-    const user = await User.findOne({ fireBaseId: firebaseID }).populate('profile.venues'); 
-
-    if (!user) {
-      return res.status(404).json({ message: "User not found." });
-    }
-
-    if (!user.profile.venues || user.profile.venues.length === 0) {
-      return res.status(404).json({ message: "No venues found for this user." });
-    }
-
-    const venues = user.profile.venues; 
-
-    res.json(venues); 
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: "Failed to fetch venues." });
-  }
-};
