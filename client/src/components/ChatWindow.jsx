@@ -7,6 +7,13 @@ import Namebar from './Namebar';
 const socket = io('http://localhost:3000');  // Initialize the socket connection
 
 const ChatWindow = ({ userfirebaseId, friendfirebaseId, friendName, friendEmail }) => {
+
+  // console.log("in chatwindow");
+  // console.log("in chatwindow ",userfirebaseId);
+  // console.log(friendfirebaseId);
+  // console.log(friendName);
+  // console.log(friendEmail);
+
   const [messages, setMessages] = useState([]);
   const [message, setMessage] = useState('');
   const [chatId, setChatId] = useState("");

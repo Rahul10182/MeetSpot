@@ -1,3 +1,4 @@
+import jwt from "jsonwebtoken";
 import { User } from "../models/userModel.js";
 
 export const authenticate = async (req, res) => {
@@ -47,7 +48,7 @@ export const getUserFireBaseId = async (req, res) => {
         const { firebaseID } = req.body; // Get firebaseId from the request body
 
         // Find the user by firebaseId
-        const user = await User.findOne({ fireBaseId:firebaseID });
+        const user = await User.findOne({ fireBaseId:firebaseId });
 
         if (!user) {
             return res.status(404).json({ message: "User not found" });

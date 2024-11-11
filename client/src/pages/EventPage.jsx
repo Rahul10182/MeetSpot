@@ -10,6 +10,7 @@ const EventsPage = () => {
   const [userEmail, setUserEmail] = useState('');
   const [friendEmail, setFriendEmail] = useState('');
 
+  // Fetch events data from backend
   const fetchEvents = async () => {
     try {
       const response = await axios.get('http://localhost:3000/event/getall');
@@ -38,6 +39,11 @@ const EventsPage = () => {
   
 
   const handleRegister = async () => {
+    if (!userEmail || !friendEmail) {
+      alert("Both emails are required.");
+      return;
+    }
+
     try {
       await axios.post('http://localhost:3000/event/register', {
         eventId: selectedEvent._id,
@@ -51,6 +57,7 @@ const EventsPage = () => {
       handleCloseModal();
     } catch (error) {
       console.error('Error registering for event:', error);
+      alert('Registration failed.');
     }
   };
 

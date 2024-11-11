@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { List, ListItem, ListItemText, Avatar, Typography, Box, TextField ,InputAdornment} from '@mui/material';
@@ -22,6 +23,7 @@ const FriendList = ({ firebaseID, onFriendSelect }) => {
         });
     }
   }, [firebaseID]);
+
 
   const handleSearch = (event) => {
     setSearchQuery(event.target.value);

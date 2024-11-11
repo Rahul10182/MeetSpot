@@ -24,8 +24,6 @@ const Header = () => {
   const user = auth.currentUser;
   const userData = JSON.parse(localStorage.getItem('user'));
   const name = userData?.fullName;
-  const firebaseID = userData?.firebaseID;
-  // console.log(firebaseID);
 
   const [anchorAccount, setAnchorAccount] = useState(null);
   const [isDrawerOpen, setDrawerOpen] = useState(false);
@@ -46,7 +44,6 @@ const Header = () => {
       if (open && firebaseID) {
         try {
           const response = await axios.post(`http://localhost:3000/notifications/${firebaseID}`);
-          console.log(response.data);
           setNotifications(response.data || []);
         } catch (error) {
           console.error('Failed to fetch notifications', error);
@@ -125,18 +122,8 @@ const Header = () => {
           >
             <SearchIcon fontSize="medium" />
           </button>
-        </div> */}
 
-        {/* Notification, Events, and User's name */}
-        <div className="flex items-center space-x-4 ml-4">
-        <Tooltip title="Scheduled Meetings" arrow>
-            <button
-              className="bg-blue-600 text-white p-2 rounded-lg hover:bg-blue-500 transition duration-300 focus:outline-none"
-              onClick={() => handleNavigation('/profile/meetings')}
-            >
-              <CalendarTodayIcon fontSize="medium" />
-            </button>
-          </Tooltip>
+          {/* Notification Button */}
           <button
             className="bg-blue-600 text-white p-2 rounded-lg hover:bg-blue-500 transition duration-300 focus:outline-none"
             onClick={() => toggleDrawer(!isDrawerOpen)}
@@ -202,10 +189,7 @@ const Header = () => {
           )}
         </div>
       </div>
-
-
-
-
+    
 
       {/* Notifications Drawer */ }
       <Drawer anchor="right" open={isDrawerOpen} onClose={() => setDrawerOpen(false)}>

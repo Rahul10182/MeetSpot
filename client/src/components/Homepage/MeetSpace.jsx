@@ -8,8 +8,9 @@ const MeetSpace = () => {
   const navigate = useNavigate();
 
   return (
-    <Box
+    <Box 
       sx={{
+
         margin: { xs: '20px', sm: '30px', md: '60px', lg: '80px' },
         backgroundColor: '#f0f4f8',
         borderRadius: '12px',
@@ -20,33 +21,21 @@ const MeetSpace = () => {
         flexDirection: 'column',
       }}
     >
-      <Grid
-        container
+      <Grid 
+        container 
         spacing={2}
         sx={{
-          flexGrow: 1,
+          flexGrow: 1, // This makes sure the grid stretches to fill the available space
         }}
       >
-
+        {/* Upper Half (Ready to Connect + Set Meetup Location) */}
         <Grid
           item
           xs={12}
-          md={6}
+          md={6} // Use half of the height for this part
           className="flex items-center justify-center bg-indigo-600 text-white"
-          sx={{ padding: { xs: '10px', md: '20px' }, display: 'flex', flexDirection: 'column', alignItems: 'center' }}
+          sx={{ padding: { xs: '10px', md: '20px' } }}
         >
-          <Typography
-            variant="h5"
-            sx={{
-              mb: 2,
-              fontWeight: 'bold',
-              mt: 6,
-              textAlign: 'center',
-            }}
-          >
-            Want To Meet?
-          </Typography>
-
           <Button
             variant="contained"
             color="secondary"
@@ -55,20 +44,21 @@ const MeetSpace = () => {
             sx={{
               fontWeight: 'bold',
               padding: '10px 20px',
-              backgroundColor: '#ff5722',
+              backgroundColor: '#ff5722', // Same color as the Meetup button
               '&:hover': { backgroundColor: '#e64a19' },
-              width: { xs: '100%', md: 'auto' },
             }}
+            fullWidth={{ xs: true, md: false }}
           >
             Set Meetup Location
           </Button>
         </Grid>
 
+        {/* Lower Half (Want To Chat? + Chat Button) */}
         <Grid
           item
           xs={12}
-          md={6}
-          className="flex items-center justify-center bg-[#4caf50] text-white"
+          md={6} // Use the other half for the chat section
+          className="flex items-center justify-center"
           sx={{
             padding: { xs: '10px', md: '20px' },
             display: 'flex',
@@ -76,6 +66,9 @@ const MeetSpace = () => {
             alignItems: 'center',
             justifyContent: 'center',
             textAlign: 'center',
+            backgroundColor: '#388e3c', // Green background
+            color: 'white', // White text color for contrast
+            borderRadius: '12px', // Optional: Rounded corners for a modern look
           }}
         >
           <Typography
@@ -83,7 +76,7 @@ const MeetSpace = () => {
             sx={{
               mb: 2,
               fontWeight: 'bold',
-              mt: 6,
+              mt: 6, // Adding margin-top for spacing
               textAlign: 'center',
             }}
           >
@@ -98,15 +91,16 @@ const MeetSpace = () => {
           >
             <Button
               variant="contained"
-              color="secondary"
+              color="secondary" // Set color to secondary to match meetup button
               size="large"
               onClick={() => navigate('/chat')}
               sx={{
                 fontWeight: 'bold',
                 padding: '10px 20px',
-                backgroundColor: '#ff5722',
-                '&:hover': { backgroundColor: '#e64a19' },
+                backgroundColor: '#ff5722', // Same color as the Meetup button
+                '&:hover': { backgroundColor: '#e64a19' }, // Same hover effect
                 width: { xs: '100%', md: 'auto' },
+                boxShadow: '0 4px 10px rgba(0, 0, 0, 0.3)',
               }}
             >
               Chat
@@ -115,6 +109,7 @@ const MeetSpace = () => {
         </Grid>
       </Grid>
 
+      {/* Right Side Section */}
       <Grid
         container
         spacing={2}
@@ -130,7 +125,7 @@ const MeetSpace = () => {
           initial={{ opacity: 0, y: 50 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
-          sx={{ mb: 2 }}
+          sx={{ mb: 2 }} // Margin bottom to add space below title
         >
           <Typography
             variant="h3"
@@ -139,19 +134,16 @@ const MeetSpace = () => {
             sx={{
               fontWeight: 'bold',
               fontSize: { xs: '1.8rem', sm: '2.5rem' },
-              textAlign: 'center', 
             }}
           >
             <Typewriter
-              onInit={(typewriter) => {
-                typewriter
-                  .typeString('Welcome to MeetSpot')
-                  .start();
-              }}
-              options={{
-                loop: false,
-                delay: 75, 
-              }}
+              words={['Welcome to MeetSpot']}
+              loop={false}
+              cursor
+              cursorStyle="_"
+              typeSpeed={70}
+              deleteSpeed={50}
+              delaySpeed={1000}
             />
           </Typography>
         </motion.div>
@@ -160,7 +152,7 @@ const MeetSpace = () => {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 1, delay: 0.5 }}
-          style={{ maxWidth: '80%' }} 
+          sx={{ maxWidth: '80%' }} // Optional: max-width for better readability
         >
           <Typography
             variant="body1"
@@ -170,6 +162,14 @@ const MeetSpace = () => {
             MeetSpace provides a user-friendly platform where you can effortlessly schedule and manage
             your meetings. Whether you're planning team discussions, client presentations, or personal
             catch-ups, we've got you covered.
+          </Typography>
+
+          <Typography
+            variant="body2"
+            color="textSecondary"
+            sx={{ mt: 2, fontSize: { xs: '0.8rem', sm: '0.9rem' } }}
+          >
+            Click the "Schedule Meeting" button to get started and experience seamless collaboration.
           </Typography>
         </motion.div>
       </Grid>
