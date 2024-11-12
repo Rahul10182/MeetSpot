@@ -1,6 +1,5 @@
 import React from 'react';
 import { Container, Typography, Box } from '@mui/material';
-import Navbar from "../components/Homepage/Navbar";
 import Sliderbar from '../components/Homepage/Sliderbar';
 import Footer from '../components/Homepage/Footer';
 import { getAuth } from 'firebase/auth';
@@ -14,38 +13,15 @@ const Home = () => {
   const user = auth.currentUser;
 
   return (
-    <div className="flex flex-col min-h-screen">
-      <Navbar />
+    <div className="flex flex-col min-h-screen bg-gradient-to-r from-pink-500 to-purple-500">
 
       <Sliderbar />
-
-      <Container maxWidth="lg" sx={{ py: 4 }}>
-        {/* MeetSpace Section */}
-        <Box mb={6}>
-          <MeetSpace />
-        </Box>
+      <MeetSpace className='h-screen'/>
+      <Container maxWidth="lg" >
+        
 
         <Box mb={6}>
-          <EventSlider/>
-        </Box>
-
-
-        {/* Welcome Message */}
-        <Box textAlign="center" mb={4}>
-          <Typography variant="h3" gutterBottom>
-            Welcome to Meeting Point
-          </Typography>
-          <Typography variant="body1">
-            Connecting people for meaningful meetings and conversations.
-          </Typography>
-        </Box>
-
-        {/* Travel Section */}
-        <Box mb={6} textAlign="center">
-          <Typography variant="h4" color="textSecondary" gutterBottom>
-            There Are Some Beautiful Places In INDIA
-          </Typography>
-          <Cards />
+          <EventSlider className='h-screen w-full'/>
         </Box>
       </Container>
 

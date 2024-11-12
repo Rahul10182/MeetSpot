@@ -1,9 +1,7 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { startTransition } from 'react';
-import SearchIcon from '@mui/icons-material/Search';
 import AccountCircle from '@mui/icons-material/AccountCircle';
-import SettingsIcon from '@mui/icons-material/Settings';
 import LogoutIcon from '@mui/icons-material/Logout';
 import NotificationsIcon from '@mui/icons-material/Notifications';
 import EventIcon from '@mui/icons-material/EventNote';
@@ -11,29 +9,25 @@ import { signOut, getAuth } from 'firebase/auth';
 import { ToastContainer, toast } from 'react-toastify';
 import axios from 'axios';
 import Drawer from '@mui/material/Drawer';
+import { Box, IconButton, Typography } from '@mui/material';
 import 'react-toastify/dist/ReactToastify.css';
 
-
 const Header = () => {
-
   const auth = getAuth();
-  const user = auth.currentUser;
   const userData = JSON.parse(localStorage.getItem('user'));
   const name = userData?.fullName;
   const firebaseID = userData?.firebaseID;
-  // console.log(firebaseID);
 
-  const [anchorAccount, setAnchorAccount] = useState(null);
+  const [anchorAccount, setAnchorAccount] = useState(false);
   const [isDrawerOpen, setDrawerOpen] = useState(false);
-  const [searchVisible, setSearchVisible] = useState(false);
   const [notifications, setNotifications] = useState([]);
   const [seenNotifications, setSeenNotifications] = useState(new Set(JSON.parse(localStorage.getItem('seenNotifications') || '[]')));
 
   const navigate = useNavigate();
   const profileMenuRef = useRef(null);
 
-  const handleAccountMenuClick = (event) => {
-    setAnchorAccount(anchorAccount ? null : event.currentTarget);
+  const toggleAccountMenu = () => {
+    setAnchorAccount((prev) => !prev);
   };
 
   const toggleDrawer = useCallback(
@@ -42,8 +36,6 @@ const Header = () => {
       if (open && firebaseID) {
         try {
           const response = await axios.post(`http://localhost:3000/notifications/${firebaseID}`);
-          // console.log(firebaseID)
-          console.log(response.data);
           setNotifications(response.data || []);
         } catch (error) {
           console.error('Failed to fetch notifications', error);
@@ -72,11 +64,8 @@ const Header = () => {
     signOut(auth)
       .then(() => {
         localStorage.removeItem('user');
-
-        toast.success('You are Logged out');
-
+        toast.success('You are logged out');
         navigate('/');
-        
       })
       .catch((error) => {
         console.log(error);
@@ -87,7 +76,7 @@ const Header = () => {
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (profileMenuRef.current && !profileMenuRef.current.contains(event.target)) {
-        setAnchorAccount(null);
+        setAnchorAccount(false);
       }
     };
     document.addEventListener('mousedown', handleClickOutside);
@@ -97,154 +86,194 @@ const Header = () => {
   }, []);
 
   return (
-    <div className="relative w-full z-50 bg-gradient-to-r from-blue-700 to-blue-900 text-white shadow-lg">
-      <div className="flex items-center justify-between p-3">
-        <button
-          onClick={() => handleNavigation('/')}
-          className="text-center text-3xl font-semibold whitespace-nowrap transition-all duration-200 focus:outline-none mr-4"
-        >
-          MeetSpot
-        </button> {/* Made "MeetSpot" clickable to navigate to homepage */}
-
-        {/* Search Bar aligned slightly left from center
-        <div className="flex items-center flex-grow mx-80 ">
-          {searchVisible && (
-            <input
-              type="text"
-              placeholder="Search…"
-              className="bg-transparent text-white border-b-2 border-white rounded-lg p-2 pl-8 pr-8 max-w-xs transition duration-200 ease-in-out focus:outline-none"
-              style={{ marginRight: '0.5rem' }}
-            />
-          )}
-          <button
-            className="bg-blue-600 text-white p-2 rounded-lg hover:bg-blue-500 transition duration-300 focus:outline-none"
-            onClick={() => setSearchVisible((prev) => !prev)}
-          >
-            <SearchIcon fontSize="medium" />
-          </button>
-        </div> */}
-
-        {/* Notification, Events, and User's name */}
-        <div className="flex items-center space-x-4 ml-4">
-          <button
-            className="bg-blue-600 text-white p-2 rounded-lg hover:bg-blue-500 transition duration-300 focus:outline-none"
-            onClick={() => toggleDrawer(!isDrawerOpen)}
-          >
-            <NotificationsIcon fontSize="medium" />
-          </button>
-
-          <button
-            className="bg-blue-600 text-white p-2 rounded-lg hover:bg-blue-500 transition duration-300 focus:outline-none"
-            onClick={() => handleNavigation('/events')}
-          >
-            <EventIcon fontSize="medium" />
-          </button>
-
-          {userData ? (
-            <div className="relative flex items-center ml-4" ref={profileMenuRef}>
-              <span className="text-lg mx-2 whitespace-nowrap overflow-hidden text-ellipsis">{`Hello, ${name}`}</span>
-              <button
-                className="text-white focus:outline-none"
-                onClick={handleAccountMenuClick}
-              >
-                <AccountCircle fontSize="medium" />
-              </button>
-              {anchorAccount && (
-                <div className="absolute right-0 mt-40 w-40 bg-gradient-to-r from-green-400 to-blue-500 text-white rounded-lg shadow-lg z-50 transition-all duration-200 ease-in-out">
-                  <div
-                    onClick={() => handleNavigation('/profile/dashboard')}
-                    className="flex items-center px-4 py-2 hover:bg-blue-600 cursor-pointer transition-colors duration-200"
-                  >
-                    <AccountCircle fontSize="small" className="mr-2" /> Profile
-                  </div>
-                  <div
-                    onClick={() => handleNavigation('/auth/settings')}
-                    className="flex items-center px-4 py-2 hover:bg-blue-600 cursor-pointer transition-colors duration-200"
-                  >
-                    <SettingsIcon fontSize="small" className="mr-2" /> Settings
-                  </div>
-                  <div
-                    onClick={handleLogout}
-                    className="flex items-center px-4 py-2 hover:bg-blue-600 cursor-pointer transition-colors duration-200"
-                  >
-                    <LogoutIcon fontSize="small" className="mr-2" /> Logout
-                  </div>
-                </div>
-              )}
-            </div>
-          ) : (
-            <div>
-              <button
-                className="bg-blue-600 text-white font-bold py-1 px-5 mx-4 rounded-lg hover:bg-pink-600 transition duration-300 mr-2 text-xl"
-                onClick={() => handleNavigation('/auth/login')}
-              >
-                Login
-              </button>
-              <button
-                className="bg-blue-600 text-white mx-4 font-bold py-1 px-5 rounded-lg hover:bg-pink-600 transition duration-300 text-xl"
-                onClick={() => handleNavigation('/auth/register')}
-              >
-                SignUp
-              </button>
-            </div>
-          )}
-        </div>
-      </div>
-    
-      <Drawer
-      anchor="right"
-      open={isDrawerOpen}
-      onClose={() => setDrawerOpen(false)}
+    <Box
+      component="header"
+      className="mx-auto flex justify-between items-center px-4 py-2"
       sx={{
-        '& .MuiDrawer-paper': {
-          width: '320px',
-          padding: '20px',
-          backgroundColor: '#f8f9fa',
-          borderRadius: '8px',
-          boxShadow: '0 4px 10px rgba(0, 0, 0, 0.1)',
-          transition: 'all 0.3s ease',
-        },
+        width: '100%',
+        height: '60px',
+        padding: '0 20px',
       }}
     >
-      <div className="w-full">
-        <h2 className="text-xl font-semibold mb-6 text-center text-gray-800">Notifications</h2>
-        <ul className="overflow-y-auto max-h-[calc(100vh-200px)]">
+    <Link to="/" style={{ textDecoration: 'none' }}>
+      <Typography
+        variant="h5"
+        className="text-white font-bold"
+        style={{ fontSize: '2rem', fontWeight: 'bolder' }} 
+      >
+        MeetSpot
+      </Typography>
+    </Link>
+      <Box sx={{ display: 'flex', alignItems: 'center', marginLeft: 'auto' }}>
+      <Box
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+            transition: 'all 0.3s ease',
+            '&:hover': { width: '160px' },
+            width: '40px',
+            overflow: 'hidden',
+            backgroundColor: 'white',
+            borderRadius: '20px',
+            boxShadow: '0px 3px 5px rgba(0, 0, 0, 0.2)',
+            marginRight: '10px',
+          }}
+        >
+          <IconButton onClick={() => toggleDrawer(!isDrawerOpen)} sx={{ color: '#ff65a3' }}>
+            <NotificationsIcon />
+          </IconButton>
+          <Typography
+            variant="body1"
+            sx={{
+              whiteSpace: 'nowrap',
+              color: '#ff65a3',
+              fontWeight: 'bold',
+              ml: '5px',
+            }}
+          >
+            Notifications
+          </Typography>
+        </Box>
+
+        <Box
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+            transition: 'all 0.3s ease',
+            '&:hover': { width: '140px' },
+            width: '40px',
+            overflow: 'hidden',
+            backgroundColor: 'white',
+            borderRadius: '20px',
+            boxShadow: '0px 3px 5px rgba(0, 0, 0, 0.2)',
+            marginRight: '10px',
+          }}
+        >
+          <IconButton sx={{ color: '#ff65a3' }} onClick={() => handleNavigation('/events')}>
+            <EventIcon />
+          </IconButton>
+          <Typography
+            variant="body1"
+            sx={{
+              whiteSpace: 'nowrap',
+              color: '#ff65a3',
+              fontWeight: 'bold',
+              ml: '5px',
+            }}
+          >
+            Events
+          </Typography>
+        </Box>
+
+        {userData ? (
+          <Box
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              position: 'relative',
+              backgroundColor: '#ff65a3',
+              padding: '8px 12px',
+              borderRadius: '8px',
+              boxShadow: '0px 4px 6px rgba(0, 0, 0, 0.1)',
+            }}
+            ref={profileMenuRef}
+          >
+            <IconButton
+              sx={{
+                color: 'white',
+                padding: '6px',
+              }}
+              onClick={toggleAccountMenu}
+            >
+              <AccountCircle fontSize="medium" />
+            </IconButton>
+
+            <Typography
+              variant="body1"
+              sx={{
+                whiteSpace: 'nowrap',
+                color: 'white',
+                fontWeight: 'bold',
+                ml: '10px',
+                fontSize: '16px',
+                letterSpacing: '0.5px',
+              }}
+            >
+              Hello, <span style={{ color: '#FFD700' }}>{name}</span>
+            </Typography>
+
+            {anchorAccount && (
+              <div
+                className="absolute right-0 mt-40 w-48 bg-gradient-to-r from-purple-500 via-pink-500 to-red-500 text-white rounded-lg shadow-lg z-50"
+                style={{
+                  boxShadow: '0px 8px 16px rgba(0, 0, 0, 0.25)',
+                  borderRadius: '12px',
+                }}
+              >
+                <div
+                  onClick={() => handleNavigation('/profile/dashboard')}
+                  className="flex items-center px-4 py-2 hover:bg-blue-600 cursor-pointer transition-colors duration-200 rounded-lg"
+                >
+                  <AccountCircle fontSize="small" className="mr-2" /> Profile
+                </div>
+
+                <div
+                  onClick={handleLogout}
+                  className="flex items-center px-4 py-2 hover:bg-blue-600 cursor-pointer transition-colors duration-200 rounded-lg"
+                >
+                  <LogoutIcon fontSize="small" className="mr-2" /> Logout
+                </div>
+              </div>
+            )}
+          </Box>
+        ) : (
+          <div className="space-x-4">
+            <button
+              className="bg-white text-pink-500 font-bold py-2 px-4 rounded-lg hover:bg-pink-500 hover:text-white transition duration-300 text-lg"
+              onClick={() => handleNavigation('/auth/login')}
+            >
+              Login
+            </button>
+            <button
+              className="bg-pink-500 text-white font-bold py-2 px-4 rounded-lg hover:bg-pink-600 hover:text-white transition duration-300 text-lg"
+              onClick={() => handleNavigation('/auth/signup')}
+            >
+              Sign Up
+            </button>
+          </div>
+        )}
+      </Box>
+
+      <Drawer anchor="right" open={isDrawerOpen} onClose={() => toggleDrawer(false)}>
+        <Box sx={{ width: 300, padding: 2 }}>
+          <Typography variant="h6" sx={{ marginBottom: 2 }}>
+            Notifications
+          </Typography>
           {notifications.length > 0 ? (
             notifications.map((notification, index) => (
-              <li
-                key={notification._id}
-                className={`p-4 mb-3 rounded-lg transition-all duration-300 ${
-                  seenNotifications.has(notification._id) ? 'bg-green-100' : 'bg-white hover:bg-blue-50'
-                } shadow-sm border border-gray-200 cursor-pointer`}
-                onClick={() => handleNotificationClick(index, notification._id)}
+              <Box
+                key={notification.id}
+                sx={{
+                  padding: 2,
+                  backgroundColor: seenNotifications.has(notification.id) ? '#f4f4f4' : '#ffefef',
+                  borderRadius: '8px',
+                  marginBottom: 1,
+                  cursor: 'pointer',
+                  '&:hover': { backgroundColor: '#ffe6e6' },
+                }}
+                onClick={() => handleNotificationClick(index, notification.id)}
               >
-                <p className="text-sm text-gray-700">{notification.message}</p>
-                <span
-                  className={`text-xs text-gray-500 block mt-1 ${
-                    seenNotifications.has(notification._id) ? 'text-green-600' : 'text-gray-400'
-                  }`}
-                >
-                  {seenNotifications.has(notification._id) ? 'Read' : 'New'}
-                </span>
-              </li>
+                {notification.message}
+              </Box>
             ))
           ) : (
-            <p className="text-center text-gray-500 mt-8">No new notifications</p>
+            <Typography variant="body1">No notifications available.</Typography>
           )}
-        </ul>
-        <div className="mt-6 flex justify-center">
-          <button
-            className="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-500 transition duration-300"
-            onClick={() => setDrawerOpen(false)}
-          >
-            Close
-          </button>
-        </div>
-      </div>
-    </Drawer>
+        </Box>
+      </Drawer>
 
       <ToastContainer />
-    </div >
+    </Box>
   );
 };
 
