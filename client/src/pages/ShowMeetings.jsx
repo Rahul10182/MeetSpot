@@ -1,37 +1,32 @@
 import React, { useEffect, useState } from 'react';
-import { Box,IconButton,TextField, Typography, Grid, Paper, Select, MenuItem, FormControl, InputLabel } from '@mui/material';
+import { Box, IconButton, Typography, Grid, Paper } from '@mui/material';
 import axios from 'axios';
 import DirectionsCarIcon from '@mui/icons-material/DirectionsCar';
-import DirectionsBusIcon from '@mui/icons-material/DirectionsBus';
 import DirectionsWalkIcon from '@mui/icons-material/DirectionsWalk';
-import DirectionsBikeIcon from '@mui/icons-material/DirectionsBike';
-import { useLocation, useNavigate } from 'react-router-dom';
-import  ChatBubbleIcon  from '@mui/icons-material/ChatBubble';
-import  AccountCircleIcon  from '@mui/icons-material/AccountCircle';
+import { useLocation } from 'react-router-dom';
+import ChatBubbleIcon from '@mui/icons-material/ChatBubble';
+import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 
-
-const ShowMeetings = () => {
+const ShowMeetings = ({coordinates}) => {
   const [userLocation, setUserLocation] = useState(null);
   const [routeData, setRouteData] = useState(null);
   const [loading, setLoading] = useState(false);
   const [mapUrl, setMapUrl] = useState("");
   const [travelMode, setTravelMode] = useState("WALKING"); // Default mode
-  const navigate = useNavigate();
-  const [showChat, setShowChat] = useState(false);
-  const toggleChat = () => {
-    setShowChat((prev) => !prev);
-  };
+  const [map, setMap] = useState(null);
+  const [userMarker, setUserMarker] = useState(null);
+  const [trafficLayer, setTrafficLayer] = useState(null);
 
   const { state } = useLocation();
-  const coordinates = state?.coordinates;
+  coordinates = state?.coordinates;
 
   useEffect(() => {
-    loadGoMapsAPI();
+    loadGoogleMapsAPI();
   }, []);
 
   const getUserLocation = () => {
     if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
+      navigator.geolocation.watchPosition(
         (position) => {
           const userCoords = {
             lat: position.coords.latitude,
@@ -41,9 +36,10 @@ const ShowMeetings = () => {
           if (coordinates) {
             fetchRouteData(userCoords, coordinates, travelMode);
           }
+          updateUserMarker(userCoords);
         },
         (error) => {
-          console.error("Error getting user location:", error);
+          console.error('Error getting user location:', error);
         }
       );
     }
@@ -51,13 +47,7 @@ const ShowMeetings = () => {
 
   const fetchRouteData = async (origin, destination, mode) => {
     setLoading(true);
-    const apiKey = 'AlzaSyP6exizIh22-UNatVUUC-PtIH_dU7nZf2s';
-
-    let travelMode = mode;
-    if (mode === 'CAR') {
-      travelMode = 'DRIVING';
-    } 
-
+    const apiKey = 'AlzaSyNg7F1l5MxHkgXGX2_m1qqt9rrUWXOBiux';
     const url = `https://maps.gomaps.pro/maps/api/directions/json?origin=${origin.lat},${origin.lng}&destination=${destination[1]},${destination[0]}&mode=${mode.toLowerCase()}&key=${apiKey}`;
 
     try {
@@ -65,7 +55,7 @@ const ShowMeetings = () => {
       if (response.data.status === "OK") {
         setRouteData(response.data);
         setMapUrl(generateMapUrl(origin, destination));
-        initializeMap(origin, destination, travelMode);
+        initializeMap(origin, destination, mode);
       } else {
         console.error("Error in response:", response.data);
       }
@@ -77,27 +67,22 @@ const ShowMeetings = () => {
   };
 
   const generateMapUrl = (userCoords, venueCoords) => {
-    if (!userCoords || !venueCoords) return "";
-
-    const apiKey = 'AlzaSyP6exizIh22-UNatVUUC-PtIH_dU7nZf2s';
-    const origin = `${userCoords.lat},${userCoords.lng}`;
-    const destination = `${venueCoords[1]},${venueCoords[0]}`;
-
-    return `https://maps.gomaps.pro/maps/api/directions/json?origin=${origin}&destination=${destination}&key=${apiKey}`;
+    const apiKey = 'AlzaSyNg7F1l5MxHkgXGX2_m1qqt9rrUWXOBiux';
+    return `https://maps.gomaps.pro/maps/dir/?api=1&origin=${userCoords.lat},${userCoords.lng}&destination=${venueCoords[1]},${venueCoords[0]}&travelmode=${travelMode.toLowerCase()}&key=${apiKey}`;
   };
 
-  const loadGoMapsAPI = () => {
+  const loadGoogleMapsAPI = () => {
     if (!window.google) {
       const script = document.createElement('script');
-      script.src = `https://maps.gomaps.pro/maps/api/js?key=AlzaSyP6exizIh22-UNatVUUC-PtIH_dU7nZf2s&libraries=places`;
+      script.src = `https://maps.gomaps.pro/maps/api/js?key=AlzaSyNg7F1l5MxHkgXGX2_m1qqt9rrUWXOBiux&libraries=places`;
       script.async = true;
       script.defer = true;
       script.onload = () => {
-        console.log('GoMaps API loaded successfully.');
+        console.log('Google Maps API loaded successfully.');
         getUserLocation();
       };
       script.onerror = () => {
-        console.error('Failed to load GoMaps API.');
+        console.error('Failed to load Google Maps API.');
       };
       document.body.appendChild(script);
     } else {
@@ -106,18 +91,24 @@ const ShowMeetings = () => {
   };
 
   const initializeMap = (origin, destination, mode) => {
-    const map = new google.maps.Map(document.getElementById('map'), {
-      center: { lat: origin.lat, lng: origin.lng },
+    const newMap = new google.maps.Map(document.getElementById('map'), {
+      center: origin,
       zoom: 14,
     });
 
     const directionsService = new google.maps.DirectionsService();
     const directionsRenderer = new google.maps.DirectionsRenderer();
-    directionsRenderer.setMap(map);
+    directionsRenderer.setMap(newMap);
+
+    if (!trafficLayer) {
+      const newTrafficLayer = new google.maps.TrafficLayer();
+      newTrafficLayer.setMap(newMap);
+      setTrafficLayer(newTrafficLayer);
+    }
 
     directionsService.route(
       {
-        origin: { lat: origin.lat, lng: origin.lng },
+        origin,
         destination: { lat: destination[1], lng: destination[0] },
         travelMode: google.maps.TravelMode[mode],
       },
@@ -129,6 +120,24 @@ const ShowMeetings = () => {
         }
       }
     );
+
+    const marker = new google.maps.Marker({
+      position: origin,
+      map: newMap,
+      title: 'Your Live Location',
+    });
+
+    setUserMarker(marker);
+    setMap(newMap);
+  };
+
+  const updateUserMarker = (coords) => {
+    if (userMarker) {
+      userMarker.setPosition(new google.maps.LatLng(coords.lat, coords.lng));
+    }
+    if (map) {
+      map.setCenter(new google.maps.LatLng(coords.lat, coords.lng));
+    }
   };
 
   const handleModeChange = (mode) => {
@@ -137,7 +146,6 @@ const ShowMeetings = () => {
       fetchRouteData(userLocation, coordinates, mode);
     }
   };
-
 
   const renderDirections = () => {
     if (loading) return <Typography>Loading Directions...</Typography>;
@@ -158,7 +166,6 @@ const ShowMeetings = () => {
 
   return (
     <Box sx={{ padding: 1 }}>
-    
       <Box
         component="header"
         className="bg-white shadow-md mx-auto flex justify-between items-center"
@@ -168,17 +175,11 @@ const ShowMeetings = () => {
           height: '60px',
           borderRadius: '30px',
           padding: '0 10px',
-          transition: 'background-color 0.3s ease',
-          
           mb: 1,
-          '&:hover': {
-            background: 'linear-gradient(90deg, #ff7eb9, #ff65a3)',
-          },
+          '&:hover': { background: 'linear-gradient(90deg, #ff7eb9, #ff65a3)' },
         }}
       >
-        <Typography variant="h5" className="text-white font-bold">
-          MeetSpot
-        </Typography>
+        <Typography variant="h5" className="text-white font-bold">MeetSpot</Typography>
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
           <Box
             sx={{
@@ -194,20 +195,8 @@ const ShowMeetings = () => {
               mr: 2,
             }}
           >
-            <IconButton sx={{ color: '#ff65a3' }}>
-              <ChatBubbleIcon />
-            </IconButton>
-            <Typography
-              variant="body1"
-              sx={{
-                whiteSpace: 'nowrap',
-                color: '#ff65a3',
-                fontWeight: 'bold',
-                ml: 1,
-              }}
-            >
-              Chat
-            </Typography>
+            <IconButton sx={{ color: '#ff65a3' }}><ChatBubbleIcon /></IconButton>
+            <Typography variant="body1" sx={{ whiteSpace: 'nowrap', color: '#ff65a3', fontWeight: 'bold', ml: 1 }}>Chat</Typography>
           </Box>
           <Box
             sx={{
@@ -222,82 +211,25 @@ const ShowMeetings = () => {
               boxShadow: '0px 3px 5px rgba(0, 0, 0, 0.2)',
             }}
           >
-            <IconButton sx={{ color: '#ff65a3' }}>
-              <AccountCircleIcon />
-            </IconButton>
-            <Typography
-              variant="body1"
-              sx={{
-                whiteSpace: 'nowrap',
-                color: '#ff65a3',
-                fontWeight: 'bold',
-                ml: 1,
-              }}
-            >
-              Account
-            </Typography>
+            <IconButton sx={{ color: '#ff65a3' }}><AccountCircleIcon /></IconButton>
+            <Typography variant="body1" sx={{ whiteSpace: 'nowrap', color: '#ff65a3', fontWeight: 'bold', ml: 1 }}>Account</Typography>
           </Box>
         </Box>
       </Box>
 
       <Grid container spacing={3}>
-        {/* Left Section */}
         <Grid item xs={12} md={4}>
           <Paper elevation={3} sx={{ padding: 3, height: '100%' }}>
-            <Box className="flex justify-center bg-gray-300" sx={{ mb: 2 }}>
-
+            <Box sx={{ display: 'flex', justifyContent: 'space-around', alignItems: 'center', padding: '10px', backgroundColor: '#f5f5f5', borderRadius: '8px', mb: 2 }}>
+              <DirectionsCarIcon fontSize="large" color={travelMode === 'DRIVING' ? 'primary' : 'inherit'} onClick={() => handleModeChange('DRIVING')} sx={{ cursor: 'pointer' }} />
+              <DirectionsWalkIcon fontSize="large" color={travelMode === 'WALKING' ? 'primary' : 'inherit'} onClick={() => handleModeChange('WALKING')} sx={{ cursor: 'pointer' }} />
             </Box>
-
-            <Box
-              sx={{
-                display: 'flex',
-                justifyContent: 'space-around',
-                alignItems: 'center',
-                padding: '10px',
-                backgroundColor: '#f5f5f5',
-                borderRadius: '8px',
-                mb: 2,
-              }}
-            >
-              <DirectionsCarIcon
-                fontSize="large"
-                color={travelMode === 'DRIVING' ? 'primary' : 'inherit'}
-                onClick={() => handleModeChange('DRIVING')}
-                sx={{ cursor: 'pointer' }}
-              />
-              <DirectionsWalkIcon
-                fontSize="large"
-                color={travelMode === 'WALKING' ? 'primary' : 'inherit'}
-                onClick={() => handleModeChange('WALKING')}
-                sx={{ cursor: 'pointer' }}
-              />
-            </Box>
-
-            <Box
-              sx={{
-                backgroundColor: '#e0f7fa',
-                borderRadius: '8px',
-                padding: 2,
-              }}
-            >
-              {renderDirections()}
-            </Box>
+            <Box sx={{ backgroundColor: '#e0f7fa', borderRadius: '8px', padding: 2 }}>{renderDirections()}</Box>
           </Paper>
         </Grid>
 
-        {/* Map Section */}
         <Grid item xs={12} md={8}>
-          <Box
-            id="map"
-            sx={{
-              width: '100%',
-              height: '600px',
-              backgroundColor: '#d0d0d0',
-              borderRadius: '8px',
-            }}
-          >
-            Map placeholder
-          </Box>
+          <Box id="map" sx={{ height: '600px', borderRadius: '8px' }}></Box>
         </Grid>
       </Grid>
     </Box>
