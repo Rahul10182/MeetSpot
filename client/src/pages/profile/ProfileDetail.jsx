@@ -76,7 +76,7 @@ const UserDashboard = () => {
 
     
     return (
-        <div className="min-h-screen flex bg-slate-300 relative">
+        <div className="min-h-screen flex bg-white relative">
             <aside className="w-64 bg-gradient-to-b from-indigo-600 to-purple-500 text-white shadow-lg p-6">
                 <div className="text-center mb-8">
 
@@ -122,8 +122,8 @@ const UserDashboard = () => {
             <main className="flex-1 p-8">
                 <AppBar position="static" color="transparent" elevation={0} className="bg-blue-500 shadow-sm mb-6">
                     <Toolbar className="flex justify-between">
-                        <div>
-                        <Typography variant="h5" className="font-semibold text-blue-800">
+                        <div className=' font-bold text-blue-500 text-4xl'>
+                        <Typography variant="h5" className="font-bold text-blue-500">
                             Welcome, {name || "User"}
                         </Typography>
                         

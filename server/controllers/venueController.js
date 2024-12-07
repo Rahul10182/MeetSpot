@@ -5,7 +5,7 @@ import calculateMidpoint from '../utils/midpointUtil.js';
 import { getDistance } from "../utils/getDistance.js"
 
 
-const GO_MAPS_API_KEY = "AlzaSy5i2nMmv0eAaFQmmsFisfBZi88SAbtjNTH";
+const GO_MAPS_API_KEY = "AlzaSyXP55cfGepMsoWhHU6gk1g1e_7lxhH8ltC";
 
 
 export const getVenueSuggestions = async (req, res) => {
@@ -141,47 +141,66 @@ export const getVenueSuggestions = async (req, res) => {
         });
 
     } catch (error) {
-        console.error(error);
-        res.status(500).json({ message: "Failed to search for venues.", success: false });
+      console.error("Error details:", error.message, error.stack);
+      res.status(500).json({ 
+        message: "Failed to select venue", 
+        error: error.message, // Add this to get specific error info
+        success: false 
+      });
     }
+    
 };
 
-
-
 export const selectVenue = async (req, res) => {
-  const { firebaseId, venueId, isNew, name, type, latitude, longitude, address } = req.body;
+  const {
+    firebaseId,
+    friendFirebaseId,
+    date,
+    venueId,
+    isNew,
+    name,
+    type,
+    latitude,
+    longitude,
+    address,
+    photo
+  } = req.body;
 
   try {
+    console.log({
+      firebaseId,
+      friendFirebaseId,
+      venueId,
+      isNew,
+      name,
+      type,
+      latitude,
+      longitude,
+      address,
+      date,
+      photo
+    });
 
-    console.log(firebaseId);
-    console.log(venueId);
-    console.log(isNew);
-    console.log(name);
-    console.log(type);
-    console.log(latitude);
-    console.log(longitude);
-    console.log(address);
     // Validate input
-    if (!firebaseId) return res.status(400).json({ message: "Firebase ID is required", success: false });
-    if (isNew && (!name || !type || !latitude || !longitude)) {
+    if (!firebaseId || !friendFirebaseId)
+      return res.status(400).json({ message: "Firebase IDs are required", success: false });
+
+    if (isNew && (!name || !type || latitude == null || longitude == null || !address))
       return res.status(400).json({ message: "Missing required fields for new venue", success: false });
-    }
 
-    // Validate latitude and longitude
-    if (isNew && (typeof latitude !== 'number' || typeof longitude !== 'number')) {
-      return res.status(400).json({ message: "Latitude and Longitude must be numbers", success: false });
-    }
+    if (!isNew && !mongoose.isValidObjectId(venueId))
+      return res.status(400).json({ message: "Invalid venue ID", success: false });
 
-    // Find the user
-    const user = await User.findOne({ fireBaseId : firebaseId});
-    if (!user) {
-      return res.status(404).json({ message: "User not found", success: false });
-    }
+    // Find users
+    const user = await User.findOne({ fireBaseId:firebaseId });
+    const friend = await User.findOne({ fireBaseId: friendFirebaseId });
 
+    if (!user) return res.status(404).json({ message: "User not found", success: false });
+    if (!friend) return res.status(404).json({ message: "Friend not found", success: false });
+
+    // Venue creation/retrieval
     let venue;
-
     if (isNew) {
-      // Create a new venue
       venue = new Venue({
         name,
         type,
@@ -190,26 +209,32 @@ export const selectVenue = async (req, res) => {
           coordinates: [longitude, latitude],
         },
         address,
+        date,
+        photo,
+        user: user._id,
+        friend: friend._id
       });
       await venue.save();
     } else {
-      // Retrieve existing venue
-      venue = await Venue.findById(venueId);
-      if (!venue) {
-        return res.status(404).json({ message: "Venue not found", success: false });
-      }
+      venue = await Venue.findOne({ _id: venueId });
+      if (!venue) return res.status(404).json({ message: "Venue not found", success: false });
     }
 
-    // Check if venue is already visited
-    if (user.profile.venues.includes(venue._id)) {
+    // Check if venue already exists in user or friend profile
+    if (user.profile?.venues.includes(venue._id) || friend.profile?.venues.includes(venue._id)) {
       return res.status(400).json({ message: "Venue already selected", success: false });
     }
 
-    // Add venue to user's profile
+    // Add venue to user and friend's profiles
+    user.profile = user.profile || { venues: [] };
+    friend.profile = friend.profile || { venues: [] };
     user.profile.venues.push(venue._id);
-    await user.save();
+    friend.profile.venues.push(venue._id);
 
-    res.status(201).json({
+    await user.save();
+    await friend.save();
+
+    return res.status(201).json({
       message: "Venue selected successfully",
       venue: {
         venueId: venue._id,
@@ -223,26 +248,51 @@ export const selectVenue = async (req, res) => {
     });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: "Failed to select venue", success: false });
+    return res.status(500).json({ message: "Failed to select venue", success: false });
   }
 };
+
 // Controller to fetch all venues for a specific user
 export const getUserVenues = async (req, res) => {
   try {
-      const { firebaseID } = req.params; // Get fireBaseId from query params
-      console.log(firebaseID);
+    const { firebaseID } = req.params;
+    console.log(firebaseID);
 
-      // Find the user by fireBaseId and populate their venues
-      const fireBaseId = firebaseID
-      const user = await User.findOne({ fireBaseId }).populate('profile.venues');
+    if (!firebaseID) {
+      return res.status(400).json({ message: "Firebase ID is required" });
+    }
 
-      if (!user) {
-          return res.status(404).json({ message: "User not found" });
-      }
+    console.log(`Fetching venues for user with Firebase ID: ${firebaseID}`);
 
-      return res.status(200).json({ venues: user.profile.venues });
+    // Find the user by Firebase ID and populate their venues
+    const user = await User.findOne({ fireBaseId: firebaseID })
+      .populate({
+        path: 'profile.venues', // Populate venues
+        populate: { 
+          path: 'friend', // Populate friend's data
+          model: 'User', // Ensure it's populated from User collection
+          select: 'fullName' // Fetch only friend's name
+        }
+      });
+
+    console.log("User data: ", user);
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    // Extract and format venues with friend's name:
+    const venuesWithFriends = user.profile.venues.map((venue) => ({
+      ...venue.toObject(),
+      friendName: venue.friend?.fullName ?? 'Unknown Friend',
+    }));
+    console.log("Venues with friends: ", venuesWithFriends);
+
+    return res.status(200).json({ venues: venuesWithFriends });
+
   } catch (error) {
-      console.error("Error fetching venues:", error);
-      return res.status(500).json({ message: "Internal server error" });
+    console.error("Error fetching venues:", error.message);
+    return res.status(500).json({ message: "Internal server error" });
   }
 };
+

@@ -16,6 +16,9 @@ import userSearch from "./routes/userSearchRoute.js";
 import Message from "./models/messageModel.js"; 
 import Chat from "./models/chatModel.js";
 import notificationRoutes from "./routes/notificationRoutes.js"
+
+import mailRoutes from "./routes/mailRoutes.js"
+
 dotenv.config();
 connectDB();
 
@@ -48,6 +51,7 @@ app.use('/api/v1/venue', venueRoutes);
 app.use('/api/v1/review', reviewRoutes);
 app.use('/api/v1/chat', chatRoutes);
 app.use("/notifications", notificationRoutes);
+app.use('/api/v1/mail', mailRoutes);
 
 // Socket.io for real-time chat
 io.on('connection', (socket) => {

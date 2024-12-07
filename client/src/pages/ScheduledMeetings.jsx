@@ -1,21 +1,24 @@
 import React, { useEffect, useState } from 'react';
-import { Card, CardMedia, CardContent, Typography, Button, Box, Grid, CircularProgress } from '@mui/material';
-import AccessTimeIcon from '@mui/icons-material/AccessTime';
+import {
+  Card,
+  CardMedia,
+  CardContent,
+  Typography,
+  Button,
+  Box,
+  Grid,
+  CircularProgress,
+  CardActions,
+} from '@mui/material';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 
 const ScheduledMeetings = () => {
   const [venues, setVenues] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [showExpired, setShowExpired] = useState(false); // State to track the toggle
+  const [showExpired, setShowExpired] = useState(false);
+  const [showFullAddress, setShowFullAddress] = useState({});
   const navigate = useNavigate();
-  const [showMore, setShowMore] = useState(false);
-
-
-  const handleToggle = () => {
-    setShowMore(!showMore);
-  };
-
 
   const userData = JSON.parse(localStorage.getItem('user'));
   const firebaseID = userData?.firebaseID;
@@ -23,182 +26,279 @@ const ScheduledMeetings = () => {
   useEffect(() => {
     const fetchVenues = async () => {
       try {
-        const response = await axios.get(`http://localhost:3000/api/v1/venue/allvenues/${firebaseID}`);
+        const response = await axios.get(
+          `http://localhost:3000/api/v1/venue/allvenues/${firebaseID}`
+        );
         setVenues(response.data.venues || []);
       } catch (error) {
-        console.error("Error fetching venues:", error);
-        setVenues([]); // Fallback to empty array on error
+        console.error('Error fetching venues:', error);
+        setVenues([]);
       } finally {
         setLoading(false);
       }
     };
-
     fetchVenues();
   }, [firebaseID]);
 
-  if (loading) {
-    return <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}><CircularProgress color="primary" /></Box>;
-  }
-
-  if (!venues || venues.length === 0) {
-    return <Typography variant="h6" align="center" sx={{ width: '100%' }}>No Scheduled Meetings Found</Typography>;
-  }
-
-  // Helper function to check if the venue is expired or upcoming
-  const isExpired = (venueTime) => {
-    const venueDate = new Date(venueTime);
-    return venueDate < new Date();
+  const formatDateTime = (dateTime) => {
+    const date = new Date(dateTime);
+    return date.toLocaleString('en-US', {
+      weekday: 'long',
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: true,
+    });
   };
-
-  const handleTakeAction = (venue) => {
-    if (!venue?.location?.coordinates) {
-      alert("Venue location is incomplete. Please check.");
-      return;
+  const getFriendEmail = async (venue) => {
+    try {
+      if (!venue.friend || !venue.friend._id) {
+        console.error('Friend data is missing for venue:', venue);
+        return null;
+      }
+  
+      const selectedFriendId = venue.friend._id;
+  
+      const friendResponse = await axios.post(
+        `http://localhost:3000/api/v1/user/getEmail`,
+        { selectedFriendId }
+      );
+  
+      const friendEmail = friendResponse.data?.email;
+      if (!friendEmail) {
+        console.error('Friend email not found');
+        return null;
+      }
+  
+      return friendEmail;
+    } catch (error) {
+      console.error('Error fetching friend email:', error);
+      return null;
     }
-    console.log("on Scheduled meeting page");
-    console.log(venue.location.coordinates);
-    navigate('/show-meet', {
-      state: {
-        coordinates: venue.location.coordinates,
-      },
+  };
+  
+  const sendEmailNotification = async (venue) => {
+    try {
+      const friendEmail = await getFriendEmail(venue);
+      if (!friendEmail) {
+        return;
+      }
+  
+      const emailData = {
+        userEmail: userData?.email,
+        friendEmail,
+        venueName: venue.name,
+        meetingTime: `${venue.date} ${venue.time}`,
+      };
+  
+      await axios.post('http://localhost:3000/api/v1/mail/send-reminder', {
+        emailData,
+      });
+      console.log('Email sent successfully');
+    } catch (error) {
+      console.error('Error sending email:', error);
+    }
+  };
+  
+
+  const isExpired = (venueDate ) => {
+    const currentDateTime = new Date();
+    const venueDateTime = new Date(`${venueDate}`);
+    return venueDateTime < currentDateTime; // True if the meeting time has passed
+  };
+  
+  const filteredVenues = venues.filter((venue) =>
+    showExpired ? isExpired(venue.date) : !isExpired(venue.date)
+  );
+  
+  // Automatically update expired venues
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setVenues((prevVenues) =>
+        prevVenues.filter((venue) => !isExpired(venue.date))
+      );
+    }, 60 * 1000); // Check every minute
+  
+    return () => clearInterval(interval); // Cleanup interval on component unmount
+  }, [venues]);
+  
+  
+  
+  const calculateLeaveTime = (venueDate, venueTime) => {
+    const venueDateTime = new Date(`${venueDate}T${venueTime}:00`);
+    venueDateTime.setMinutes(venueDateTime.getMinutes() - 30);
+    return venueDateTime.toLocaleTimeString('en-US', {
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: true,
     });
   };
 
-  // Filter venues based on the state
-  const filteredVenues = venues.filter((venue) =>
-    showExpired ? isExpired(venue.time) : !isExpired(venue.time)
-  );
+  const handleTakeAction = async (venue) => {
+    if (!venue?.location?.coordinates) {
+      alert('Venue location is incomplete. Please check.');
+      return;
+    }
+  
+    try {
+      const friendEmail = await getFriendEmail(venue);
+      console.log("friend email on last page")
+      console.log(friendEmail)
+  
+      if (!friendEmail) {
+        alert('Friend email not found. Cannot proceed.');
+        return;
+      }
+  
+      navigate('/show-meet', {
+        state: {
+          coordinates: venue.location.coordinates,venueName: venue.name,
+          friendEmail,
+        },
+      });
+    } catch (error) {
+      console.error('Error in handleTakeAction:', error);
+    }
+  };
+  
+
+  const toggleAddress = (venueId) => {
+    setShowFullAddress((prevState) => ({
+      ...prevState,
+      [venueId]: !prevState[venueId],
+    }));
+  };
+
+  // Automatically send email 2 hours before the meeting
+  useEffect(() => {
+    const scheduleEmails = () => {
+      venues.forEach((venue) => {
+        const venueDateTime = new Date(`${venue.date}T${venue.time}:00`);
+        const currentTime = new Date();
+        const timeDifference = venueDateTime - currentTime;
+
+        // Check if the meeting is in the future and if it's 2 hours away
+        if (timeDifference > 0 && timeDifference <= 2 * 60 * 60 * 1000) {
+          // Send email 2 hours before the meeting
+          setTimeout(() => {
+            sendEmailNotification(venue);
+          }, timeDifference);
+        }
+      });
+    };
+
+    if (!loading) {
+      scheduleEmails();
+    }
+  }, [loading, venues]);
+
+  if (loading) {
+    return (
+      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
+        <CircularProgress color="primary" />
+      </Box>
+    );
+  }
 
   return (
     <Box sx={{ padding: 4 }}>
-      <Typography variant="h4" gutterBottom align="center" sx={{ fontWeight: 'bold', color: '#C2185B' }}>
+      <Typography
+        variant="h4"
+        gutterBottom
+        align="center"
+        sx={{ fontWeight: 'bold', color: '#C2185B' }}
+      >
         Scheduled Meetings
       </Typography>
 
-      {/* Buttons to toggle between expired and upcoming venues */}
       <Box sx={{ display: 'flex', justifyContent: 'center', mb: 3 }}>
-        <div className=' bg-pink-300 h-12 w-48 justify-center rounded-xl items-center flex '>
-        <Button
-          variant="contained"
-          onClick={() => setShowExpired(false)}
-          sx={{
-            backgroundColor: '#D07C85',
-            color: '#fff',
-            '&:hover': {
-              backgroundColor: '#C2185B',
-            },
-            borderRadius: '20px' // margin to separate buttons
-          }}
-        >
-          coming
-        </Button>
-        <Button
-          variant="contained"
-          onClick={() => setShowExpired(true)}
-          sx={{
-            backgroundColor: '#D07C85',
-            color: '#fff',
-            '&:hover': {
-              backgroundColor: '#C2185B',
-            },
-            borderRadius: '20px'
-          }}
-        >
-          Passed
-        </Button>
+        <div className="bg-pink-400 h-16 w-48 justify-center rounded-xl items-center flex">
+          <Button
+            variant="contained"
+            onClick={() => setShowExpired(false)}
+            sx={{
+              backgroundColor: '#D07C85',
+              color: '#fff',
+              '&:hover': { backgroundColor: '#C2185B' },
+              borderRadius: '20px',
+            }}
+          >
+            Coming
+          </Button>
+          <Button
+            variant="contained"
+            onClick={() => setShowExpired(true)}
+            sx={{
+              backgroundColor: '#D07C85',
+              color: '#fff',
+              '&:hover': { backgroundColor: '#C2185B' },
+              borderRadius: '20px',
+            }}
+          >
+            Passed
+          </Button>
         </div>
       </Box>
 
-      {/* Render venues based on the selected button */}
       <Grid container spacing={4}>
         {filteredVenues.length === 0 ? (
-          <Typography variant="h6" align="center" sx={{ width: '100%', color: '#666' }}>
-            <br></br>
+          <Typography
+            variant="h6"
+            align="center"
+            sx={{ width: '100%', color: '#666' }}
+          >
             No {showExpired ? 'Passed' : 'Scheduled'} Meetings Found
           </Typography>
         ) : (
-          filteredVenues.map((venue, index) => (
-            <Grid item xs={12} sm={6} md={4} key={index}>
-              <Card sx={{
-                maxWidth: '100%',
-                borderRadius: 3,
-                boxShadow: 3,
-                transition: '0.3s',
-                '&:hover': {
-                  boxShadow: 20,
-                  transform: 'scale(1.05)',
-                  transition: 'transform 0.3s',
-                },
-                backgroundColor: '#D1D5DB',
-                p: 2,
-              }}>
+          filteredVenues.map((venue) => (
+            <Grid item xs={12} sm={6} md={4} key={venue.id} >
+              <Card
+              
+                sx={{
+                  maxWidth: '100%',
+                  borderRadius: 3,
+                  boxShadow: 1,
+                  transition: '0.3s',
+                  '&:hover': {
+                    boxShadow: 10,
+                    transform: 'scale(1.05)',
+                  },
+                  backgroundColor: '#F1F5F9',
+                  p: 2,
+                }}
+              >
                 <CardMedia
                   component="img"
                   height="180"
-                  image={venue.photo || "https://via.placeholder.com/300x150"}
+                  image={venue.photo || 'https://via.placeholder.com/300x150'}
                   alt={`Venue of ${venue.place}`}
-                  sx={{
-                    borderRadius: 3,
-                    objectFit: 'cover',
-                    backgroundColor: '#D1D5DB'
-                  }}
+                  sx={{ borderRadius: 3, objectFit: 'cover' }}
                 />
                 <CardContent sx={{ textAlign: 'center' }}>
-                  <Typography variant="h6"
-                      component="div"
-                      gutterBottom
-                      sx={{
-                        fontWeight: 'bold',
-                        fontSize: '0.9rem',
-                        height: showMore ? 'auto' : '1.2em',  // Toggle height based on showMore state
-                        overflow: 'hidden',  // Hide overflow if not showing full address
-                        textOverflow: 'ellipsis',  // Medium-sized text for the address
-                      }}>
-                    {venue.address || "Unknown Place"}
+                  <Typography variant="h6">
+                    {showFullAddress[venue.id]
+                      ? venue.address
+                      : `${venue.address.slice(0, 40)}...`}
+                    <Button onClick={() => toggleAddress(venue.id)}>Toggle</Button>
                   </Typography>
-                  {!showMore && (
-                    <Button onClick={handleToggle} sx={{ color: '#1976D2' }}>
-                      More
-                    </Button>
-                  )}
-                  {showMore && (
-                    <Button onClick={handleToggle} sx={{ color: '#1976D2' }}>
-                      Less
-                    </Button>
-                  )}
-
-                  <Typography variant="body2"
-                      color="text.secondary"
-                      sx={{
-                        display: 'flex',
-                        justifyContent: 'center',
-                        alignItems: 'center',
-                        fontSize: '1rem',  // Medium text for the date and time
-                        color: '#C2185B',  // Dark pink color for meeting date/time text
-                      }}
->
-                    <AccessTimeIcon fontSize="medium" sx={{ verticalAlign: 'middle', mr: 1 }} />
-                    {venue.time || "Time not available"}
+                  <Typography variant="body2">
+                    Date: {venue.date} 
+                  </Typography>
+                  <Typography variant="body2">
+                    Leave at: {calculateLeaveTime(venue.date, venue.time)}
                   </Typography>
                 </CardContent>
-                <Box sx={{ display: 'flex', justifyContent: 'center', p: 2 }}>
+                <CardActions sx={{ justifyContent: 'space-between' }}>
                   <Button
                     variant="contained"
-                    color="primary"
-                    size="medium"
+                    color={'primary'}
                     onClick={() => handleTakeAction(venue)}
-                    sx={{
-                      borderRadius: 25,
-                      textTransform: 'none',
-                      boxShadow: 2,
-                      '&:hover': {
-                        boxShadow: 8,
-                      },
-                    }}
                   >
-                    Take Action
+                     'Go to Venue'
                   </Button>
-                </Box>
+                </CardActions>
               </Card>
             </Grid>
           ))

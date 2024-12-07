@@ -1,239 +1,449 @@
 import React, { useEffect, useState } from 'react';
-import { Box, IconButton, Typography, Grid, Paper } from '@mui/material';
+import { Box, IconButton, Typography, Grid, Paper, Button, List, ListItem, ListItemText } from '@mui/material';
 import axios from 'axios';
 import DirectionsCarIcon from '@mui/icons-material/DirectionsCar';
 import DirectionsWalkIcon from '@mui/icons-material/DirectionsWalk';
+import PedalBikeIcon from '@mui/icons-material/PedalBike';
+import TaxiAlertIcon from '@mui/icons-material/TaxiAlert';
+import DirectionsBusIcon from '@mui/icons-material/DirectionsBus';
 import { useLocation } from 'react-router-dom';
 import ChatBubbleIcon from '@mui/icons-material/ChatBubble';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 
-const ShowMeetings = ({coordinates}) => {
+const ShowMeetings = ({ coordinates ,friendEmail,venueName}) => {
   const [userLocation, setUserLocation] = useState(null);
-  const [routeData, setRouteData] = useState(null);
+  const [routeData, setRouteData] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [mapUrl, setMapUrl] = useState("");
-  const [travelMode, setTravelMode] = useState("WALKING"); // Default mode
+  const [travelMode, setTravelMode] = useState("WALKING");
   const [map, setMap] = useState(null);
-  const [userMarker, setUserMarker] = useState(null);
   const [trafficLayer, setTrafficLayer] = useState(null);
+  const [selectedRouteIndex, setSelectedRouteIndex] = useState(0);
 
   const { state } = useLocation();
   coordinates = state?.coordinates;
+  friendEmail = state?.friendEmail;
+  venueName = state?.venueName;
+  console.log("venue:name")
+  console.log(venueName)
+  console.log("Friend Email")
+  console.log(friendEmail)
+
+  console.log("venue coordinates : ",coordinates);
 
   useEffect(() => {
-    loadGoogleMapsAPI();
+    loadHereMapsAPI(); // Load the HERE Maps API
   }, []);
-
+  
+  useEffect(() => {
+    if (userLocation && coordinates && routeData.length > 0) {
+      initializeMap(userLocation, coordinates, routeData);
+    }
+  }, [userLocation, coordinates, routeData]); // Re-run when any of these change
+  
+  
   const getUserLocation = () => {
     if (navigator.geolocation) {
-      navigator.geolocation.watchPosition(
+      const watchId = navigator.geolocation.watchPosition(
         (position) => {
           const userCoords = {
             lat: position.coords.latitude,
             lng: position.coords.longitude,
           };
+          console.log('User coordinates:', userCoords);
           setUserLocation(userCoords);
+  
           if (coordinates) {
             fetchRouteData(userCoords, coordinates, travelMode);
           }
-          updateUserMarker(userCoords);
         },
         (error) => {
-          console.error('Error getting user location:', error);
-        }
+          console.error('Error getting user location:', error.message);
+          alert('Failed to get location');
+        },
+        { enableHighAccuracy: true, maximumAge: 0, timeout: 10000 }
       );
+  
+      return () => navigator.geolocation.clearWatch(watchId);
+    } else {
+      alert('Geolocation is not supported by this browser.');
     }
   };
-
-  const fetchRouteData = async (origin, destination, mode) => {
-    setLoading(true);
-    const apiKey = 'AlzaSyNg7F1l5MxHkgXGX2_m1qqt9rrUWXOBiux';
-    const url = `https://maps.gomaps.pro/maps/api/directions/json?origin=${origin.lat},${origin.lng}&destination=${destination[1]},${destination[0]}&mode=${mode.toLowerCase()}&key=${apiKey}`;
-
+  
+  const handleModeChange = (mode) => {
+    setTravelMode(mode);
+    if (userLocation && coordinates) {
+      setLoading(true);  // Start loading indicator
+      fetchRouteData(userLocation, coordinates, mode);
+    }
+  };
+  
+  const fetchRouteData = async (userCoords, venueCoords, travelMode) => {
     try {
-      const response = await axios.get(url);
-      if (response.data.status === "OK") {
-        setRouteData(response.data);
-        setMapUrl(generateMapUrl(origin, destination));
-        initializeMap(origin, destination, mode);
-      } else {
-        console.error("Error in response:", response.data);
+      const origin = `${userCoords.lat},${userCoords.lng}`;
+      const destination = `${venueCoords[1]},${venueCoords[0]}`; // Correct order (lat, lng)
+      const response = await axios.get('https://router.hereapi.com/v8/routes', {
+        params: {
+          transportMode: travelMode,
+          origin: origin,
+          destination: destination,
+          return: 'summary,polyline',
+          alternatives: 3,
+          apiKey: 'Lhu8fRXCXhzlnW8i_5Mszi2otgOMuli4nBmfaEx2CVI',
+        },
+      });
+  
+      setRouteData(response.data.routes);
+      setLoading(false);  // Stop loading when data is fetched
+      if (map) {
+        updateRouteOnMap(response.data.routes);
       }
     } catch (error) {
-      console.error("Error fetching route:", error);
-    } finally {
+      console.error('Error fetching route:', error);
       setLoading(false);
     }
   };
-
-  const generateMapUrl = (userCoords, venueCoords) => {
-    const apiKey = 'AlzaSyNg7F1l5MxHkgXGX2_m1qqt9rrUWXOBiux';
-    return `https://maps.gomaps.pro/maps/dir/?api=1&origin=${userCoords.lat},${userCoords.lng}&destination=${venueCoords[1]},${venueCoords[0]}&travelmode=${travelMode.toLowerCase()}&key=${apiKey}`;
+  
+  const updateRouteOnMap = (routes) => {
+    if (!map || routes.length === 0) return;
+  
+    const selectedRoute = routes[selectedRouteIndex];
+    if (!selectedRoute || !selectedRoute.sections) {
+      console.error('No valid route found for the selected route.');
+      return;
+    }
+  
+    const linestring = H.geo.LineString.fromFlexiblePolyline(
+      selectedRoute.sections[0].polyline
+    );
+    const routeLine = new H.map.Polyline(linestring, {
+      style: { strokeColor: 'green', lineWidth: 5 },
+    });
+  
+    map.removeObjects(map.getObjects()); // Remove existing route from the map
+    map.addObject(routeLine); // Add new route line
+    map.getViewModel().setLookAtData({ bounds: routeLine.getBoundingBox() });
+  
+    // Add or update the user's location marker
+    const userMarker = new H.map.Marker(userLocation);
+    map.addObject(userMarker);
+  
+    // Add or update the venue's location marker
+    if (coordinates) {
+      const venueMarker = new H.map.Marker(coordinates);
+      map.addObject(venueMarker);
+    }
   };
+  
+  
+  
+  
 
-  const loadGoogleMapsAPI = () => {
-    if (!window.google) {
+  const loadHereMapsAPI = () => {
+    if (!window.H) {
       const script = document.createElement('script');
-      script.src = `https://maps.gomaps.pro/maps/api/js?key=AlzaSyNg7F1l5MxHkgXGX2_m1qqt9rrUWXOBiux&libraries=places`;
+      script.src = `https://js.api.here.com/v3/3.1/mapsjs.bundle.js`;
       script.async = true;
       script.defer = true;
       script.onload = () => {
-        console.log('Google Maps API loaded successfully.');
+        console.log('HERE Maps API loaded successfully.');
         getUserLocation();
       };
       script.onerror = () => {
-        console.error('Failed to load Google Maps API.');
+        console.error('Failed to load HERE Maps API.');
       };
       document.body.appendChild(script);
     } else {
       getUserLocation();
     }
   };
+  
 
-  const initializeMap = (origin, destination, mode) => {
-    const newMap = new google.maps.Map(document.getElementById('map'), {
-      center: origin,
-      zoom: 14,
-    });
-
-    const directionsService = new google.maps.DirectionsService();
-    const directionsRenderer = new google.maps.DirectionsRenderer();
-    directionsRenderer.setMap(newMap);
-
-    if (!trafficLayer) {
-      const newTrafficLayer = new google.maps.TrafficLayer();
-      newTrafficLayer.setMap(newMap);
-      setTrafficLayer(newTrafficLayer);
-    }
-
-    directionsService.route(
-      {
-        origin,
-        destination: { lat: destination[1], lng: destination[0] },
-        travelMode: google.maps.TravelMode[mode],
-      },
-      (response, status) => {
-        if (status === google.maps.DirectionsStatus.OK) {
-          directionsRenderer.setDirections(response);
-        } else {
-          console.error('Directions request failed due to ' + status);
+  const initializeMap = (origin, destination, routes) => {
+    if (!map) {
+      const platform = new H.service.Platform({
+        apikey: 'Lhu8fRXCXhzlnW8i_5Mszi2otgOMuli4nBmfaEx2CVI',
+      });
+      const defaultLayers = platform.createDefaultLayers();
+  
+      const newMap = new H.Map(
+        document.getElementById('map'),
+        defaultLayers.vector.normal.map,
+        {
+          center: origin,
+          zoom: 14,
         }
-      }
+      );
+  
+      const behavior = new H.mapevents.Behavior(new H.mapevents.MapEvents(newMap));
+      const ui = H.ui.UI.createDefault(newMap, defaultLayers);
+  
+      setMap(newMap); // Set the map state here
+    }
+  
+    // Wait for map to be initialized before adding objects
+    if (!map) {
+      console.error("Map is not initialized yet.");
+      return;
+    }
+  
+    map.removeObjects(map.getObjects());
+  
+    const selectedRoute = routes[selectedRouteIndex];
+  
+    if (!selectedRoute || !selectedRoute.sections) {
+      console.error('No valid route found for the selected route.');
+      return;
+    }
+  
+    const linestring = H.geo.LineString.fromFlexiblePolyline(
+      selectedRoute.sections[0].polyline
     );
-
-    const marker = new google.maps.Marker({
-      position: origin,
-      map: newMap,
-      title: 'Your Live Location',
+  
+    const routeLine = new H.map.Polyline(linestring, {
+      style: { strokeColor: 'green', lineWidth: 5 },
     });
+  
+    map.addObject(routeLine); // Now it is safe to call addObject
+    map.getViewModel().setLookAtData({ bounds: routeLine.getBoundingBox() });
+  
+    // Add the user's location marker
+    const userMarker = new H.map.Marker(origin);
+    map.addObject(userMarker);
+    
 
-    setUserMarker(marker);
-    setMap(newMap);
+    // Add the venue's location marker
+    // console.log("destination:")
+    // const cleanedDestination = destination.filter(value => !isNaN(value));
+    // console.log(cleanedDestination)
+    // const longitude = cleanedDestination[0];
+    // const latitude = cleanedDestination[1];
+    // const validDestination = { lat: latitude, lng: longitude };
+    // const venueMarker = new H.map.Marker(validDestination);
+    // map.addObject(venueMarker);
+
+    // If route data is available, draw the route
+    if (routes.length > 0) {
+      const selectedRoute = routes[selectedRouteIndex];
+      const linestring = H.geo.LineString.fromFlexiblePolyline(
+        selectedRoute.sections[0].polyline
+      );
+      const routeLine = new H.map.Polyline(linestring, {
+        style: { strokeColor: 'green', lineWidth: 5 },
+      });
+      map.addObject(routeLine); // Add the route line to the map
+      map.getViewModel().setLookAtData({ bounds: routeLine.getBoundingBox() });
+    }
+
   };
 
-  const updateUserMarker = (coords) => {
-    if (userMarker) {
-      userMarker.setPosition(new google.maps.LatLng(coords.lat, coords.lng));
-    }
-    if (map) {
-      map.setCenter(new google.maps.LatLng(coords.lat, coords.lng));
+  const handleRouteChange = (index) => {
+    setSelectedRouteIndex(index);
+    initializeMap(userLocation, coordinates, routeData);
+  };
+  
+  const formatDuration = (durationInSeconds) => {
+    const durationInMinutes = durationInSeconds / 60;
+    
+    if (durationInMinutes >= 1440) { // 1440 minutes = 24 hours
+      const days = Math.floor(durationInMinutes / 1440);
+      return `${days} day${days > 1 ? 's' : ''}`;
+    } else if (durationInMinutes >= 60) { // 60 minutes = 1 hour
+      const hours = Math.floor(durationInMinutes / 60);
+      return `${hours} hour${hours > 1 ? 's' : ''}`;
+    } else {
+      return `${Math.round(durationInMinutes)} minute${durationInMinutes > 1 ? 's' : ''}`;
     }
   };
-
-  const handleModeChange = (mode) => {
-    setTravelMode(mode);
-    if (userLocation && coordinates) {
-      fetchRouteData(userLocation, coordinates, mode);
-    }
-  };
+  
 
   const renderDirections = () => {
     if (loading) return <Typography>Loading Directions...</Typography>;
-    if (!routeData || !routeData.routes || !routeData.routes[0]?.legs[0]) {
-      return <Typography>No route found or error occurred.</Typography>;
-    }
+    if (!routeData.length) return <Typography>No route found or error occurred.</Typography>;
+  
+    const selectedRoute = routeData[selectedRouteIndex];
+    const summary = selectedRoute.sections[0].summary;
 
-    const { distance, duration } = routeData.routes[0].legs[0];
-
+    const sendFriendEmail = () => {
+      
+      const userData = JSON.parse(localStorage.getItem('user'));
+      const userName = userData?.fullName;
+      const email = userData?.email;
+  
+      const emailContent = {
+        from: userName,
+        to: friendEmail,
+        subject: "I have reached my destination",
+        body: `Hi, this is ${userName}. I have successfully reached ${venueName}.`,
+      };
+  
+      // Backend API call to send email
+      fetch("http://localhost:3000/api/v1/mail/send-email", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(emailContent),
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          console.log("Email sent successfully:", data);
+          // Optionally show a success message or notification
+        })
+        .catch((error) => {
+          console.error("Error sending email:", error);
+          // Optionally show an error message or notification
+        });
+    };
+  
     return (
       <Box>
-        <Typography variant="h6">Directions</Typography>
-        <Typography variant="body1">Distance: {distance?.text || "N/A"}</Typography>
-        <Typography variant="body1">Duration: {duration?.text || "N/A"}</Typography>
+        <Typography variant="h6">Selected Route</Typography>
+        <Typography variant="body1">Distance: {summary?.length / 1000} km</Typography>
+        <Typography variant="body1">Duration: {summary?.duration / 60} mins</Typography>
+  
+        <Typography variant="h6" sx={{ mt: 2 }}>Alternate Routes</Typography>
+        <Box
+          sx={{
+            maxHeight: '300px', // Limit the height to enable scrolling
+            overflowY: 'auto', // Allow vertical scrolling
+            scrollbarWidth: 'none', // For Firefox
+            '&::-webkit-scrollbar': {
+              display: 'none', // For Chrome, Safari, and Edge
+            },
+          }}
+        >
+
+        <List>
+          {routeData.map((route, index) => (
+            <ListItem
+              button
+              key={index}
+              selected={index === selectedRouteIndex}
+              onClick={() => handleRouteChange(index)}
+            >
+              <ListItemText
+                primary={`Route ${index + 1}`}
+                secondary={`Distance: ${(route.sections[0].summary.length / 1000).toFixed(2)} km, Duration: ${formatDuration(route.sections[0].summary.duration)}`}
+                />
+
+
+            </ListItem>
+          ))}
+        </List>
+              <Button
+                variant="contained"
+                color="primary"
+                onClick={() => sendFriendEmail()} // Pass route details to the email function
+                sx={{ mt: 2, width: '50%' }}
+              >
+                I have reached
+              </Button>
+        </Box>  
       </Box>
     );
   };
-
-  return (
-    <Box sx={{ padding: 1 }}>
-      <Box
-        component="header"
-        className="bg-white shadow-md mx-auto flex justify-between items-center"
-        sx={{
-          width: '80%',
-          backgroundColor: '#f089cc',
-          height: '60px',
-          borderRadius: '30px',
-          padding: '0 10px',
-          mb: 1,
-          '&:hover': { background: 'linear-gradient(90deg, #ff7eb9, #ff65a3)' },
-        }}
-      >
-        <Typography variant="h5" className="text-white font-bold">MeetSpot</Typography>
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-          <Box
-            sx={{
-              display: 'flex',
-              alignItems: 'center',
-              transition: 'all 0.3s ease',
-              '&:hover': { width: '120px' },
-              width: '40px',
-              overflow: 'hidden',
-              backgroundColor: 'white',
-              borderRadius: '20px',
-              boxShadow: '0px 3px 5px rgba(0, 0, 0, 0.2)',
-              mr: 2,
-            }}
-          >
-            <IconButton sx={{ color: '#ff65a3' }}><ChatBubbleIcon /></IconButton>
-            <Typography variant="body1" sx={{ whiteSpace: 'nowrap', color: '#ff65a3', fontWeight: 'bold', ml: 1 }}>Chat</Typography>
-          </Box>
-          <Box
-            sx={{
-              display: 'flex',
-              alignItems: 'center',
-              transition: 'all 0.3s ease',
-              '&:hover': { width: '140px' },
-              width: '40px',
-              overflow: 'hidden',
-              backgroundColor: 'white',
-              borderRadius: '20px',
-              boxShadow: '0px 3px 5px rgba(0, 0, 0, 0.2)',
-            }}
-          >
-            <IconButton sx={{ color: '#ff65a3' }}><AccountCircleIcon /></IconButton>
-            <Typography variant="body1" sx={{ whiteSpace: 'nowrap', color: '#ff65a3', fontWeight: 'bold', ml: 1 }}>Account</Typography>
-          </Box>
+  
+  
+    return (
+      <Box sx={{ padding: 1 }}>
+        <Box component="header" className="bg-white shadow-md mx-auto flex justify-between items-center" sx={{ /* styles */ }}>
+          <Typography variant="h5" className="text-white font-bold">MeetSpot</Typography>
+          {/* Other Header Components */}
         </Box>
-      </Box>
-
-      <Grid container spacing={3}>
+    
+        <Grid container spacing={3}>
         <Grid item xs={12} md={4}>
-          <Paper elevation={3} sx={{ padding: 3, height: '100%' }}>
-            <Box sx={{ display: 'flex', justifyContent: 'space-around', alignItems: 'center', padding: '10px', backgroundColor: '#f5f5f5', borderRadius: '8px', mb: 2 }}>
-              <DirectionsCarIcon fontSize="large" color={travelMode === 'DRIVING' ? 'primary' : 'inherit'} onClick={() => handleModeChange('DRIVING')} sx={{ cursor: 'pointer' }} />
-              <DirectionsWalkIcon fontSize="large" color={travelMode === 'WALKING' ? 'primary' : 'inherit'} onClick={() => handleModeChange('WALKING')} sx={{ cursor: 'pointer' }} />
+          <Paper elevation={3} sx={{ padding: 3, height: '100%', backgroundColor: '#fff', borderRadius: '8px' }}>
+            <Box sx={{
+              display: 'flex',
+              justifyContent: 'space-around',
+              alignItems: 'center',
+              padding: '10px',
+              backgroundColor: '#f5f5f5',
+              borderRadius: '8px',
+              mb: 2,
+              boxShadow: 2,
+            }}>
+              <DirectionsCarIcon
+                fontSize="large"
+                color={travelMode === 'car' ? 'primary' : 'inherit'}
+                onClick={() => handleModeChange('car')}
+                sx={{
+                  cursor: 'pointer',
+                  '&:hover': { color: 'primary.main' },
+                  transition: 'color 0.3s',
+                }}
+              />
+              <DirectionsWalkIcon
+                fontSize="large"
+                color={travelMode === 'pedestrian' ? 'primary' : 'inherit'}
+                onClick={() => handleModeChange('pedestrian')}
+                sx={{
+                  cursor: 'pointer',
+                  '&:hover': { color: 'primary.main' },
+                  transition: 'color 0.3s',
+                }}
+              />
+              <PedalBikeIcon
+                fontSize="large"
+                color={travelMode === 'bicycle' ? 'primary' : 'inherit'}
+                onClick={() => handleModeChange('bicycle')}
+                sx={{
+                  cursor: 'pointer',
+                  '&:hover': { color: 'primary.main' },
+                  transition: 'color 0.3s',
+                }}
+              />
+              <TaxiAlertIcon
+                fontSize="large"
+                color={travelMode === 'taxi' ? 'primary' : 'inherit'}
+                onClick={() => handleModeChange('taxi')}
+                sx={{
+                  cursor: 'pointer',
+                  '&:hover': { color: 'primary.main' },
+                  transition: 'color 0.3s',
+                }}
+              />
+              <DirectionsBusIcon
+                fontSize="large"
+                color={travelMode === 'bus' ? 'primary' : 'inherit'}
+                onClick={() => handleModeChange('bus')}
+                sx={{
+                  cursor: 'pointer',
+                  '&:hover': { color: 'primary.main' },
+                  transition: 'color 0.3s',
+                }}
+              />
             </Box>
-            <Box sx={{ backgroundColor: '#e0f7fa', borderRadius: '8px', padding: 2 }}>{renderDirections()}</Box>
+            <Box sx={{
+              backgroundColor: '#e0f7fa',
+              borderRadius: '8px',
+              padding: 2,
+              boxShadow: 1,
+            }}>
+              {renderDirections()}
+            </Box>
+
           </Paper>
         </Grid>
 
         <Grid item xs={12} md={8}>
-          <Box id="map" sx={{ height: '600px', borderRadius: '8px' }}></Box>
+          <Box id="map" sx={{
+            height: '600px',
+            width: '100%',
+            padding: 3,
+            borderRadius: '8px',
+            backgroundColor: '#f5f5f5',
+            boxShadow: 3,
+            transition: 'all 0.3s ease',
+            '&:hover': { boxShadow: 6 },
+          }}></Box>
         </Grid>
       </Grid>
-    </Box>
-  );
+
+      </Box>
+    );
+    
 };
 
 export default ShowMeetings;
