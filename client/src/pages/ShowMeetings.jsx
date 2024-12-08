@@ -9,6 +9,7 @@ import DirectionsBusIcon from '@mui/icons-material/DirectionsBus';
 import { useLocation } from 'react-router-dom';
 import ChatBubbleIcon from '@mui/icons-material/ChatBubble';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
+import { useNavigate } from 'react-router-dom';
 
 const ShowMeetings = ({ coordinates ,friendEmail,venueName}) => {
   const [userLocation, setUserLocation] = useState(null);
@@ -18,6 +19,8 @@ const ShowMeetings = ({ coordinates ,friendEmail,venueName}) => {
   const [map, setMap] = useState(null);
   const [trafficLayer, setTrafficLayer] = useState(null);
   const [selectedRouteIndex, setSelectedRouteIndex] = useState(0);
+  const [isTrafficVisible, setIsTrafficVisible] = useState(false); // Track traffic visibility state
+  const navigate = useNavigate();
 
   const { state } = useLocation();
   coordinates = state?.coordinates;
@@ -40,6 +43,15 @@ const ShowMeetings = ({ coordinates ,friendEmail,venueName}) => {
     }
   }, [userLocation, coordinates, routeData]); // Re-run when any of these change
   
+  const toggleTrafficLayer = () => {
+    if (isTrafficVisible && trafficLayer) {
+      map.removeObject(trafficLayer); // Remove traffic layer from map
+    } else if (trafficLayer) {
+      map.addObject(trafficLayer); // Add traffic layer to map
+    }
+    setIsTrafficVisible(!isTrafficVisible); // Toggle traffic visibility state
+  };
+
   
   const getUserLocation = () => {
     if (navigator.geolocation) {
@@ -88,7 +100,7 @@ const ShowMeetings = ({ coordinates ,friendEmail,venueName}) => {
           destination: destination,
           return: 'summary,polyline',
           alternatives: 3,
-          apiKey: 'Lhu8fRXCXhzlnW8i_5Mszi2otgOMuli4nBmfaEx2CVI',
+          apiKey: 'qDTgfdpiiqW3yGmO9kvq7WwXW7yFrOK-lKpMiOd7zp8',
         },
       });
   
@@ -154,6 +166,16 @@ const ShowMeetings = ({ coordinates ,friendEmail,venueName}) => {
       document.body.appendChild(script);
     } else {
       getUserLocation();
+      addTrafficLayer(); 
+    }
+  };
+  const addTrafficLayer = () => {
+    if (map) {
+      const traffic = new H.map.Layer('traffic');
+      traffic.setVisibility(false); // Initially hide the traffic layer
+      map.addLayer(traffic);
+      
+      setTrafficLayer(traffic); // Save the traffic layer for later use
     }
   };
   
@@ -161,10 +183,11 @@ const ShowMeetings = ({ coordinates ,friendEmail,venueName}) => {
   const initializeMap = (origin, destination, routes) => {
     if (!map) {
       const platform = new H.service.Platform({
-        apikey: 'Lhu8fRXCXhzlnW8i_5Mszi2otgOMuli4nBmfaEx2CVI',
+        apikey: 'qDTgfdpiiqW3yGmO9kvq7WwXW7yFrOK-lKpMiOd7zp8',
       });
+
       const defaultLayers = platform.createDefaultLayers();
-  
+      
       const newMap = new H.Map(
         document.getElementById('map'),
         defaultLayers.vector.normal.map,
@@ -176,8 +199,11 @@ const ShowMeetings = ({ coordinates ,friendEmail,venueName}) => {
   
       const behavior = new H.mapevents.Behavior(new H.mapevents.MapEvents(newMap));
       const ui = H.ui.UI.createDefault(newMap, defaultLayers);
-  
-      setMap(newMap); // Set the map state here
+      setMap(newMap); 
+      newMap.addLayer(defaultLayers.vector.traffic.map);
+
+      // Store map and additional layers
+     // Assuming setMap is a state handler
     }
   
     // Wait for map to be initialized before adding objects
@@ -200,7 +226,7 @@ const ShowMeetings = ({ coordinates ,friendEmail,venueName}) => {
     );
   
     const routeLine = new H.map.Polyline(linestring, {
-      style: { strokeColor: 'green', lineWidth: 5 },
+      style: { strokeColor: 'red', lineWidth: 5 },
     });
   
     map.addObject(routeLine); // Now it is safe to call addObject
@@ -211,15 +237,14 @@ const ShowMeetings = ({ coordinates ,friendEmail,venueName}) => {
     map.addObject(userMarker);
     
 
-    // Add the venue's location marker
-    // console.log("destination:")
-    // const cleanedDestination = destination.filter(value => !isNaN(value));
-    // console.log(cleanedDestination)
-    // const longitude = cleanedDestination[0];
-    // const latitude = cleanedDestination[1];
-    // const validDestination = { lat: latitude, lng: longitude };
-    // const venueMarker = new H.map.Marker(validDestination);
-    // map.addObject(venueMarker);
+    console.log("destination:")
+    const cleanedDestination = destination.filter(value => !isNaN(value));
+    console.log(cleanedDestination)
+    const longitude = cleanedDestination[0];
+    const latitude = cleanedDestination[1];
+    const validDestination = { lat: latitude, lng: longitude };
+    const venueMarker = new H.map.Marker(validDestination);
+    map.addObject(venueMarker);
 
     // If route data is available, draw the route
     if (routes.length > 0) {
@@ -228,13 +253,32 @@ const ShowMeetings = ({ coordinates ,friendEmail,venueName}) => {
         selectedRoute.sections[0].polyline
       );
       const routeLine = new H.map.Polyline(linestring, {
-        style: { strokeColor: 'green', lineWidth: 5 },
+        style: { strokeColor: 'red', lineWidth: 5 },
       });
       map.addObject(routeLine); // Add the route line to the map
       map.getViewModel().setLookAtData({ bounds: routeLine.getBoundingBox() });
     }
 
   };
+
+  const toggleMapView = () => {
+    const platform = new H.service.Platform({
+      apikey: 'qDTgfdpiiqW3yGmO9kvq7WwXW7yFrOK-lKpMiOd7zp8',
+    });
+  
+    const defaultLayers = platform.createDefaultLayers();
+  
+    const satelliteLayer = defaultLayers.satellite.map;
+    const normalLayer = defaultLayers.vector.normal.map;
+  
+    // Check if the current base layer is the normal map, then switch to satellite
+    if (map.getBaseLayer() === normalLayer) {
+      map.setBaseLayer(satelliteLayer); // Switch to satellite view
+    } else {
+      map.setBaseLayer(normalLayer); // Switch back to normal view
+    }
+  };
+  
 
   const handleRouteChange = (index) => {
     setSelectedRouteIndex(index);
@@ -272,7 +316,7 @@ const ShowMeetings = ({ coordinates ,friendEmail,venueName}) => {
       const emailContent = {
         from: userName,
         to: friendEmail,
-        subject: "I have reached my destination",
+        subject: "Your friend has reached the destination",
         body: `Hi, this is ${userName}. I have successfully reached ${venueName}.`,
       };
   
@@ -294,6 +338,11 @@ const ShowMeetings = ({ coordinates ,friendEmail,venueName}) => {
           // Optionally show an error message or notification
         });
     };
+    const handleClick = () => {
+      sendFriendEmail(); // Call your email function
+      navigate('/'); // Navigate to the home page
+    };
+  
   
     return (
       <Box>
@@ -330,14 +379,15 @@ const ShowMeetings = ({ coordinates ,friendEmail,venueName}) => {
             </ListItem>
           ))}
         </List>
-              <Button
-                variant="contained"
-                color="primary"
-                onClick={() => sendFriendEmail()} // Pass route details to the email function
-                sx={{ mt: 2, width: '50%' }}
-              >
-                I have reached
-              </Button>
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={handleClick} // Trigger both functions on click
+            sx={{ mt: 2, width: '50%' }}
+          >
+            I have reached
+          </Button>
+
         </Box>  
       </Box>
     );
@@ -428,7 +478,9 @@ const ShowMeetings = ({ coordinates ,friendEmail,venueName}) => {
         </Grid>
 
         <Grid item xs={12} md={8}>
+          
           <Box id="map" sx={{
+          
             height: '600px',
             width: '100%',
             padding: 3,

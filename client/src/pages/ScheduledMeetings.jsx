@@ -23,6 +23,9 @@ const ScheduledMeetings = () => {
   const userData = JSON.parse(localStorage.getItem('user'));
   const firebaseID = userData?.firebaseID;
 
+  const [countdownTimes, setCountdownTimes] = useState({});
+
+
   useEffect(() => {
     const fetchVenues = async () => {
       try {
@@ -40,18 +43,56 @@ const ScheduledMeetings = () => {
     fetchVenues();
   }, [firebaseID]);
 
-  const formatDateTime = (dateTime) => {
-    const date = new Date(dateTime);
-    return date.toLocaleString('en-US', {
-      weekday: 'long',
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
-      hour12: true,
-    });
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const updatedCountdowns = {};
+  
+      venues.forEach((venue) => {
+        if (venue.date) {
+          const timeLeft = calculateTimeLeft(venue.date);
+          updatedCountdowns[venue.id] = timeLeft;
+        }
+      });
+  
+      setCountdownTimes(updatedCountdowns); // Update state with countdowns for each venue
+    }, 1000);
+  
+    return () => clearInterval(interval); // Clear interval on component unmount
+  }, [venues]);
+  
+  const calculateTimeLeft = (venueDateTime) => {
+    try {
+      const venueTime = new Date(venueDateTime);
+      const currentTime = new Date();
+  
+      if (isNaN(venueTime.getTime())) {
+        return 'Invalid time format!';
+      }
+  
+      const difference = venueTime - currentTime;
+      if (difference > 0) {
+        const days = Math.floor(difference / (1000 * 60 * 60 * 24));
+        const hours = Math.floor((difference / (1000 * 60 * 60)) % 24);
+        const minutes = Math.floor((difference / (1000 * 60)) % 60);
+        const seconds = Math.floor((difference / 1000) % 60);
+        return `Time left for Meeting: ${days > 0 ? `${days}d ` : ''}${hours}h ${minutes}m ${seconds}s`;
+      }
+      if (difference < 0) {
+        
+        return 'Meeting Has Passed';
+      }
+  
+      
+    } catch (error) {
+      console.error('Error calculating time left:', error);
+      return 'Invalid time format!';
+    }
   };
+  
+
+
+  
+  
   const getFriendEmail = async (venue) => {
     try {
       if (!venue.friend || !venue.friend._id) {
@@ -126,15 +167,21 @@ const ScheduledMeetings = () => {
   
   
   
-  const calculateLeaveTime = (venueDate, venueTime) => {
-    const venueDateTime = new Date(`${venueDate}T${venueTime}:00`);
-    venueDateTime.setMinutes(venueDateTime.getMinutes() - 30);
-    return venueDateTime.toLocaleTimeString('en-US', {
-      hour: '2-digit',
-      minute: '2-digit',
-      hour12: true,
-    });
-  };
+  // const calculateLeaveTime = (venueDate) => {
+  //   // Parse the venueDate string into a Date object
+  //   const venueDateTime = new Date(venueDate);
+    
+  //   // Subtract 1 hour (60 minutes) from the date
+  //   venueDateTime.setHours(venueDateTime.getHours() - 1);
+  
+  //   // Return the updated time in a readable format
+  //   return venueDateTime.toLocaleTimeString('en-US', {
+  //     hour: '2-digit',
+  //     minute: '2-digit',
+  //     hour12: true,
+  //   });
+  // };
+  
 
   const handleTakeAction = async (venue) => {
     if (!venue?.location?.coordinates) {
@@ -252,8 +299,8 @@ const ScheduledMeetings = () => {
             No {showExpired ? 'Passed' : 'Scheduled'} Meetings Found
           </Typography>
         ) : (
-          filteredVenues.map((venue) => (
-            <Grid item xs={12} sm={6} md={4} key={venue.id} >
+          filteredVenues.map((venue,index) => (
+            <Grid item xs={12} sm={6} md={4} key={venue.id || index} >
               <Card
               
                 sx={{
@@ -283,12 +330,14 @@ const ScheduledMeetings = () => {
                       : `${venue.address.slice(0, 40)}...`}
                     <Button onClick={() => toggleAddress(venue.id)}>Toggle</Button>
                   </Typography>
-                  <Typography variant="body2">
+                  <Typography variant="body2" sx={{ fontWeight: 'bold', color: 'purple' }}>
                     Date: {venue.date} 
                   </Typography>
-                  <Typography variant="body2">
-                    Leave at: {calculateLeaveTime(venue.date, venue.time)}
+                  
+                  <Typography variant="body2" sx={{ fontWeight: 'bold', color: 'red' }}>
+                    {calculateTimeLeft(venue.date)}
                   </Typography>
+
                 </CardContent>
                 <CardActions sx={{ justifyContent: 'space-between' }}>
                   <Button
