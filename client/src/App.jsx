@@ -23,7 +23,6 @@ import Notifications from './pages/profile/Notifications';
 import ShowMeetings from './pages/ShowMeetings';
 import ScheduledMeetings from './pages/ScheduledMeetings';
 
-
 const App = () => {
   const [authenticated, setAuthenticated] = useState(false);
   const [firebaseId, setFirebaseId] = useState(null);

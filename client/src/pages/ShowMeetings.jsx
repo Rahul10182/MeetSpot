@@ -211,9 +211,9 @@ const ShowMeetings = ({ coordinates ,friendEmail,venueName}) => {
       console.error("Map is not initialized yet.");
       return;
     }
-  
+    
     map.removeObjects(map.getObjects());
-  
+    
     const selectedRoute = routes[selectedRouteIndex];
   
     if (!selectedRoute || !selectedRoute.sections) {
@@ -236,7 +236,7 @@ const ShowMeetings = ({ coordinates ,friendEmail,venueName}) => {
     const userMarker = new H.map.Marker(origin);
     map.addObject(userMarker);
     
-
+    
     console.log("destination:")
     const cleanedDestination = destination.filter(value => !isNaN(value));
     console.log(cleanedDestination)
