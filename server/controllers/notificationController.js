@@ -17,16 +17,13 @@ export const sendNotification = async (firebaseID, message, type = 'other') => {
 
 export const getUserNotifications = async (req, res) => {
     try {
-        // the firebaseId coming from params case sensitive
-        const firebaseID = req.params.firebaseId;
-        // console.log(firebaseID)
+        const firebaseID = req.query.firebaseId; // Use query parameter
 
-        // filter notification for particular user
-        const notifications = await Notification.find({ firebaseID:firebaseID }).sort({ timestamp: -1 });
+        const notifications = await Notification.find({ firebaseID }).sort({ timestamp: -1 });
 
         if (notifications.length === 0) {
             return res.status(404).json({ message: 'No notifications found for this user.' });
-        } 
+        }
 
         res.status(200).json(notifications);
     } catch (error) {
