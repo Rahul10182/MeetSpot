@@ -22,6 +22,7 @@ import Notifications from './pages/profile/Notifications';
 
 import ShowMeetings from './pages/ShowMeetings';
 import ScheduledMeetings from './pages/ScheduledMeetings';
+import SearchEvents from './pages/profile/FamousEvent';
 
 const App = () => {
   const [authenticated, setAuthenticated] = useState(false);
@@ -88,6 +89,7 @@ const App = () => {
                 <Route path="new" element={<FriendRequest />} />
                 <Route path="sentreq" element={<FriendRequestSent />} />
               </Route>
+              <Route path="famousEvents" element={<SearchEvents />}></Route>
               <Route path="notifications" element={<Notifications firebaseID = {firebaseId}/>} />
             </Route>
           </Route>

@@ -3,11 +3,9 @@ import React from "react";
 const Footer = () => {
   return (
     <footer className="bg-gray-800 text-white py-8">
-      {/* Container with max-width and centered */}
-      <div className="container mx-auto px-4 max-w-screen-lg">
+      <div className="container mx-auto px-4 max-w-screen-lg mt-16">
         <div className="flex flex-wrap justify-between">
           
-          {/* Logo and Description */}
           <div className="w-full sm:w-1/3 mb-6 sm:mb-0">
             <h2 className="text-xl font-bold">Meeting Point</h2>
             <p className="mt-2 text-gray-400">
@@ -15,7 +13,6 @@ const Footer = () => {
             </p>
           </div>
           
-          {/* Quick Links */}
           <div className="w-full sm:w-1/3 mb-6 sm:mb-0">
             <h3 className="text-lg font-semibold">Quick Links</h3>
             <ul className="mt-2 space-y-2">
@@ -26,7 +23,6 @@ const Footer = () => {
             </ul>
           </div>
           
-          {/* Legal Links */}
           <div className="w-full sm:w-1/3">
             <h3 className="text-lg font-semibold">Legal</h3>
             <ul className="mt-2 space-y-2">
@@ -37,10 +33,8 @@ const Footer = () => {
           </div>
         </div>
 
-        {/* Social Media and Copyright */}
         <div className="mt-8 flex justify-between items-center text-sm text-gray-500">
           
-          {/* Social Media Links */}
           <div className="flex space-x-4">
             <a href="https://facebook.com" aria-label="Facebook" className="hover:text-blue-400">
               <i className="fab fa-facebook"></i>
@@ -56,7 +50,6 @@ const Footer = () => {
             </a>
           </div>
           
-          {/* Copyright */}
           <div>&copy; {new Date().getFullYear()} Meeting Point. All rights reserved.</div>
         </div>
       </div>

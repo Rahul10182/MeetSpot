@@ -3,7 +3,7 @@ import { deleteNotification, getUserNotifications } from "../controllers/notific
 
 const router = express.Router();
 
-router.post("/:firebaseId", getUserNotifications); // Get all user notifications
+router.get("/", getUserNotifications); // Get all user notifications
 router.delete("/del/:notificationId", deleteNotification); // Delete notification
 router.patch("/read/:id", );  
 

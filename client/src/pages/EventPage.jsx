@@ -12,7 +12,6 @@ const EventsPage = () => {
 
   const fetchEvents = async () => {
     try {
-      
       const response = await axios.get('http://localhost:3000/event/getall');
       setEvents(response.data || []);
       console.log("Events Fetched");
@@ -36,21 +35,16 @@ const EventsPage = () => {
     setFriendEmail('');
   };
 
-  
-
   const handleRegister = async () => {
-    console.log(selectedEvent._id)
-    console.log(userEmail)
-    console.log(friendEmail)
+    console.log(selectedEvent._id);
+    console.log(userEmail);
+    console.log(friendEmail);
     try {
       await axios.post('http://localhost:3000/event/register', {
         eventId: selectedEvent._id,
         userEmail,
         friendEmail,
       });
-      console.log(selectedEvent._id);
-      console.log(userEmail);
-      console.log(friendEmail)
       alert('Registration successful, notification sent!');
       handleCloseModal();
     } catch (error) {
@@ -59,9 +53,14 @@ const EventsPage = () => {
   };
 
   return (
-    <>
+    <Box
+      sx={{
+        minHeight: '100vh',
+        background: 'linear-gradient(to right, #ff7e5f, #feb47b)', // Gradient background
+      }}
+    >
       <Header />
-      <Box sx={{ p: 8, bgcolor: '#f4f6f8' }}>
+      <Box sx={{ p: 8 }}>
         <Typography variant="h3" align="center" fontWeight="bold" color="primary" gutterBottom>
           All Events
         </Typography>
@@ -97,7 +96,6 @@ const EventsPage = () => {
                   <Typography variant="body2" color="textSecondary" sx={{ mt: 2 }}>
                     Location: {event.location}
                   </Typography>
-                  
                   <Typography variant="body2" color="textSecondary">
                     Date: {event.beginDate} - {event.endDate}
                   </Typography>
@@ -155,7 +153,7 @@ const EventsPage = () => {
           </Button>
         </Box>
       </Modal>
-    </>
+    </Box>
   );
 };
 

@@ -9,7 +9,7 @@ const Notifications = ({ firebaseID }) => {
   useEffect(() => {
     const fetchNotifications = async () => {
       try {
-        const response = await axios.post(`http://localhost:3000/notifications/${firebaseID}`);
+        const response = await axios.get(`http://localhost:3000/notifications/${firebaseID}`);
         setNotifications(response.data);
       } catch (error) {
         console.error("Error fetching notifications:", error);

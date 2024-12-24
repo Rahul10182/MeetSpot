@@ -102,9 +102,8 @@ const UserDashboard = () => {
                           { text: 'Friends', icon: <AccountCircle />, path: '/profile/friends/old' },
                           { text: 'Notifications', icon: <Notifications />, path: '/profile/notifications' },
                           { text: 'Create Event', icon: <Event />, path: '/profile/createevent' },
-                          { text: 'Settings', icon: <Settings />, path: '/profile/settings' },
                           { text: 'Meetings', icon: <CalendarTodayIcon fontSize="medium" />, path: '/profile/ScheduledMeetings'},
-                          { text: 'Venues', icon: <LocationOn />, path: '/profile/venues' }]
+                          { text: 'Famous Events', icon: <LocationOn />, path: '/profile/famousEvents'}]
                           .map((item, index) => (
                             <ListItem
                                 button
