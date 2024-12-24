@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { pink } from '@mui/material/colors'
 import {
   Box,
   AppBar,
@@ -77,11 +78,15 @@ const SearchEvents = () => {
     <Box sx={{ flexGrow: 1 }}>
       <header>
         <AppBar position="static">
-          <Toolbar>
+          <Toolbar
+            className=' bg-pink-400'
+            position="static"
+            sx={{ bgcolor: 'dark-pink' }}
+          >
             <Typography
               variant="h6"
               component="div"
-              sx={{ flexGrow: 1, textAlign: 'left' }}
+              sx={{ flexGrow: 1, textAlign: 'left',color:'',height:'' }}
             >
               Event Finder
             </Typography>
@@ -129,35 +134,84 @@ const SearchEvents = () => {
             results.map((event) => (
               <Grid item xs={12} sm={6} md={4} key={event.id}>
                 <Card
-                  onClick={() => handleCardClick(event)} // Add onClick to the card
-                  sx={{
-                    maxWidth: 345,
-                    boxShadow: '0 4px 8px rgba(0, 0, 0, 0.2)',
-                    transition: 'transform 0.3s ease',
-                    '&:hover': { transform: 'scale(1.05)', cursor: 'pointer' },
-                  }}
-                >
-                  <CardMedia
-                    component="img"
-                    alt={event.name}
-                    height="140"
-                    image={event.image}
-                  />
-                  <CardContent>
-                    <Typography variant="h6" component="div">
-                      {event.name}
-                    </Typography>
-                    <Typography variant="body2" color="text.secondary">
-                      {event.description}
-                    </Typography>
-                    <Typography variant="body2" color="text.secondary">
-                      <strong>Date:</strong> {event.date}
-                    </Typography>
-                    <Typography variant="body2" color="text.secondary">
-                      <strong>Venue:</strong> {event.venue}
-                    </Typography>
-                  </CardContent>
-                </Card>
+                    onClick={() => handleCardClick(event)} // Add onClick to the card
+                    sx={{
+                      maxWidth: 345,
+                      height: 400,
+                      boxShadow: '0 8px 16px rgba(0, 0, 0, 0.2)',
+                      transition: 'transform 0.3s ease, box-shadow 0.3s ease',
+                      borderRadius: '12px',
+                      background: 'linear-gradient(135deg, #f9f9f9, #fefefe)',
+                      '&:hover': {
+                        transform: 'scale(1.05)',
+                        cursor: 'pointer',
+                        boxShadow: '0 12px 24px rgba(0, 0, 0, 0.3)',
+                      },
+                      overflow: 'hidden',
+                      position: 'relative',
+                    }}
+                  >
+                    <CardMedia
+                      component="img"
+                      alt={event.name}
+                      height="140"
+                      image={event.image}
+                      sx={{
+                        transition: 'opacity 0.3s ease',
+                        '&:hover': { opacity: 0.85 },
+                      }}
+                    />
+                    <CardContent
+                      sx={{
+                        padding: '16px',
+                        textAlign: 'center',
+                      }}
+                    >
+                      <Typography
+                        variant="h6"
+                        component="div"
+                        sx={{
+                          fontWeight: 'bold',
+                          fontSize: '18px',
+                          color: '#333',
+                        }}
+                      >
+                        {event.name}
+                      </Typography>
+                      <Typography
+                        variant="body2"
+                        sx={{
+                          color: '#555',
+                          fontSize: '14px',
+                          margin: '8px 0',
+                          lineHeight: 1.5,
+                        }}
+                      >
+                        {event.description}
+                      </Typography>
+                      <Typography
+                        variant="body2"
+                        sx={{
+                          color: '#777',
+                          fontSize: '13px',
+                          marginTop: '4px',
+                        }}
+                      >
+                        <strong>Date:</strong> {event.date}
+                      </Typography>
+                      <Typography
+                        variant="body2"
+                        sx={{
+                          color: '#777',
+                          fontSize: '13px',
+                          marginTop: '4px',
+                        }}
+                      >
+                        <strong>Venue:</strong> {event.venue}
+                      </Typography>
+                    </CardContent>
+                  </Card>
+
               </Grid>
             ))
           ) : (

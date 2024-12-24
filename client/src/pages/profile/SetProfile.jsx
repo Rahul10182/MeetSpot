@@ -6,14 +6,14 @@ const SetProfile = () => {
     const name = userData?.fullName;
     const email = userData?.email;
   return (
-    <div>
-      <Paper elevation={3} className="p-8 rounded-lg bg-white">
+    <div className=''>
+      <Paper elevation={3} className="p-8 ml-48 rounded-lg w-2/3 bg-white">
                     <div className="flex justify-between items-center mb-8">
                         <div className="flex items-center space-x-4">
                             <Avatar
                                 alt={name}
                                 src="/static/images/avatar/1.jpg"
-                                sx={{ width: 80, height: 80 ,backgroundColor: '#FFB6C1'}}
+                                sx={{ width: 80, height: 80 ,backgroundColor: '#F08D99'}}
                             />
                             <div>
                                 <Typography variant="h6" className="font-semibold">

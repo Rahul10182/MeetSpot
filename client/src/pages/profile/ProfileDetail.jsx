@@ -6,15 +6,15 @@ import {
 import CalendarTodayIcon from '@mui/icons-material/CalendarToday'; // Import new icon
 
 import { Settings, Dashboard, Notifications, AccountCircle, Event, Search, LocationOn } from '@mui/icons-material';
-import { useNavigate, Outlet } from 'react-router-dom';
+import { useNavigate, useLocation, Outlet } from 'react-router-dom';
 import axios from 'axios';
 
 const UserDashboard = () => {
     const userData = JSON.parse(localStorage.getItem('user'));
     const name = userData?.fullName;
-    const email = userData?.email;
-    const firebaseID1 = userData?.firebaseID;
     const navigate = useNavigate();
+    const location = useLocation();
+    const currentPath = location.pathname;
 
     const [searchQuery, setSearchQuery] = useState('');
     const [searchResults, setSearchResults] = useState([]);
@@ -32,26 +32,22 @@ const UserDashboard = () => {
                 console.error('Error searching for people:', error);
             }
         } else {
-            setSearchResults([]); 
+            setSearchResults([]);
         }
     };
 
     const handleAddFriend = async (userId) => {
         const currentUser = JSON.parse(localStorage.getItem('user'));
         const firebaseID1 = currentUser?.firebaseID;
-        console.log(userId)
-        console.log(firebaseID1)
 
-    
         try {
             const response = await axios.post('http://localhost:3000/friend/sendreq', {
                 firebaseID1: firebaseID1,
-                firebaseID2 : userId
+                firebaseID2: userId
             });
-            
+
             if (response.status === 201) {
                 console.log(`Friend request sent to user with ID: ${userId}`);
-                // Optionally remove user from searchResults after adding
                 setSearchResults(prevResults => prevResults.filter(user => user._id !== userId));
             } else {
                 console.log(`Failed to send friend request: ${response.data.message}`);
@@ -60,7 +56,6 @@ const UserDashboard = () => {
             console.error('Error sending friend request:', error);
         }
     };
-    
 
     useEffect(() => {
         const handleClickOutside = (event) => {
@@ -77,34 +72,33 @@ const UserDashboard = () => {
         };
     }, []);
 
-    
+    // Pages where "Welcome, User" and search should appear
+    const showHeader = ['/profile/dashboard', '/profile/friends/old'].includes(currentPath);
+
     return (
         <div className="min-h-screen flex bg-white relative">
-            <aside className="w-64 bg-gradient-to-b from-indigo-600 to-purple-500 text-white shadow-lg p-6">
+            <aside className="w-64 bg-gradient-to-r from-pink-500 to-purple-500 text-white shadow-lg p-6">
                 <div className="text-center mb-8">
-
-                <button 
-                    onClick={() => navigate('/')} 
-                    className="text-center text-3xl font-semibold mx-4 whitespace-nowrap transition-all duration-200 focus:outline-none"
-                >
-                    MeetSpot
-                </button>
-                <br></br>
-                <br></br>
-                <br></br>
-                <br></br>
-
+                    <button 
+                        onClick={() => navigate('/')} 
+                        className="text-center text-3xl font-semibold mx-4 whitespace-nowrap transition-all duration-200 focus:outline-none"
+                    >
+                        MeetSpot
+                    </button>
+                    <br />
+                    <br />
                 </div>
                 <Divider className="my-4 border-indigo-400" />
                 <nav>
-                    <List className=' cursor-pointer'>
-                        {[{ text: 'Dashboard', icon: <Dashboard />, path: '/profile/dashboard' },
-                          { text: 'Friends', icon: <AccountCircle />, path: '/profile/friends/old' },
-                          { text: 'Notifications', icon: <Notifications />, path: '/profile/notifications' },
-                          { text: 'Create Event', icon: <Event />, path: '/profile/createevent' },
-                          { text: 'Meetings', icon: <CalendarTodayIcon fontSize="medium" />, path: '/profile/ScheduledMeetings'},
-                          { text: 'Famous Events', icon: <LocationOn />, path: '/profile/famousEvents'}]
-                          .map((item, index) => (
+                    <List className="cursor-pointer">
+                        {[
+                            { text: 'Dashboard', icon: <Dashboard />, path: '/profile/dashboard' },
+                            { text: 'Friends', icon: <AccountCircle />, path: '/profile/friends/old' },
+                            { text: 'Notifications', icon: <Notifications />, path: '/profile/notifications' },
+                            { text: 'Create Event', icon: <Event />, path: '/profile/createevent' },
+                            { text: 'Meetings', icon: <CalendarTodayIcon fontSize="medium" />, path: '/profile/ScheduledMeetings' },
+                            { text: 'Famous Events', icon: <LocationOn />, path: '/profile/famousEvents' }
+                        ].map((item, index) => (
                             <ListItem
                                 button
                                 key={index}
@@ -121,57 +115,56 @@ const UserDashboard = () => {
                 </nav>
             </aside>
 
-            <main className="flex-1 p-8">
-                <AppBar position="static" color="transparent" elevation={0} className="bg-blue-500 shadow-sm mb-6">
-                    <Toolbar className="flex justify-between">
-                        <div className=' font-bold text-blue-500 text-4xl'>
-                        <Typography variant="h5" className="font-bold text-blue-500">
-                            Welcome, {name || "User"}
-                        </Typography>
-                        
-                        </div>
-                        <div className="flex items-center space-x-4 relative" ref={searchRef}>
-                            <TextField
-                                variant="outlined"
-                                size="small"
-                                placeholder="Search for friend"
-                                className="bg-gray-100 rounded w-80"
-                                value={searchQuery}
-                                onChange={handleSearchChange} 
-                                InputProps={{
-                                    startAdornment: (
-                                        <InputAdornment position="start">
-                                            <Search className="text-gray-400" />
-                                        </InputAdornment>
-                                    ),
-                                }}
-
-                            />
-                            
-                            {searchResults.length > 0 && (
-                                <div className="absolute left-0 right-0 bg-white shadow-lg mt-72 rounded-md z-10 max-h-60 overflow-y-auto w-72 sm:w-80">
-                                    {searchResults.map((user) => (
-                                        <Card key={user._id} className="mb-2">
-                                            <CardContent>
-                                                <Typography variant="h6">{user.fullName}</Typography>
-                                                <Typography variant="body2">{user.email}</Typography>
-                                                <Button 
-                                                    variant="contained" 
-                                                    color="primary" 
-                                                    fullWidth 
-                                                    className="mt-2"
-                                                    onClick={() => handleAddFriend(user.fireBaseId)}
-                                                >
-                                                    Add Friend
-                                                </Button>
-                                            </CardContent>
-                                        </Card>
-                                    ))}
-                                </div>
-                            )}
-                        </div>
-                    </Toolbar>
-                </AppBar>
+            <main className={`flex-1 p-8 bg-gradient-to-r from-pink-200 to-pink-400 ${showHeader ? 'mt-0' : 'mt-0'}`}>
+                {showHeader && (
+                    <AppBar position="static" color="transparent" elevation={0} className="bg-pink-500 shadow-sm mb-6">
+                        <Toolbar className="flex justify-between">
+                            <div className="font-bold text-blue-500 text-4xl">
+                                <Typography variant="h5" className="font-extrabold text-xl h-8 text-pink-600">
+                                    Welcome, {name || "User"}
+                                </Typography>
+                            </div>
+                            <div className="flex items-center space-x-4 relative" ref={searchRef}>
+                                <TextField
+                                    variant="outlined"
+                                    size="small"
+                                    placeholder="Search for friend"
+                                    className="bg-gray-200 border-8 rounded-lg w-80"
+                                    value={searchQuery}
+                                    onChange={handleSearchChange}
+                                    InputProps={{
+                                        startAdornment: (
+                                            <InputAdornment position="start">
+                                                <Search className="text-gray-400" />
+                                            </InputAdornment>
+                                        ),
+                                    }}
+                                />
+                                {searchResults.length > 0 && (
+                                    <div className="absolute left-0 right-0 bg-white shadow-lg mt-72 rounded-md z-10 max-h-60 overflow-y-auto w-72 sm:w-80">
+                                        {searchResults.map((user) => (
+                                            <Card key={user._id} className="mb-2">
+                                                <CardContent>
+                                                    <Typography variant="h6">{user.fullName}</Typography>
+                                                    <Typography variant="body2">{user.email}</Typography>
+                                                    <Button 
+                                                        variant="contained" 
+                                                        color="primary" 
+                                                        fullWidth 
+                                                        className="mt-2"
+                                                        onClick={() => handleAddFriend(user.fireBaseId)}
+                                                    >
+                                                        Add Friend
+                                                    </Button>
+                                                </CardContent>
+                                            </Card>
+                                        ))}
+                                    </div>
+                                )}
+                            </div>
+                        </Toolbar>
+                    </AppBar>
+                )}
 
                 <Outlet />
             </main>

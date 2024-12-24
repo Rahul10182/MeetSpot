@@ -100,7 +100,7 @@ const ShowMeetings = ({ coordinates ,friendEmail,venueName}) => {
           destination: destination,
           return: 'summary,polyline',
           alternatives: 3,
-          apiKey: 'qDTgfdpiiqW3yGmO9kvq7WwXW7yFrOK-lKpMiOd7zp8',
+          apiKey: 'Lhu8fRXCXhzlnW8i_5Mszi2otgOMuli4nBmfaEx2CVI',
         },
       });
   
@@ -183,7 +183,7 @@ const ShowMeetings = ({ coordinates ,friendEmail,venueName}) => {
   const initializeMap = (origin, destination, routes) => {
     if (!map) {
       const platform = new H.service.Platform({
-        apikey: 'qDTgfdpiiqW3yGmO9kvq7WwXW7yFrOK-lKpMiOd7zp8',
+        apikey: 'Lhu8fRXCXhzlnW8i_5Mszi2otgOMuli4nBmfaEx2CVI',
       });
 
       const defaultLayers = platform.createDefaultLayers();
@@ -263,7 +263,7 @@ const ShowMeetings = ({ coordinates ,friendEmail,venueName}) => {
 
   const toggleMapView = () => {
     const platform = new H.service.Platform({
-      apikey: 'qDTgfdpiiqW3yGmO9kvq7WwXW7yFrOK-lKpMiOd7zp8',
+      apikey: 'Lhu8fRXCXhzlnW8i_5Mszi2otgOMuli4nBmfaEx2CVI',
     });
   
     const defaultLayers = platform.createDefaultLayers();

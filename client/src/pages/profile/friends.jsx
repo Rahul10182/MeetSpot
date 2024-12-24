@@ -6,8 +6,8 @@ const FriendPage = () => {
   const navigate = useNavigate();
 
   return (
-    <div className="bg-blue-300 min-h-screen flex justify-center items-center p-8">
-      <div className="w-full max-w-3xl bg-white shadow-lg rounded-lg p-8">
+    <div className="bg-gradient-to-r from-pink-200 to-pink-400 min-h-screen flex justify-center items-center p-8">
+      <div className="w-full max-w-xl bg-white shadow-lg rounded-lg p-8">
         <div className="flex justify-around mb-8">
           <Button 
             variant="contained" 

@@ -29,7 +29,7 @@ const Notifications = ({ firebaseID }) => {
 
   return (
     <Box 
-      className="flex items-center justify-center min-h-screen bg-gradient-to-r from-blue-50 to-blue-100"
+      className="flex items-center justify-center min-h-screen bg-gradient-to-r from-pink-200 to-pink-400"
     >
       <Paper 
         elevation={6} 

@@ -7,7 +7,7 @@ const Footer = () => {
         <div className="flex flex-wrap justify-between">
           
           <div className="w-full sm:w-1/3 mb-6 sm:mb-0">
-            <h2 className="text-xl font-bold">Meeting Point</h2>
+            <h2 className="text-xl font-bold">MeetSpot</h2>
             <p className="mt-2 text-gray-400">
               Connecting people for meaningful meetings and conversations.
             </p>
