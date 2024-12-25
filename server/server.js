@@ -18,6 +18,8 @@ import Message from "./models/messageModel.js";
 import Chat from "./models/chatModel.js";
 import notificationRoutes from "./routes/notificationRoutes.js"
 
+import mailRoutes from "./routes/mailRoutes.js"
+
 dotenv.config();
 connectDB();
 
@@ -48,6 +50,7 @@ app.use('/friend', friendRoute);
 app.use('/api/v1/venue', venueRoutes);
 app.use('/api/v1/chat', chatRoutes);
 app.use("/notifications", notificationRoutes);
+app.use('/api/v1/mail', mailRoutes);
 
 io.on('connection', (socket) => {
   console.log('User connected', socket.id);
@@ -95,5 +98,5 @@ io.on('connection', (socket) => {
 });
 
 server.listen(PORT, () => {
-  console.log('Server running on port ${PORT}');
+  console.log(`Server running on port ${PORT}`);
 });

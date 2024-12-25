@@ -19,12 +19,15 @@ import FriendRequest from './pages/profile/reqFriend';
 import FriendRequestSent from './pages/profile/FriendReqSent';
 import ChatPage from './pages/ChatPage';
 import EventsPage from './pages/Eventpage';
+import Notifications from './pages/profile/Notifications';
 import MeetSpotPage from './pages/test/MeetSpotPage';
 import TestPage from './pages/test/testmeetpage';
 import DemoPage from './pages/test/demo';
 import NewPage from './pages/test/new';
 
-
+import ShowMeetings from './pages/ShowMeetings';
+import ScheduledMeetings from './pages/ScheduledMeetings';
+import SearchEvents from './pages/profile/FamousEvent';
 
 const App = () => {
   const [authenticated, setAuthenticated] = useState(false);
@@ -84,16 +87,18 @@ const App = () => {
           <Route element={<PrivateRoute authenticated={authenticated} />}>
             <Route path="/profile" element={<UserDashboard />}>
               <Route path="dashboard" element={<SetProfile />} />
+              <Route path ="ScheduledMeetings" element={<ScheduledMeetings/>}></Route>
               <Route path="createevent" element={<EventPlannerForm />} />
               <Route path="friends" element={<FriendPage />}>
                 <Route path="old" element={<FriendList />} />
                 <Route path="new" element={<FriendRequest />} />
                 <Route path="sentreq" element={<FriendRequestSent />} />
-                 
               </Route>
+              <Route path="famousEvents" element={<SearchEvents />}></Route>
+              <Route path="notifications" element={<Notifications firebaseID = {firebaseId}/>} />
             </Route>
           </Route>
-
+          <Route path='/show-meet' element={<ShowMeetings></ShowMeetings>}></Route>
           <Route path="/unauth-page" element={<UnauthPages />} />
           <Route path="/" element={<Home />} />
           <Route path="/meeting-point" element={<MeetingPoint />} />

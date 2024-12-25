@@ -159,9 +159,8 @@ export const getVenueSuggestions = async (req, res) => {
             success: false,
         });
     }
+    
 };
-
-
 
 export const selectVenue = async (req, res) => {
   const {
@@ -198,7 +197,14 @@ export const selectVenue = async (req, res) => {
       return res.status(400).json({ message: "Firebase IDs are required", success: false });
 
     if (isNew && (!name || !type || latitude == null || longitude == null || !address))
+    if (!firebaseId || !friendFirebaseId)
+      return res.status(400).json({ message: "Firebase IDs are required", success: false });
+
+    if (isNew && (!name || !type || latitude == null || longitude == null || !address))
       return res.status(400).json({ message: "Missing required fields for new venue", success: false });
+
+    if (!isNew && !mongoose.isValidObjectId(venueId))
+      return res.status(400).json({ message: "Invalid venue ID", success: false });
 
     if (!isNew && !mongoose.isValidObjectId(venueId))
       return res.status(400).json({ message: "Invalid venue ID", success: false });
@@ -231,7 +237,6 @@ export const selectVenue = async (req, res) => {
       venue = await Venue.findOne({ _id: venueId });
       if (!venue) return res.status(404).json({ message: "Venue not found", success: false });
     }
-
     // Check if venue already exists in user or friend profile
     if (user.profile?.venues.includes(venue._id) || friend.profile?.venues.includes(venue._id)) {
       return res.status(400).json({ message: "Venue already selected", success: false });
@@ -258,7 +263,8 @@ export const selectVenue = async (req, res) => {
       },
       success: true,
     });
-  } catch (error) {
+  }
+   catch (error) {
     console.error(error);
     return res.status(500).json({ message: "Failed to select venue", success: false });
   }

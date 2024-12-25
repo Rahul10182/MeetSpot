@@ -1,5 +1,5 @@
-import jwt from "jsonwebtoken";
 import { User } from "../models/userModel.js";
+import mongoose from "mongoose";
 
 export const authenticate = async (req, res) => {
     try {
@@ -81,4 +81,30 @@ export const getFireBaseId = async (req, res) => {
         res.status(500).json({ error: error.message });
     }
 };
+
+
+
+export const getEmailId = async (req, res) => {
+  try {
+    const { selectedFriendId } = req.body;
+
+    if (!mongoose.isValidObjectId(selectedFriendId)) {
+      return res.status(400).json({ message: "Invalid user ID format." });
+    }
+
+    // Find the user by `_id`
+    const user = await User.findById(selectedFriendId);
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found." });
+    }
+
+    return res.status(200).json({ email: user.email, message: "Email retrieved successfully." });
+  } catch (error) {
+    console.error("Error fetching user email:", error);
+    return res.status(500).json({ error: "Internal server error.", details: error.message });
+  }
+};
+
+
 

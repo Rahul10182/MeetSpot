@@ -4,12 +4,55 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Vite + React</title>
-    <!-- Include GoMaps Pro Library -->
-    <script src="https://maps.gomaps.pro/api/v1/gomapspro.js" defer></script>
+    <title>MeetSpot</title>
+    
+    <!-- Include Leaflet CSS (for map styling) -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+
+    <!-- Include HERE Maps API (for map services) -->
+    <script type="text/javascript" 
+      src="https://js.api.here.com/v3/3.1/here.js" 
+      integrity="sha384-vvxaHqAqX/x1KqzoNm/VkLvW64vChy7JtKN+RmP6i6N0DZaJp34P0P/aXY11DeAi" 
+      crossorigin="anonymous">
+    </script>
+    <script
+      type="text/javascript"
+      src="https://js.api.here.com/v3/3.1/mapsjs-core.js"
+    ></script>
+    <script
+      type="text/javascript"
+      src="https://js.api.here.com/v3/3.1/mapsjs-service.js"
+    ></script>
+    <script
+      type="text/javascript"
+      src="https://js.api.here.com/v3/3.1/mapsjs-mapevents.js"
+    ></script>
+
+    <script
+      type="text/javascript"
+      charset="utf-8"
+      src="https://js.api.here.com/v3/3.1/mapsjs-ui.js"
+    ></script>
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="https://js.api.here.com/v3/3.1/mapsjs-ui.css"
+    />
+  
+    <script src="https://js.api.here.com/v3/3.1/mapsjs-core.js"></script>
+    <script src="https://js.api.here.com/v3/3.1/mapsjs-service.js"></script>
+    <script src="https://js.api.here.com/v3/3.1/mapsjs-ui.js"></script>
+    <script src="https://js.api.here.com/v3/3.1/mapsjs-mapevents.js"></script>
+    
+
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   </head>
   <body>
     <div id="root"></div>
+    
+    <!-- Include the main React JSX entry script -->
     <script type="module" src="/src/main.jsx"></script>
   </body>
 </html>
+

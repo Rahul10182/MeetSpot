@@ -1,57 +1,28 @@
-import React from 'react'
-import Navbar from "../components/Homepage/Navbar"
-import Sliderbar from '../components/Homepage/Sliderbar'
-import Footer from '../components/Homepage/Footer'
-import { getAuth } from 'firebase/auth'
-import Events from '../components/Homepage/Events'
-import Cards from '../components/Homepage/Cards'
-import MeetSpace from '../components/Homepage/MeetSpace'
+import React from 'react';
+import { Container, Typography, Box } from '@mui/material';
+import Sliderbar from '../components/Homepage/Sliderbar';
+import Footer from '../components/Homepage/Footer';
+import { getAuth } from 'firebase/auth';
+import Cards from '../components/Homepage/Cards';
+import MeetSpace from '../components/Homepage/MeetSpace';
+import EventSlider from '../components/event/EventSlider';
+
 
 const Home = () => {
   const auth = getAuth();
   const user = auth.currentUser;
   return (
-    <div className="flex flex-col min-h-screen">
-      
-      <Navbar/>
+    <div className="flex flex-col min-h-screen bg-gradient-to-r from-pink-500 to-purple-500">
 
-      <br></br>
-
-      <Sliderbar/>
-
-      <br></br>
-      <br></br>
-
-      <div> 
-          <MeetSpace  />
-      </div>
-      
-
-        <main className="flex flex-grow container justify-center mx-auto px-4 py-8">
-          <div className=' flex justify-center items-center flex-col'>
-            {/* Add your page content here */}
-            <h1 className="text-3xl font-bold">Welcome to Meeting Point</h1>
-            <p className="mt-4">Connecting people for meaningful meetings and conversations.</p>
-            {/* More content... */}
-          </div>
-
-        </main>
+      <Sliderbar />
+      <MeetSpace className='h-screen'/>
+      <Container maxWidth="lg" >
         
-        <br></br>
 
-      
-      <Events/>
-
-
-
-      <div className=' text-gray-600 font-bold text-3xl flex justify-center '> There Are Some Beautiful Places In INDIA</div>
-
-      <Cards/>
-
-        <br></br>
-        <br></br>      
-        <br></br>      
-        <br></br>      
+        <Box mb={6}>
+          <EventSlider className='h-screen w-full'/>
+        </Box>
+      </Container>
 
       <Footer/>
     </div>

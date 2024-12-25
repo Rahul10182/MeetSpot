@@ -38,26 +38,28 @@ const EventPlannerForm = () => {
   };
 
   return (
-    <div className="bg-gradient-to-br bg-blue-300 min-h-screen flex items-center justify-center p-6">
-      <Box className="bg-white shadow-4xl rounded-xl border-2 w-full max-w-md p-10 space-y-6 transition-all duration-300 transform hover:-translate-y-1 hover:shadow-2xl">
-        
-        <Typography variant="h5" component="h2" className="text-center font-extrabold text-gray-800 mb-4">
-          Event Planner
-        </Typography>
-        
-        <TextField
-          fullWidth
-          variant="outlined"
-          label="Event Name"
-          placeholder="Enter event name"
-          name="eventName"
-          value={formData.eventName}
-          onChange={handleChange}
-          className="mb-4"
-          InputProps={{
-            className: "bg-gray-50"
-          }}
-        />
+    <div className=" bg-gradient-to-r from-pink-200 to-pink-400 min-h-screen flex items-center justify-center p-6">
+      <Box className="bg-white shadow-4xl rounded-xl border-2 w-full max-w-md p-10 space-y-6">
+        {showSuccess ? (
+          <Typography variant="h6" component="p" className="text-center text-green-600 font-semibold">
+            Event Created Successfully!
+          </Typography>
+        ) : (
+          <>
+            <Typography variant="h5" component="h2" className="text-center font-extrabold text-gray-800 mb-4">
+              Event Planner
+            </Typography>
+
+            <TextField
+              fullWidth
+              variant="outlined"
+              label="Event Name"
+              placeholder="Enter event name"
+              name="eventName"
+              value={formData.eventName}
+              onChange={handleChange}
+              className="mb-4"
+            />
 
         <div className="flex gap-4 mb-4">
           <TextField
