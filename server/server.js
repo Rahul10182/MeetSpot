@@ -82,6 +82,11 @@ io.on('connection', (socket) => {
 
       // Emit the message to the users in the same chat room
       socket.to(chatId).emit('newMessage', message);  // Consistent event name 'newMessage'
+      
+      socket.on('typing', ({ chatId, isTyping }) => {
+        socket.to(chatId).emit('typing', { chatId, isTyping });
+      });
+      
     } catch (error) {
       console.error('Error sending message:', error);
     }

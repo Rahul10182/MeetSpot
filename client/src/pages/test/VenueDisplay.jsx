@@ -2,9 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { CircularProgress, Box, Typography, Card, CardContent } from '@mui/material';
 import { fetchVenues, fetchDistance } from './venueService';
 
-const VenueDisplay = ({ userLocation, friendLocation }) => {
-  console.log(userLocation);
-  console.log(friendLocation);
+const VenueDisplay = ({ userLocation, friendLocation, type }) => {
   const [venues, setVenues] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -21,7 +19,7 @@ const VenueDisplay = ({ userLocation, friendLocation }) => {
 
       try {
         // Fetch venues based on locations
-        const venuesResponse = await fetchVenues(userLocation, friendLocation);
+        const venuesResponse = await fetchVenues(userLocation, friendLocation, type);
 
         // Calculate distance for each venue
         const venuesWithDistances = await Promise.all(
@@ -44,6 +42,7 @@ const VenueDisplay = ({ userLocation, friendLocation }) => {
 
         setVenues(venuesWithDistances);
       } catch (err) {
+         console.error(err);
         setError('Error fetching venues or distances.');
       } finally {
         setLoading(false);

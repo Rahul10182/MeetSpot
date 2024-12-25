@@ -25,6 +25,7 @@ const MeetSpotPage = ({ firebaseID }) => {
   const [selectedFriend, setSelectedFriend] = useState(null);
   const [selectedSection, setSelectedSection] = useState('select');
   const [locationsSet, setLocationsSet] = useState(false); // New state to check if both locations are set
+  const [venueType, setVenueType] = useState('');
   const searchInputRef = useRef(null);
   const friendInputRef = useRef(null);
 
@@ -130,7 +131,7 @@ const MeetSpotPage = ({ firebaseID }) => {
   const handleSetLocations = () => {
     console.log(userLocation);
     console.log(friendLocation);
-    if (userLocation && selectedFriend && friendLocation) {
+    if (userLocation && selectedFriend && friendLocation && venueType) {
       setLocationsSet(true);
     } else {
       alert('Please set both user and friend locations before proceeding.');
@@ -141,7 +142,7 @@ const MeetSpotPage = ({ firebaseID }) => {
     const loadGoMapsAPI = () => {
       if (!window.gomaps) {
         const script = document.createElement('script');
-        script.src = `https://maps.gomaps.pro/maps/api/js?key=AlzaSyW_ArwSIkDDvuo6b2q_ydRToUA6n-lVp-T&libraries=places&async&defer`;
+        script.src = `https://maps.gomaps.pro/maps/api/js?key=AlzaSyLMVnq5No06P-AM88ZKZE0jAFEjidcsxfL&libraries=places&async&defer`;
         script.async = true;
         script.defer = true;
         script.onload = initializeMap;
@@ -231,7 +232,7 @@ const MeetSpotPage = ({ firebaseID }) => {
   const renderLeftSection = () => {
     switch (selectedSection) {
       case 'venue':
-        return <VenueDisplay userLocation={userLocation} friendLocation={friendLocation} />;
+        return <VenueDisplay userLocation={userLocation} friendLocation={friendLocation} type={venueType}/>;
       case 'meet':
         return <MeetingScheduler />;
       default:
@@ -258,6 +259,11 @@ const MeetSpotPage = ({ firebaseID }) => {
               onChange={(e) => setFriendSearchInput(e.target.value)}
               fullWidth
               inputRef={friendInputRef}
+            />
+            <TextField
+              label="Enter Venue Type"
+              onChange={(e) => setVenueType(e.target.value)}
+              fullWidth
             />
             <Button variant="contained" color="primary" onClick={handleSetLocations} sx={{ mt: 2 }}>
               Set Location

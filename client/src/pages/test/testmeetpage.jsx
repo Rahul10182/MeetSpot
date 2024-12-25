@@ -10,18 +10,25 @@ import MeetingScheduler from './MeetingScheduler';
 import VenueDisplay from './VenueDisplay';
 import RightSidebar from './RightSlider';
 import AccountModal from './AccountModal';
+import H from "@here/maps-api-for-javascript"
 
 const MeetSpotPage = ({ firebaseID }) => {
   const [showChat, setShowChat] = useState(false);
   const [map, setMap] = useState(null);
-  const [userLocation, setUserLocation] = useState({ lat: 25.4358, lng: 81.8463 }); // Default location (Prayagraj)
+  const [userLocation, setUserLocation] = useState({ lat: 25.4358, lng: 81.8463 });
+  const [friendLocation, setFriendLocation] = useState(null);
   const [userMarker, setUserMarker] = useState(null);
+  const [friendMarker, setFriendMarker] = useState(null);
   const [searchInput, setSearchInput] = useState('');
+  const [friendSearchInput, setFriendSearchInput] = useState('');
   const [locationOption, setLocationOption] = useState('');
   const [showModal, setShowModal] = useState(false);
   const [selectedFriend, setSelectedFriend] = useState(null);
-  const searchInputRef = useRef(null); 
   const [selectedSection, setSelectedSection] = useState('select');
+  const [locationsSet, setLocationsSet] = useState(false); // New state to check if both locations are set
+  const [venueType, setVenueType] = useState('');
+  const searchInputRef = useRef(null);
+  const friendInputRef = useRef(null);
 
 
   const handleAccountIconClick = () => {
@@ -29,16 +36,14 @@ const MeetSpotPage = ({ firebaseID }) => {
   };
 
   const handleSelectFriend = (friend) => {
-    console.log('Selected Friend:', friend); // Debug log to verify friend selection
+    console.log('Selected Friend:', friend);
     setSelectedFriend(friend);
-    setShowModal(false); // Close the modal after selecting a friend
+    setShowModal(false);
   };
-
-
 
   // Toggle chat window
   const toggleChat = () => {
-    setShowChat(prev => !prev); 
+    setShowChat(prev => !prev);
   };
 
   // Set current location
@@ -48,30 +53,28 @@ const MeetSpotPage = ({ firebaseID }) => {
         const { latitude, longitude } = position.coords;
         const location = { lat: latitude, lng: longitude };
         setUserLocation(location);
-        if (map) {
-          map.setCenter(location);
-        }
-
-        // Set marker for current location
-        if (userMarker) {
-          userMarker.setMap(null);
-        }
-        const newMarker = new window.google.maps.Marker({
-          position: location,
-          map: map,
-          title: 'Your Current Location',
-        });
-        setUserMarker(newMarker);
+        setMarkerOnMap(location, 'Your Current Location', setUserMarker);
 
         // Geocode to get address from latitude and longitude
-        const geocoder = new window.google.maps.Geocoder();
-        geocoder.geocode({ location }, (results, status) => {
-          if (status === 'OK' && results[0]) {
-            setSearchInput(results[0].formatted_address);
-          } else {
-            alert("Address not found for your current location.");
+        const geocoder = async (location) => {
+          const apiKey = 'Jfigr_wm9GvgO11YqmnP_mcw7ek_kxIG9VY5K0Jhyec'; 
+          const url = `https://revgeocode.search.hereapi.com/v1/revgeocode?at=${location.lat},${location.lng}&lang=en-US&apikey=${apiKey}`;
+
+          try {
+            const response = await fetch(url);
+            if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+
+            const data = await response.json();
+            if (data.items && data.items.length > 0) {
+              setSearchInput(data.items[0].address.label); 
+            } else {
+              alert('Address not found for your current location.');
+            }
+          } catch (error) {
+            console.error('Error with geocoding request:', error);
+            alert('Failed to fetch address.');
           }
-        });
+        };
 
         setLocationOption('current');
       });
@@ -79,127 +82,203 @@ const MeetSpotPage = ({ firebaseID }) => {
       alert("Geolocation is not supported by this browser.");
     }
   };
-  const handleMapClick = (event) => {
-    const location = { lat: event.latLng.lat(), lng: event.latLng.lng() };
-    setUserLocation(location);
-    if (userMarker) {
-      userMarker.setMap(null);
-    }
-    const newMarker = new window.google.maps.Marker({
-      position: location,
-      map: map,
-      title: 'Selected Location',
-    });
-    setUserMarker(newMarker);
 
-    const geocoder = new window.google.maps.Geocoder();
-    geocoder.geocode({ location }, (results, status) => {
-      if (status === 'OK' && results[0]) {
-        setSearchInput(results[0].formatted_address);
+  const handleMapClick = async (event) => {
+    const location = { lat: event.latLng.lat, lng: event.latLng.lng };
+    setUserLocation(location);
+    setMarkerOnMap(location, 'Selected Location', setUserMarker);
+
+    const apiKey = 'qDTgfdpiiqW3yGmO9kvq7WwXW7yFrOK-lKpMiOd7zp8';
+    const url = `https://revgeocode.search.hereapi.com/v1/revgeocode?at=${location.lat},${location.lng}&lang=en-US&apikey=${apiKey}`;
+
+    try {
+      const response = await fetch(url);
+      if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+
+      const data = await response.json();
+      if (data.items && data.items.length > 0) {
+        setSearchInput(data.items[0].address.label); // Update user location input
       } else {
-        alert('Geocode failed.');
+        alert('No address found.');
       }
-    });
-    setLocationOption('map');
+    } catch (error) {
+      console.error('Error with geocode request:', error);
+      alert('Geocode failed.');
+    }
+  };
+
+  const handleFriendLocationClick = async (event) => {
+    const location = { lat: event.latLng.lat, lng: event.latLng.lng };
+    setFriendLocation(location);
+    console.log('Inside handle friend click');
+    console.log(friendLocation);
+    setMarkerOnMap(location, 'Friend Location', setFriendMarker, true);
+
+    const apiKey = 'qDTgfdpiiqW3yGmO9kvq7WwXW7yFrOK-lKpMiOd7zp8';
+    const url = `https://revgeocode.search.hereapi.com/v1/revgeocode?at=${location.lat},${location.lng}&lang=en-US&apikey=${apiKey}`;
+
+    try {
+      const response = await fetch(url);
+      if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+
+      const data = await response.json();
+      if (data.items && data.items.length > 0) {
+        setFriendSearchInput(data.items[0].address.label); // Update friend location input
+      } else {
+        alert('No address found.');
+      }
+    } catch (error) {
+      console.error('Error with geocode request:', error);
+      alert('Geocode failed.');
+    }
+  };
+
+  // Helper function to set markers on the map
+  const setMarkerOnMap = (location, title, setMarker, isFriend = false) => {
+    if (map) {
+      const markerIcon = isFriend
+        ? './blue-marker.png' // Replace with your own blue marker icon
+        : './red-marker.png'; // Replace with your own red marker icon
+
+      const marker = new H.map.Marker(location, {
+        icon: new H.map.Icon(markerIcon),
+      });
+
+      map.addObject(marker);
+      setMarker(marker);
+    }
+  };
+
+  // Function to set both user and friend locations
+  const handleSetLocations = () => {
+    console.log(userLocation);
+    console.log(friendLocation);
+    if (userLocation && selectedFriend && friendLocation && venueType) {
+      setLocationsSet(true);
+    } else {
+      alert('Please set both user and friend locations before proceeding.');
+    }
   };
 
   useEffect(() => {
-    const loadGoMapsAPI = () => {
-      if (!window.gomaps) {
-        const script = document.createElement('script');
-        script.src = `https://maps.gomaps.pro/maps/api/js?key=AlzaSyW_ArwSIkDDvuo6b2q_ydRToUA6n-lVp-T&libraries=places&async&defer`;
-        script.async = true;
-        script.defer = true;
-        script.onload = initializeMap;
-        document.body.appendChild(script);
+    const loadHereMapsAPI = () => {
+      const script = document.createElement('script');
+      script.src = `https://js.api.here.com/v3/3.1/mapsjs-core.js`;
+      script.async = true;
+      script.defer = true;
 
-        script.onload = () => {
-          console.log('GoMaps API loaded successfully.');
-          initializeMap();
+      const scriptUI = document.createElement('script');
+      scriptUI.src = `https://js.api.here.com/v3/3.1/mapsjs-ui.js`;
+      scriptUI.async = true;
+      scriptUI.defer = true;
+
+      const scriptEvents = document.createElement('script');
+      scriptEvents.src = `https://js.api.here.com/v3/3.1/mapsjs-mapevents.js`;
+      scriptEvents.async = true;
+      scriptEvents.defer = true;
+
+      script.onload = () => {
+        scriptUI.onload = () => {
+          scriptEvents.onload = initializeMap;
         };
+      };
 
-        script.onerror = () => {
-          console.error('Failed to load GoMaps API.');
-        };
+      script.onerror = () => {
+        console.error('Failed to load HERE Maps API.');
+      };
 
-      } else {
-        initializeMap();
-      }
+      document.body.appendChild(script);
+      document.body.appendChild(scriptUI);
+      document.body.appendChild(scriptEvents);
     };
 
     const initializeMap = () => {
-      const mapInstance = new window.google.maps.Map(document.getElementById('map'), {
-        center: userLocation,
-        zoom: 12,
+      const platform = new H.service.Platform({
+        apikey: 'qDTgfdpiiqW3yGmO9kvq7WwXW7yFrOK-lKpMiOd7zp8',
       });
+
+      const defaultLayers = platform.createDefaultLayers();
+      const mapInstance = new H.Map(
+        document.getElementById('map'),
+        defaultLayers.vector.normal.map,
+        {
+          center: userLocation,
+          zoom: 12,
+        }
+      );
+
+      const behavior = new H.mapevents.Behavior(new H.mapevents.MapEvents(mapInstance));
+      H.ui.UI.createDefault(mapInstance, defaultLayers);
+
       setMap(mapInstance);
 
-      const marker = new window.google.maps.Marker({
-        position: userLocation,
-        map: mapInstance,
-        title: 'Your Location',
-      });
-      setUserMarker(marker);
+      // Default user marker
+      setMarkerOnMap(userLocation, 'Your Location', setUserMarker);
 
-      const searchBox = new window.google.maps.places.SearchBox(searchInputRef.current);
+      // Default friend marker
+      if (friendLocation) {
+        setMarkerOnMap(friendLocation, 'Friend Location', setFriendMarker, true);
+      }
 
-      searchBox.addListener('places_changed', () => {
-        const places = searchBox.getPlaces();
-        if (places.length === 0) return;
-
-        const place = places[0];
-        const location = place.geometry.location;
-
-        mapInstance.setCenter(location);
-        setUserLocation({ lat: location.lat(), lng: location.lng() });
-
-        setSearchInput(place.name);
-
-        if (userMarker) {
-          userMarker.setMap(null);
+      mapInstance.addEventListener('tap', (evt) => {
+        const coords = mapInstance.screenToGeo(evt.currentPointer.viewportX, evt.currentPointer.viewportY);
+        if (locationOption === 'current') {
+          handleMapClick({ latLng: { lat: coords.lat, lng: coords.lng } });
+        } else if (locationOption === 'friend') {
+          handleFriendLocationClick({ latLng: { lat: coords.lat, lng: coords.lng } });
         }
-
-        const newMarker = new window.google.maps.Marker({
-          position: location,
-          map: mapInstance,
-          title: place.name,
-        });
-        setUserMarker(newMarker);
       });
-
-      mapInstance.addListener('click', handleMapClick);
     };
 
-    loadGoMapsAPI();
+    loadHereMapsAPI();
   }, [userLocation]);
 
   const renderLeftSection = () => {
     switch (selectedSection) {
       case 'venue':
-        return <VenueDisplay />;
+        return <VenueDisplay userLocation={userLocation} friendLocation={friendLocation} type={venueType} />;
       case 'meet':
         return <MeetingScheduler />;
       default:
-        return <TextField
-          label="Search Location"
-          value={searchInput}
-          onChange={(e) => setSearchInput(e.target.value)}
-          fullWidth
-          InputProps={{
-            endAdornment: (
-              <InputAdornment position="end">
-                <MyLocationIcon onClick={setCurrentLocation} />
-              </InputAdornment>
-            ),
-          }}
-          inputRef={searchInputRef}
-        />
+        return (
+          <div className='flex flex-col space-y-4'>
+            <TextField
+              label="Search Your Location"
+              value={searchInput}  // Ensure this is updated correctly
+              onChange={(e) => setSearchInput(e.target.value)}
+              fullWidth
+              InputProps={{
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <MyLocationIcon onClick={setCurrentLocation} />
+                  </InputAdornment>
+                ),
+              }}
+              inputRef={searchInputRef}
+            />
+
+            <TextField
+              label="Search Friend Location"
+              value={friendSearchInput}  // Ensure this is updated correctly
+              onChange={(e) => setFriendSearchInput(e.target.value)}
+              fullWidth
+              inputRef={friendInputRef}
+            />
+            <TextField
+              label="Enter Venue Type"
+              onChange={(e) => setVenueType(e.target.value)}
+              fullWidth
+            />
+            <Button variant="contained" color="primary" onClick={handleSetLocations} sx={{ mt: 2 }}>
+              Set Location
+            </Button>
+          </div>
+        );
     }
   };
 
   return (
     <div className="min-h-screen bg-gray-100 flex flex-col">
-
       <Box
         component="header"
         className="bg-white shadow-md mx-auto flex justify-between items-center mt-4 mb-4"
@@ -266,6 +345,7 @@ const MeetSpotPage = ({ firebaseID }) => {
             <IconButton
               onClick={() => setSelectedSection('venue')}
               sx={{ color: '#ff65a3' }}
+              disabled={!locationsSet}
             >
               <WhereToVoteIcon />
             </IconButton>
@@ -369,13 +449,10 @@ const MeetSpotPage = ({ firebaseID }) => {
 
       {/* Right Sidebar (Chat) */}
       <Grid item xs={4}>
-      <RightSidebar showChat={showChat} toggleChat={toggleChat} selectedFriend={selectedFriend} />
+        <RightSidebar showChat={showChat} toggleChat={toggleChat} selectedFriend={selectedFriend} />
 
-        </Grid>
-
-        
-      
-          <AccountModal firebaseID={firebaseID}
+      </Grid>
+      <AccountModal firebaseID={firebaseID}
         open={showModal}
         onClose={() => setShowModal(false)}
         onSelectFriend={handleSelectFriend} />

@@ -1,12 +1,46 @@
 import { User } from "../models/userModel.js";
 import axios from "axios";
 import Venue from "../models/venueModel.js"
-import calculateMidpoint from '../utils/midpointUtil.js';
-import { getDistance } from "../utils/getDistance.js"
 
+const HERE_API_KEY = "Jfigr_wm9GvgO11YqmnP_mcw7ek_kxIG9VY5K0Jhyec";
 
-const GO_MAPS_API_KEY = "AlzaSy5CgyOHomgbCzkFlTzYj0MowZrnZx20bFs";
+const calculateMidpoint = (loc1, loc2) => ({
+    latitude: (loc1.latitude + loc2.latitude) / 2,
+    longitude: (loc1.longitude + loc2.longitude) / 2,
+});
 
+const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+const getDuration = async (startLat, startLng, endLat, endLng) => {
+    const maxRetries = 3;
+    let attempts = 0;
+
+    while (attempts < maxRetries) {
+        try {
+            const response = await axios.get(`https://router.hereapi.com/v8/routes`, {
+                params: {
+                    transportMode: 'car',
+                    origin: `${startLat},${startLng}`,
+                    destination: `${endLat},${endLng}`,
+                    return: 'summary',
+                    apiKey: HERE_API_KEY,
+                },
+            });
+
+            return response.data.routes[0].sections[0].summary.duration;
+        } catch (error) {
+            if (error.response && error.response.status === 429 && attempts < maxRetries - 1) {
+                const retryAfter = error.response.headers['retry-after'] || 1;
+                console.warn(`Rate limited. Retrying after ${retryAfter} seconds...`);
+                await delay(retryAfter * 1000);
+                attempts++;
+            } else {
+                console.error('Error fetching duration:', error.message);
+                return null;
+            }
+        }
+    }
+};
 
 export const getVenueSuggestions = async (req, res) => {
     try {
@@ -20,168 +54,164 @@ export const getVenueSuggestions = async (req, res) => {
         }
 
         // Calculate the midpoint
-        const midpoint = calculateMidpoint(
-            user1Location,
-            user2Location
-        );
-
-        //Find Distance Between The users
-        const distanceResult = await getDistance(
-            user1Location.latitude, user1Location.longitude,
-            user2Location.latitude, user2Location.longitude
-        );
-
-        if (!distanceResult) {
-            return res.status(500).json({
-                message: 'Error calculating the distance between users.',
-                success: false,
-            });
-        }
-
-        const d = distanceResult.distance;  // distance in meters
+        const midpoint = calculateMidpoint(user1Location, user2Location);
 
         let venues = [];
-        let venueTypes = [];
-
         if (type) {
-            // If type is provided, use it directly
-            const response = await axios.get("https://maps.gomaps.pro/maps/api/place/nearbysearch/json", {
+            // Fetch venues of the specified type using HERE Places API
+            const response = await axios.get(`https://discover.search.hereapi.com/v1/discover`, {
                 params: {
-                    location: `${midpoint.latitude},${midpoint.longitude}`,
-                    radius: 2000,  // Increased radius
-                    type,  // Directly use the provided type
-                    key: GO_MAPS_API_KEY
-                }
+                    at: `${midpoint.latitude},${midpoint.longitude}`,
+                    q: type,
+                    limit: 20,
+                    apiKey: HERE_API_KEY,
+                },
             });
 
-            // console.log("Google Places API Response:", response.data);  // Debugging log
-
-            venues = response.data.results.map(place => ({
-                venueId: place.place_id,
-                name: place.name,
+            venues = response.data.items.map((place) => ({
+                venueId: place.id,
+                name: place.title,
                 type,
-                latitude: place.geometry.location.lat,
-                longitude: place.geometry.location.lng,
-                address: place.vicinity
+                latitude: place.position.lat,
+                longitude: place.position.lng,
+                address: place.address.label,
             }));
-
         } else {
-            // If no type is provided, use types from the database
+            // Fetch venues from the database
             const nearbyVenues = await Venue.find({
                 location: {
                     $geoWithin: {
                         $centerSphere: [
                             [midpoint.longitude, midpoint.latitude],
-                            1 / 3963.2  
-                        ]
-                    }
-                }
+                            1 / 3963.2, // 1 mile radius
+                        ],
+                    },
+                },
             }).lean();
 
-            venueTypes = [...new Set(nearbyVenues.map(venue => venue.type))];
+            const venueTypes = [...new Set(nearbyVenues.map((venue) => venue.type))];
 
             if (venueTypes.length === 0) {
                 return res.status(400).json({
                     message: "No venue types found in the database",
-                    success: false
+                    success: false,
                 });
             }
 
-            // For each type from the database, find venues via Google Places API
-            for (const venueType of venueTypes) {
-                const response = await axios.get("https://maps.gomaps.pro/maps/api/place/nearbysearch/json", {
+            const venuePromises = venueTypes.map(async (venueType) => {
+                const response = await axios.get(`https://discover.search.hereapi.com/v1/discover`, {
                     params: {
-                        location: `${midpoint.latitude},${midpoint.longitude}`,
-                        radius: 2000,  // search radius
-                        type: venueType,  // Use venue type from the database
-                        key: GO_MAPS_API_KEY
-                    }
+                        at: `${midpoint.latitude},${midpoint.longitude}`,
+                        q: venueType,
+                        limit: 20,
+                        apiKey: HERE_API_KEY,
+                    },
                 });
 
-                // console.log(`Response for type ${venueType}:`, response.data);  //Debugg
-
-                const venuesForType = response.data.results.map(place => ({
-                    venueId: place.place_id,
-                    name: place.name,
-                    type: venueType,  // Use the type from the database
-                    latitude: place.geometry.location.lat,
-                    longitude: place.geometry.location.lng,
-                    address: place.vicinity
+                return response.data.items.map((place) => ({
+                    venueId: place.id,
+                    name: place.title,
+                    type: venueType,
+                    latitude: place.position.lat,
+                    longitude: place.position.lng,
+                    address: place.address.label,
                 }));
+            });
 
-                venues = venues.concat(venuesForType);
-            }
+            const venueResults = await Promise.all(venuePromises);
+            venues = venueResults.flat();
         }
 
+        // Add duration info for each venue
+        const venueWithDurations = await Promise.all(
+            venues.map(async (venue) => {
+                const [user1Duration, user2Duration] = await Promise.all([
+                    getDuration(user1Location.latitude, user1Location.longitude, venue.latitude, venue.longitude),
+                    getDuration(user2Location.latitude, user2Location.longitude, venue.latitude, venue.longitude),
+                ]);
 
-        // time taken by each user
-        const venueWithDurations = await Promise.all(venues.map(async (venue) => {
-            //user 1 time to reach veue
-            const user1 = await getDistance(user1Location.latitude, user1Location.longitude, venue.latitude, venue.longitude);
-            const user1Duration = user1.duration;
-            const user2 = await getDistance(user2Location.latitude, user2Location.longitude, venue.latitude, venue.longitude);
-            const user2Duration = user2.duration;
+                if (user1Duration === null || user2Duration === null) return null;
 
-            return {
-                ...venue,
-                user1Duration,
-                user2Duration,
-                totalDuration: Math.abs(user1Duration + user2Duration)
-            };
-        }));
+                return {
+                    ...venue,
+                    user1Duration,
+                    user2Duration,
+                    totalDuration: user1Duration + user2Duration,
+                };
+            })
+        );
 
-        // sort by total time taken
-        const sortedVenues = venueWithDurations.sort((a, b) => Math.abs(a.totalDuration - b.totalDuration));
+        const filteredVenues = venueWithDurations.filter(Boolean);
+        const sortedVenues = filteredVenues.sort((a, b) => a.totalDuration - b.totalDuration);
 
         res.status(200).json({
             message: "Venue suggestions are:",
             midpoint,
             venues: sortedVenues,
-            success: true
+            success: true,
         });
-
     } catch (error) {
-        console.error(error);
-        res.status(500).json({ message: "Failed to search for venues.", success: false });
+        console.error("Error details:", error.message, error.stack);
+        res.status(500).json({
+            message: "Failed to select venue",
+            error: error.message,
+            success: false,
+        });
     }
 };
 
 
 
 export const selectVenue = async (req, res) => {
-  const { firebaseId, venueId, isNew, name, type, latitude, longitude, address } = req.body;
+  const {
+    firebaseId,
+    friendFirebaseId,
+    date,
+    venueId,
+    isNew,
+    name,
+    type,
+    latitude,
+    longitude,
+    address,
+    photo
+  } = req.body;
 
   try {
+    console.log({
+      firebaseId,
+      friendFirebaseId,
+      venueId,
+      isNew,
+      name,
+      type,
+      latitude,
+      longitude,
+      address,
+      date,
+      photo
+    });
 
-    console.log(firebaseId);
-    console.log(venueId);
-    console.log(isNew);
-    console.log(name);
-    console.log(type);
-    console.log(latitude);
-    console.log(longitude);
-    console.log(address);
     // Validate input
-    if (!firebaseId) return res.status(400).json({ message: "Firebase ID is required", success: false });
-    if (isNew && (!name || !type || !latitude || !longitude)) {
+    if (!firebaseId || !friendFirebaseId)
+      return res.status(400).json({ message: "Firebase IDs are required", success: false });
+
+    if (isNew && (!name || !type || latitude == null || longitude == null || !address))
       return res.status(400).json({ message: "Missing required fields for new venue", success: false });
-    }
 
-    // Validate latitude and longitude
-    if (isNew && (typeof latitude !== 'number' || typeof longitude !== 'number')) {
-      return res.status(400).json({ message: "Latitude and Longitude must be numbers", success: false });
-    }
+    if (!isNew && !mongoose.isValidObjectId(venueId))
+      return res.status(400).json({ message: "Invalid venue ID", success: false });
 
-    // Find the user
-    const user = await User.findOne({ fireBaseId : firebaseId});
-    if (!user) {
-      return res.status(404).json({ message: "User not found", success: false });
-    }
+    // Find users
+    const user = await User.findOne({ fireBaseId:firebaseId });
+    const friend = await User.findOne({ fireBaseId: friendFirebaseId });
 
+    if (!user) return res.status(404).json({ message: "User not found", success: false });
+    if (!friend) return res.status(404).json({ message: "Friend not found", success: false });
+
+    // Venue creation/retrieval
     let venue;
-
     if (isNew) {
-      // Create a new venue
       venue = new Venue({
         name,
         type,
@@ -190,26 +220,32 @@ export const selectVenue = async (req, res) => {
           coordinates: [longitude, latitude],
         },
         address,
+        date,
+        photo,
+        user: user._id,
+        friend: friend._id
       });
       await venue.save();
     } else {
-      // Retrieve existing venue
-      venue = await Venue.findById(venueId);
-      if (!venue) {
-        return res.status(404).json({ message: "Venue not found", success: false });
-      }
+      venue = await Venue.findOne({ _id: venueId });
+      if (!venue) return res.status(404).json({ message: "Venue not found", success: false });
     }
 
-    // Check if venue is already visited
-    if (user.profile.venues.includes(venue._id)) {
+    // Check if venue already exists in user or friend profile
+    if (user.profile?.venues.includes(venue._id) || friend.profile?.venues.includes(venue._id)) {
       return res.status(400).json({ message: "Venue already selected", success: false });
     }
 
-    // Add venue to user's profile
+    // Add venue to user and friend's profiles
+    user.profile = user.profile || { venues: [] };
+    friend.profile = friend.profile || { venues: [] };
     user.profile.venues.push(venue._id);
-    await user.save();
+    friend.profile.venues.push(venue._id);
 
-    res.status(201).json({
+    await user.save();
+    await friend.save();
+
+    return res.status(201).json({
       message: "Venue selected successfully",
       venue: {
         venueId: venue._id,
@@ -223,6 +259,51 @@ export const selectVenue = async (req, res) => {
     });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: "Failed to select venue", success: false });
+    return res.status(500).json({ message: "Failed to select venue", success: false });
   }
 };
+
+// Controller to fetch all venues for a specific user
+export const getUserVenues = async (req, res) => {
+  try {
+    const { firebaseID } = req.params;
+    console.log(firebaseID);
+
+    if (!firebaseID) {
+      return res.status(400).json({ message: "Firebase ID is required" });
+    }
+
+    console.log(`Fetching venues for user with Firebase ID: ${firebaseID}`);
+
+    // Find the user by Firebase ID and populate their venues
+    const user = await User.findOne({ fireBaseId: firebaseID })
+      .populate({
+        path: 'profile.venues', // Populate venues
+        populate: { 
+          path: 'friend', // Populate friend's data
+          model: 'User', // Ensure it's populated from User collection
+          select: 'fullName' // Fetch only friend's name
+        }
+      });
+
+    console.log("User data: ", user);
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    // Extract and format venues with friend's name:
+    const venuesWithFriends = user.profile.venues.map((venue) => ({
+      ...venue.toObject(),
+      friendName: venue.friend?.fullName ?? 'Unknown Friend',
+    }));
+    console.log("Venues with friends: ", venuesWithFriends);
+
+    return res.status(200).json({ venues: venuesWithFriends });
+
+  } catch (error) {
+    console.error("Error fetching venues:", error.message);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+};
+

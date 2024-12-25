@@ -17,15 +17,21 @@ const MapComponent = ({ location, onLocationChange }) => {
       position: newLocation,
       map: map,
       title: 'Selected Location',
+      animation: window.google.maps.Animation.DROP
     });
     setUserMarker(newMarker);
+    
+    map.panTo(newLocation);
   };
 
   useEffect(() => {
+    if (userMarker) {
+      userMarker.setMap(null);
+    }
     const loadGoMapsAPI = () => {
-      if (!window.gomaps) {
+      if (!window.google) {
         const script = document.createElement('script');
-        script.src = `https://maps.gomaps.pro/maps/api/js?key=YOUR_API_KEY&libraries=places&async&defer`;
+        script.src = `https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&libraries=places`;
         script.async = true;
         script.defer = true;
         script.onload = initializeMap;
@@ -42,34 +48,58 @@ const MapComponent = ({ location, onLocationChange }) => {
       });
       setMap(mapInstance);
 
-      const marker = new window.google.maps.Marker({
-        position: location,
-        map: mapInstance,
-        title: 'Your Location',
-      });
-      setUserMarker(marker);
+      if (location) {
+        const marker = new window.google.maps.Marker({
+          position: location,
+          map: mapInstance,
+          title: 'Your Location',
+        });
+        setUserMarker(marker);
+      }
 
       const searchBox = new window.google.maps.places.SearchBox(searchInputRef.current);
+      mapInstance.controls[window.google.maps.ControlPosition.TOP_LEFT].push(searchInputRef.current);
       searchBox.addListener('places_changed', () => {
         const places = searchBox.getPlaces();
         if (places.length === 0) return;
 
-        const place = places[0];
-        const newLocation = place.geometry.location;
-
-        mapInstance.setCenter(newLocation);
-        onLocationChange({ lat: newLocation.lat(), lng: newLocation.lng() });
-
+        // Clear existing marker
         if (userMarker) {
           userMarker.setMap(null);
         }
 
+        const bounds = new window.google.maps.LatLngBounds();
+        const place = places[0];
+        
+        if (!place.geometry || !place.geometry.location) {
+          console.log("Returned place contains no geometry");
+          return;
+        }
+
+        const newLocation = {
+          lat: place.geometry.location.lat(),
+          lng: place.geometry.location.lng()
+        };
+
+        // Create new marker
         const newMarker = new window.google.maps.Marker({
           position: newLocation,
           map: mapInstance,
           title: place.name,
+          animation: window.google.maps.Animation.DROP
         });
+        
         setUserMarker(newMarker);
+        onLocationChange(newLocation);
+
+        if (place.geometry.viewport) {
+          bounds.union(place.geometry.viewport);
+        } else {
+          bounds.extend(place.geometry.location);
+        }
+
+        mapInstance.fitBounds(bounds);
+        mapInstance.setZoom(Math.min(mapInstance.getZoom(), 15));
       });
 
       mapInstance.addListener('click', handleMapClick);
@@ -82,12 +112,23 @@ const MapComponent = ({ location, onLocationChange }) => {
         userMarker.setMap(null);
       }
     };
-  }, [location, userMarker]);
+  }, [location]);
 
   return (
     <div id="map" style={{ height: '87vh', width: '100%' }}>
-      {/* Input for search, using the ref */}
-      <input ref={searchInputRef} type="text" placeholder="Search location" style={{ position: 'absolute', top: 10, left: 10, zIndex: 1, padding: '10px' }} />
+      <input 
+        ref={searchInputRef} 
+        type="text" 
+        placeholder="Search location" 
+        style={{ 
+          margin: '10px',
+          padding: '10px',
+          width: '300px',
+          border: '1px solid #ccc',
+          borderRadius: '4px',
+          boxShadow: '0 2px 6px rgba(0,0,0,0.3)'
+        }} 
+      />
     </div>
   );
 };

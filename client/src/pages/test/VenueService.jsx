@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const apiKey = "AlzaSy5CgyOHomgbCzkFlTzYj0MowZrnZx20bFs";
+const apiKey = "AlzaSyW_ArwSIkDDvuo6b2q_ydRToUA6n-lVp-T";
 
 export const fetchDistance = async (originLat, originLng, destLat, destLng) => {
   const origin = `${originLat},${originLng}`;
@@ -17,11 +17,15 @@ export const fetchDistance = async (originLat, originLng, destLat, destLng) => {
 
 export const fetchVenues = async (userLocation, friendLocation, venueType) => {
   try {
+    console.log(userLocation);
+    console.log(friendLocation);
+    console.log(venueType);
     const response = await axios.post('http://localhost:3000/api/v1/venue/get', {
       user1Location: userLocation,
       user2Location: friendLocation,
       type: venueType,
     });
+    console.log(response.data);
     return response.data.venues;
   } catch (error) {
     console.error('Error fetching venues:', error);
