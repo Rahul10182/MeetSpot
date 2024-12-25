@@ -69,6 +69,7 @@ export const registerForEvent = async (req, res) => {
       return res.status(404).json({ message: "User, friend, or event not found" });
     }
 
+
     user.events.push(eventId);
     friend.events.push(eventId);
 
@@ -88,3 +89,4 @@ export const registerForEvent = async (req, res) => {
     res.status(500).json({ message: "Error registering for event", error });
   }
 };
+

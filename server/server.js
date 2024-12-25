@@ -8,13 +8,15 @@ import venueRoutes from "./routes/venueRoutes.js"
 import eventRoutes from "./routes/eventRouter.js"
 import friendRoute from "./routes/friendRoutes.js"
 import chatRoutes from "./routes/chatRoutes.js"
-import notifcationRoutes from "./routes/notificationRoutes.js"
+import notificationRoutes from "./routes/notificationRoutes.js"
 import { Server } from "socket.io";
 
 import { createServer } from "http";
 import userSearch from "./routes/userSearchRoute.js";
 import Message from "./models/messageModel.js"; 
-// import Chat from "./models/chatModel.js";
+
+import Chat from "./models/chatModel.js";
+import notificationRoutes from "./routes/notificationRoutes.js"
 
 dotenv.config();
 connectDB();
@@ -45,7 +47,7 @@ app.use('/eventRegister', eventRoutes);
 app.use('/friend', friendRoute);
 app.use('/api/v1/venue', venueRoutes);
 app.use('/api/v1/chat', chatRoutes);
-app.use("/notifications", notifcationRoutes);
+app.use("/notifications", notificationRoutes);
 
 io.on('connection', (socket) => {
   console.log('User connected', socket.id);
@@ -67,7 +69,21 @@ io.on('connection', (socket) => {
       await message.save();
       await message.populate('sender', '_id name');
 
-      socket.to(chatId).emit('newMessage', message);  
+
+      await Chat.findByIdAndUpdate(chatId, {
+        $set: { lastMessage: message._id },
+        $push: { messages: message._id },
+      });
+  
+  
+
+      // Emit the message to the users in the same chat room
+      socket.to(chatId).emit('newMessage', message);  // Consistent event name 'newMessage'
+      
+      socket.on('typing', ({ chatId, isTyping }) => {
+        socket.to(chatId).emit('typing', { chatId, isTyping });
+      });
+
     } catch (error) {
       console.error('Error sending message:', error);
     }

@@ -1,3 +1,4 @@
+
 import js from '@eslint/js'
 import globals from 'globals'
 import react from 'eslint-plugin-react'
@@ -23,6 +24,7 @@ export default [
       'react-hooks': reactHooks,
       'react-refresh': reactRefresh,
     },
+    
     rules: {
       ...js.configs.recommended.rules,
       ...react.configs.recommended.rules,
@@ -36,3 +38,4 @@ export default [
     },
   },
 ]
+

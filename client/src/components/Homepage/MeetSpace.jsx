@@ -2,7 +2,8 @@ import React from 'react';
 import { Button, Grid, Typography, Box } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import Typewriter from 'typewriter-effect'; 
+import Typewriter from 'typewriter-effect';
+
 
 const MeetSpace = () => {
   const navigate = useNavigate();
@@ -27,14 +28,25 @@ const MeetSpace = () => {
           flexGrow: 1,
         }}
       >
-        {/* Upper Half (Ready to Connect + Set Meetup Location) */}
         <Grid
           item
           xs={12}
           md={6}
           className="flex items-center justify-center bg-indigo-600 text-white"
-          sx={{ padding: { xs: '10px', md: '20px' } }}
+          sx={{ padding: { xs: '10px', md: '20px' }, display: 'flex', flexDirection: 'column', alignItems: 'center' }}
         >
+          <Typography
+            variant="h5"
+            sx={{
+              mb: 2,
+              fontWeight: 'bold',
+              mt: 6,
+              textAlign: 'center',
+            }}
+          >
+            Want To Meet?
+          </Typography>
+
           <Button
             variant="contained"
             color="secondary"
@@ -57,7 +69,8 @@ const MeetSpace = () => {
           item
           xs={12}
           md={6}
-          className="flex items-center justify-center"
+
+          className="flex items-center justify-center bg-[#4caf50] text-white"
           sx={{
             padding: { xs: '10px', md: '20px' },
             display: 'flex',
@@ -65,9 +78,11 @@ const MeetSpace = () => {
             alignItems: 'center',
             justifyContent: 'center',
             textAlign: 'center',
+
             backgroundColor: '#388e3c',
             color: 'white',
             borderRadius: '12px',
+
           }}
         >
           <Typography

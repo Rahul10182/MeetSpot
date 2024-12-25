@@ -19,6 +19,10 @@ import FriendRequest from './pages/profile/reqFriend';
 import FriendRequestSent from './pages/profile/FriendReqSent';
 import ChatPage from './pages/ChatPage';
 import EventsPage from './pages/Eventpage';
+import MeetSpotPage from './pages/test/MeetSpotPage';
+import TestPage from './pages/test/testmeetpage';
+import DemoPage from './pages/test/demo';
+import NewPage from './pages/test/new';
 
 
 
@@ -95,6 +99,11 @@ const App = () => {
           <Route path="/meeting-point" element={<MeetingPoint />} />
           <Route path="/chat" element={<ChatPage firebaseID={firebaseId} />} />
           <Route path="/events" element={<EventsPage/>}  />
+          <Route path="/test" element={<MeetSpotPage firebaseID={firebaseId}/>}  />
+          <Route path="/testpage" element={<TestPage firebaseID={firebaseId}/>}  />
+          <Route path="/demo" element={<DemoPage/>}  />
+          <Route path="/new" element={<NewPage/>}  />
+
           
 
         </Routes>

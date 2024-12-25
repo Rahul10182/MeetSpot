@@ -9,3 +9,4 @@ router.post('/register', registerForEvent);
 
 
 export default router;
+
