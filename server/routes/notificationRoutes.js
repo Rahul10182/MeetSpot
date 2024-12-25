@@ -1,3 +1,4 @@
+
 import express from "express";
 import { getUserNotifications } from "../controllers/notificationController.js";
 
@@ -8,3 +9,4 @@ router.patch("/read/:id", );
 
 
 export default router;
+

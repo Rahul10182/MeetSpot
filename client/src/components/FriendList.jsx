@@ -1,24 +1,14 @@
+
+
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import {
-  List,
-  ListItem,
-  Avatar,
-  Typography,
-  Box,
-  TextField,
-  InputAdornment,
-  CircularProgress,
-  Card,
-  CardContent,
-} from '@mui/material';
+import { List, ListItem, ListItemText, Avatar, Typography, Box, TextField ,InputAdornment} from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import { useNavigate } from 'react-router-dom';
 
 const FriendList = ({ firebaseID, onFriendSelect }) => {
   const [friends, setFriends] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
-  const [isLoading, setIsLoading] = useState(true);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -26,15 +16,15 @@ const FriendList = ({ firebaseID, onFriendSelect }) => {
       axios
         .post('http://localhost:3000/friend/old', { firebaseID })
         .then((response) => {
+          console.log('API response:', response.data);
           setFriends(response.data || []);
-          setIsLoading(false);
         })
         .catch((error) => {
           console.error('Error fetching friends:', error);
-          setIsLoading(false);
         });
     }
   }, [firebaseID]);
+
 
   const handleSearch = (event) => {
     setSearchQuery(event.target.value);
@@ -51,65 +41,63 @@ const FriendList = ({ firebaseID, onFriendSelect }) => {
     });
 
   return (
-    <Box
-      sx={{
-        backgroundColor: '#1a4d8f',
-        minHeight: '100vh',
-        padding: '16px',
-        color: '#fff',
-      }}
-    >
-      {/* Header */}
-      <Box sx={{ textAlign: 'center', marginBottom: 4 }}>
-        <button
-          onClick={() => navigate('/')}
-          style={{
-            fontSize: '2rem',
-            color: '#fff',
-            fontWeight: 'bold',
-            background: 'none',
-            border: 'none',
-            cursor: 'pointer',
-          }}
-        >
-          MeetSpot
-        </button>
-      </Box>
+    <div style={{ backgroundColor: '#1a4d8f', minHeight: '100vh', padding: '16px' }}>
 
+    <Box >
       {/* Search Bar */}
-      <TextField
-        variant="outlined"
-        placeholder="Search friends..."
-        value={searchQuery}
-        onChange={handleSearch}
-        sx={{
-          marginBottom: 2,
-          backgroundColor: '#ffffff',
-          width: '100%',
-          borderRadius: '8px',
-          '& .MuiOutlinedInput-root': {
-            height: 56,
-            borderRadius: '8px',
-          },
-        }}
-        InputProps={{
-          startAdornment: (
-            <InputAdornment position="start">
-              <SearchIcon style={{ color: '#3498db' }} />
-            </InputAdornment>
-          ),
-        }}
-      />
 
-      {/* Friend List */}
-      <Box sx={{ maxHeight: '70vh', overflowY: 'auto' }}>
-        {isLoading ? (
-          <Box sx={{ textAlign: 'center', marginTop: 4 }}>
-            <CircularProgress />
-          </Box>
-        ) : filteredFriends.length > 0 ? (
+        <div>
+                  <button 
+                onClick={() => navigate('/')}
+                    className="text-center text-white h-20 text-3xl font-semibold mx-28 whitespace-nowrap transition-all duration-200 focus:outline-none"
+                >
+                    MeetSpot
+                </button>
+        </div>
+                
+      
+        <TextField
+            variant="outlined"
+            placeholder="Search friends..."
+            value={searchQuery}
+            onChange={handleSearch}
+            sx={{
+              marginBottom: 2,
+              backgroundColor: '#ffffff', 
+              width: '80%', 
+              borderRadius: '8px',
+              margin: '30px',  
+              
+              '& .MuiOutlinedInput-root': {
+                height: 56,
+                borderRadius: '8px', 
+                border: '1px solid #3498db', 
+              },
+              '& .MuiInputBase-input::placeholder': {
+                color: '#3498db',
+              },
+            }}
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <SearchIcon style={{ color: '#3498db' }} /> 
+                </InputAdornment>
+              ),
+            }}
+          />
+
+
+      <Box sx={{ 
+          maxHeight: '60vh', 
+          overflowY: 'auto', 
+      }}>
+
+      {/* Friends List */}
+      <List>
+        {filteredFriends.length > 0 ? (
           filteredFriends.map((friend) => (
-            <Card
+            <ListItem
+              button
               key={friend._id || friend.email}
               onClick={() =>
                 onFriendSelect({
@@ -118,45 +106,34 @@ const FriendList = ({ firebaseID, onFriendSelect }) => {
                   email: friend.email,
                 })
               }
-              sx={{
-                display: 'flex',
-                alignItems: 'center',
-                backgroundColor: '#3498db',
-                color: '#fff',
-                borderRadius: 2,
-                marginBottom: 2,
-                cursor: 'pointer',
-                boxShadow: '0 4px 10px rgba(0, 0, 0, 0.2)',
-                transition: 'transform 0.2s ease-in-out',
-                '&:hover': {
-                  transform: 'scale(1.02)',
-                },
-              }}
             >
-              <Avatar
-                sx={{
-                  bgcolor: '#ffffff',
-                  color: '#3498db',
-                  margin: 1,
-                }}
-              >
-                {friend.name?.charAt(0).toUpperCase() || 'A'}
-              </Avatar>
-              <CardContent>
-                <Typography variant="h6">{friend.name || 'Friend Name'}</Typography>
-              </CardContent>
-            </Card>
+              <div className="flex items-center gap-4 border cursor-pointer border-gray-300 w-full bg-[#3498db] text-white rounded-lg p-3 shadow-md">
+                <Avatar
+                  alt={friend.name?.charAt(0).toUpperCase() || 'A'}
+                  className="bg-white text-[#3498db]"
+                />
+
+                <div className="flex flex-col">
+                  <span className="text-lg font-medium">
+                    {friend.name || 'Friend Name'}
+                  </span>
+                </div>
+              </div>
+            </ListItem>
           ))
         ) : (
-          <Box sx={{ textAlign: 'center', marginTop: 4 }}>
+          <Box sx={{ textAlign: 'center', marginTop: 2 }}>
             <Typography variant="body2" color="textSecondary">
               No friends found
             </Typography>
           </Box>
         )}
-      </Box>
+      </List>
     </Box>
+    </Box>
+    </div>
   );
 };
 
 export default FriendList;
+

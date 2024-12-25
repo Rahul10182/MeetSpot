@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import Typewriter from 'typewriter-effect';
 
+
 const MeetSpace = () => {
   const navigate = useNavigate();
 
@@ -27,7 +28,6 @@ const MeetSpace = () => {
           flexGrow: 1,
         }}
       >
-
         <Grid
           item
           xs={12}
@@ -64,10 +64,12 @@ const MeetSpace = () => {
           </Button>
         </Grid>
 
+        {/* Lower Half (Want To Chat? + Chat Button) */}
         <Grid
           item
           xs={12}
           md={6}
+
           className="flex items-center justify-center bg-[#4caf50] text-white"
           sx={{
             padding: { xs: '10px', md: '20px' },
@@ -76,6 +78,11 @@ const MeetSpace = () => {
             alignItems: 'center',
             justifyContent: 'center',
             textAlign: 'center',
+
+            backgroundColor: '#388e3c',
+            color: 'white',
+            borderRadius: '12px',
+
           }}
         >
           <Typography
@@ -107,6 +114,7 @@ const MeetSpace = () => {
                 backgroundColor: '#ff5722',
                 '&:hover': { backgroundColor: '#e64a19' },
                 width: { xs: '100%', md: 'auto' },
+                boxShadow: '0 4px 10px rgba(0, 0, 0, 0.3)',
               }}
             >
               Chat
@@ -115,6 +123,7 @@ const MeetSpace = () => {
         </Grid>
       </Grid>
 
+      {/* Right Side Section */}
       <Grid
         container
         spacing={2}
@@ -139,19 +148,16 @@ const MeetSpace = () => {
             sx={{
               fontWeight: 'bold',
               fontSize: { xs: '1.8rem', sm: '2.5rem' },
-              textAlign: 'center', 
             }}
           >
             <Typewriter
-              onInit={(typewriter) => {
-                typewriter
-                  .typeString('Welcome to MeetSpot')
-                  .start();
-              }}
-              options={{
-                loop: false,
-                delay: 75, 
-              }}
+              words={['Welcome to MeetSpot']}
+              loop={false}
+              cursor
+              cursorStyle="_"
+              typeSpeed={70}
+              deleteSpeed={50}
+              delaySpeed={1000}
             />
           </Typography>
         </motion.div>
@@ -160,7 +166,7 @@ const MeetSpace = () => {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 1, delay: 0.5 }}
-          style={{ maxWidth: '80%' }} 
+          sx={{ maxWidth: '80%' }}
         >
           <Typography
             variant="body1"
@@ -170,6 +176,14 @@ const MeetSpace = () => {
             MeetSpace provides a user-friendly platform where you can effortlessly schedule and manage
             your meetings. Whether you're planning team discussions, client presentations, or personal
             catch-ups, we've got you covered.
+          </Typography>
+
+          <Typography
+            variant="body2"
+            color="textSecondary"
+            sx={{ mt: 2, fontSize: { xs: '0.8rem', sm: '0.9rem' } }}
+          >
+            Click the "Schedule Meeting" button to get started and experience seamless collaboration.
           </Typography>
         </motion.div>
       </Grid>

@@ -1,3 +1,4 @@
+
 import { User } from "../models/userModel.js";
 import axios from "axios";
 import Venue from "../models/venueModel.js"
@@ -306,4 +307,5 @@ export const getUserVenues = async (req, res) => {
     return res.status(500).json({ message: "Internal server error" });
   }
 };
+
 

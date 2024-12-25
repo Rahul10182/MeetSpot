@@ -80,7 +80,6 @@ function AuthLogin() {
             e.preventDefault();
             try {
                 const result = await firebase.signUpWithGoogle();
-                console.log("Result from signUpWithGoogle:", result); 
         
                 if (result) {
                     navigate('/');

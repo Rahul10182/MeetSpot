@@ -1,3 +1,4 @@
+
 import Notification  from '../models/notificationModel.js';
 
 export const sendNotification = async (firebaseID, message, type = 'other') => {
