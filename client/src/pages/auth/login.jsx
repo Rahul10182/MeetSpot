@@ -83,7 +83,7 @@ function AuthLogin() {
                 console.log("Result from signUpWithGoogle:", result); 
         
                 if (result) {
-                    navigate('/');
+                    navigate('/home');
                 }         
             } catch (err) {
                 console.error("Error signing in:", err); 

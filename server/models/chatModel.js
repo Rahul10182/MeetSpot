@@ -1,47 +1,43 @@
 import mongoose from "mongoose";
-// Chat schema modification
 
 const chatSchema = new mongoose.Schema(
   {
     participants: [
-      { 
-        type: mongoose.Schema.Types.ObjectId, 
+      {
+        type: mongoose.Schema.Types.ObjectId,
         ref: "User",
-        required: true
+        required: true,
       },
-      { 
-        type: mongoose.Schema.Types.ObjectId, 
-        ref: "User",
-        required: true
-      }
     ],
-
-    lastMessage: { 
-      type: mongoose.Schema.Types.ObjectId, 
-      ref: "Message" 
-    },
-
     messages: [
-      { 
-        type: mongoose.Schema.Types.ObjectId, 
-        ref: "Message" 
-      }
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Message",
+      },
     ],
-
-    createdAt: { 
-      type: Date, 
-      default: Date.now 
+    type: {
+      type: String,
+      enum: ["single", "group"],
+      default: "single",
     },
-
-    updatedAt: { 
-      type: Date, 
-      default: Date.now 
-    }  
+    groupDetails: {
+      name: {
+        type: String,
+        trim: true,
+      },
+      avatar: {
+        type: String, 
+      },
+      createdBy: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+      },
+    },
   },
-  { 
-    timestamps: { createdAt: "createdAt", updatedAt: "updatedAt" }
+  {
+    timestamps: true,
   }
 );
 
-const Chat = mongoose.model('Chat', chatSchema);
+const Chat = mongoose.model("Chat", chatSchema);
 export default Chat;

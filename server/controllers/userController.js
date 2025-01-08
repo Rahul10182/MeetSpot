@@ -45,10 +45,29 @@ export const authenticate = async (req, res) => {
 // Controller to get user details using firebaseId
 export const getUserFireBaseId = async (req, res) => {
     try {
-        const { firebaseID } = req.body; // Get firebaseId from the request body
+        const { firebaseId } = req.body; // Get firebaseId from the request body
 
         // Find the user by firebaseId
-        const user = await User.findOne({ fireBaseId:firebaseID });
+        const user = await User.findOne({ fireBaseId:firebaseId });
+
+        if (!user) {
+            return res.status(404).json({ message: "User not found" });
+        }
+
+        // Return the user data
+        res.status(200).json(user);
+    } catch (error) {
+        // Catch any errors and return a 500 status
+        res.status(500).json({ error: error.message });
+    }
+};
+
+export const getUserFromId = async (req, res) => {
+    try {
+        const { userId } = req.params; // Get userId from the request body
+
+        // Find the user by userId
+        const user = await User.findById({_id:userId});
 
         if (!user) {
             return res.status(404).json({ message: "User not found" });

@@ -32,7 +32,7 @@ function AuthRegister() {
       try {
           const result = await firebase.signupUserWithEmailAndPassword(email, password);
           if(result){
-            navigate('/');
+            navigate('/home');
           }
       } catch (err) {
           setError(err.message);
@@ -44,7 +44,7 @@ function AuthRegister() {
     try {
         const result = await firebase.signUpWithGoogle();
         if(result)
-          navigate('/');
+          navigate('/home');
     } catch (err) {
         setError(err.message);
     }

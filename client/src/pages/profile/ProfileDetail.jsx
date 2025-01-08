@@ -80,7 +80,7 @@ const UserDashboard = () => {
             <aside className="w-64 bg-gradient-to-r from-pink-500 to-purple-500 text-white shadow-lg p-6">
                 <div className="text-center mb-8">
                     <button 
-                        onClick={() => navigate('/')} 
+                        onClick={() => navigate('/home')} 
                         className="text-center text-3xl font-semibold mx-4 whitespace-nowrap transition-all duration-200 focus:outline-none"
                     >
                         MeetSpot

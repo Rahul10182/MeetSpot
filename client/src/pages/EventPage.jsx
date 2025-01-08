@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Box, Typography, Card, CardContent, Grid, Button, Modal, TextField } from '@mui/material';
 import axios from 'axios';
-import Header from '../components/Homepage/Navbar';
 
 const EventsPage = () => {
   const [events, setEvents] = useState([]);
@@ -56,10 +55,9 @@ const EventsPage = () => {
     <Box
       sx={{
         minHeight: '100vh',
-        background: 'linear-gradient(to right, #ff7e5f, #feb47b)', // Gradient background
+        backgroundColor: '#f4f7fb', // Subtle light gray background
       }}
     >
-      <Header />
       <Box sx={{ p: 8 }}>
         <Typography variant="h3" align="center" fontWeight="bold" color="primary" gutterBottom>
           All Events
@@ -69,10 +67,14 @@ const EventsPage = () => {
             <Grid item xs={12} sm={6} md={4} key={event._id}>
               <Card
                 sx={{
-                  height: 450,
-                  boxShadow: 4,
-                  transition: 'transform 0.3s ease-in-out',
-                  '&:hover': { transform: 'scale(1.05)' },
+                  height: '100%',
+                  boxShadow: 3,
+                  borderRadius: 2,
+                  overflow: 'hidden',
+                  transition: 'transform 0.3s ease-in-out, box-shadow 0.3s ease',
+                  '&:hover': { transform: 'scale(1.05)', boxShadow: 6 },
+                  display: 'flex',
+                  flexDirection: 'column',
                 }}
               >
                 <Box
@@ -81,28 +83,35 @@ const EventsPage = () => {
                     height: 200,
                     width: '100%',
                     objectFit: 'cover',
-                    borderRadius: '4px 4px 0 0',
+                    borderBottom: '2px solid #f1f1f1',
                   }}
                   src={event.photoUrl}
                   alt={event.eventName}
                 />
-                <CardContent>
-                  <Typography variant="h5" component="div" color="textPrimary" gutterBottom>
+                <CardContent sx={{ flexGrow: 1 }}>
+                  <Typography variant="h5" component="div" color="textPrimary" fontWeight="bold" gutterBottom>
                     {event.eventName}
                   </Typography>
-                  <Typography variant="body2" color="textSecondary">
+                  <Typography variant="body2" color="textSecondary" sx={{ mb: 2 }}>
                     {event.description}
                   </Typography>
-                  <Typography variant="body2" color="textSecondary" sx={{ mt: 2 }}>
-                    Location: {event.location}
-                  </Typography>
                   <Typography variant="body2" color="textSecondary">
-                    Date: {event.beginDate} - {event.endDate}
+                    <strong>Location:</strong> {event.location}
+                  </Typography>
+                  <Typography variant="body2" color="textSecondary" sx={{ mb: 2 }}>
+                    <strong>Date:</strong> {event.beginDate} - {event.endDate}
                   </Typography>
                   <Button
                     variant="contained"
-                    color="primary"
-                    sx={{ mt: 2 }}
+                    sx={{
+                      mt: 2,
+                      boxShadow: 2,
+                      backgroundColor: '#f48fb1', // Pink 300 color
+                      '&:hover': {
+                        backgroundColor: '#f06292', // Darker pink on hover
+                      },
+                    }}
+                  
                     onClick={() => handleOpenModal(event)}
                   >
                     Register
@@ -148,7 +157,14 @@ const EventsPage = () => {
             onChange={(e) => setFriendEmail(e.target.value)}
             sx={{ mb: 2 }}
           />
-          <Button variant="contained" color="primary" fullWidth onClick={handleRegister}>
+          <Button variant="contained" sx={{
+                      mt: 2,
+                      boxShadow: 2,
+                      backgroundColor: '#f48fb1', // Pink 300 color
+                      '&:hover': {
+                        backgroundColor: '#f06292', // Darker pink on hover
+                      },
+                    }}  onClick={handleRegister}>
             Submit Registration
           </Button>
         </Box>

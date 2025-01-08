@@ -1,20 +1,19 @@
-import { Message } from "../models/messageModel.js";
-import { Chat } from "../models/chatModel.js";
+import  Message  from "../models/messageModel.js";
+import Chat  from "../models/chatModel.js";
 import { User } from "../models/userModel.js"; 
 
 // Send a message in a chat
 export const sendMessage = async (req, res) => {
-  const { chatId, senderEmail, content } = req.body;  // Use senderEmail instead of senderId
+  const { message } = req.body;  // Use senderId
+  const { chatId, senderId, content } = message;
 
   try {
-    // Find the sender by their email
-    const sender = await User.findOne({ email: senderEmail });
 
-    if (!sender) {
+    if (!senderId) {
       return res.status(404).json({ error: "Sender not found." });
     }
 
-    const senderId = sender._id;
+
 
     // Verify the chat exists
     const chat = await Chat.findById(chatId);
@@ -22,6 +21,7 @@ export const sendMessage = async (req, res) => {
     if (!chat) {
       return res.status(404).json({ error: "Chat not found." });
     }
+    
 
     // Create a new message
     const message = new Message({
@@ -32,10 +32,6 @@ export const sendMessage = async (req, res) => {
 
     // Save the message
     await message.save();
-
-    // Update the chat's last message
-    chat.lastMessage = message._id;
-    await chat.save();
 
     // Populate the sender details for immediate response
     const populatedMessage = await message.populate('sender', '_id name');
