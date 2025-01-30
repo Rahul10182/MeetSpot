@@ -1,11 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
 import {
-    Avatar, Typography, TextField, Divider, AppBar, Toolbar,
+    Avatar, Typography, TextField, Divider, AppBar, Toolbar, IconButton,
     List, ListItem, ListItemText, ListItemIcon, Card, CardContent, Button, InputAdornment
 } from '@mui/material';
-import CalendarTodayIcon from '@mui/icons-material/CalendarToday'; // Import new icon
-
-import { Settings, Dashboard, Notifications, AccountCircle, Event, Search, LocationOn } from '@mui/icons-material';
+import { CalendarToday, Settings, Dashboard, Notifications, AccountCircle, Event, Search, LocationOn } from '@mui/icons-material';
 import { useNavigate, useLocation, Outlet } from 'react-router-dom';
 import axios from 'axios';
 
@@ -27,7 +25,7 @@ const UserDashboard = () => {
         if (query.trim()) {
             try {
                 const response = await axios.post('http://localhost:3000/search', { email: query });
-                setSearchResults(response.data.users); 
+                setSearchResults(response.data.users);
             } catch (error) {
                 console.error('Error searching for people:', error);
             }
@@ -72,86 +70,78 @@ const UserDashboard = () => {
         };
     }, []);
 
-    // Pages where "Welcome, User" and search should appear
     const showHeader = ['/profile/dashboard', '/profile/friends/old'].includes(currentPath);
 
     return (
-        <div className="min-h-screen flex bg-white relative">
-            <aside className="w-64 bg-gradient-to-r from-pink-500 to-purple-500 text-white shadow-lg p-6">
+        <div className="min-h-screen flex bg-gray-50">
+            {/* Sidebar */}
+            <aside className="w-64 bg-gradient-to-r from-pink-400 to-pink-400 p-6 text-white flex flex-col shadow-xl rounded-xl">
                 <div className="text-center mb-8">
-                    <button 
-                        onClick={() => navigate('/home')} 
-                        className="text-center text-3xl font-semibold mx-4 whitespace-nowrap transition-all duration-200 focus:outline-none"
-                    >
+                    <button onClick={() => navigate('/home')} className="text-3xl font-extrabold hover:text-pink-200 transition-colors">
                         MeetSpot
                     </button>
-                    <br />
-                    <br />
                 </div>
-                <Divider className="my-4 border-indigo-400" />
-                <nav>
-                    <List className="cursor-pointer">
-                        {[
-                            { text: 'Dashboard', icon: <Dashboard />, path: '/profile/dashboard' },
-                            { text: 'Friends', icon: <AccountCircle />, path: '/profile/friends/old' },
-                            { text: 'Notifications', icon: <Notifications />, path: '/profile/notifications' },
-                            { text: 'Create Event', icon: <Event />, path: '/profile/createevent' },
-                            { text: 'Meetings', icon: <CalendarTodayIcon fontSize="medium" />, path: '/profile/ScheduledMeetings' },
-                            { text: 'Famous Events', icon: <LocationOn />, path: '/profile/famousEvents' }
-                        ].map((item, index) => (
-                            <ListItem
-                                button
-                                key={index}
-                                className="mb-2 rounded-lg hover:bg-indigo-700 transition duration-150 ease-in-out"
-                                onClick={() => navigate(item.path)}
-                            >
-                                <ListItemIcon className="text-white">
-                                    {item.icon}
-                                </ListItemIcon>
-                                <ListItemText primary={item.text} className="text-white font-semibold" />
-                            </ListItem>
-                        ))}
+                <Divider className="my-4 border-white" />
+                <nav className="flex-1">
+                    <List>
+                        {[{ text: 'Dashboard', icon: <Dashboard />, path: '/profile/dashboard' },
+                          { text: 'Friends', icon: <AccountCircle />, path: '/profile/friends/old' },
+                          { text: 'Notifications', icon: <Notifications />, path: '/profile/notifications' },
+                          { text: 'Create Event', icon: <Event />, path: '/profile/Event/create' },
+                          { text: 'Meetings', icon: <CalendarToday />, path: '/profile/show-meet/user' }]
+                          .map((item, index) => (
+                              <ListItem
+                                  button
+                                  key={index}
+                                  className={`px-4 py-2 rounded-lg hover:bg-pink-700 hover:bg-opacity-30 transition-all ${currentPath === item.path ? 'bg-pink-700 bg-opacity-40' : ''}`}
+                                  onClick={() => navigate(item.path)}
+                              >
+                                  <ListItemIcon className="text-white">
+                                      {item.icon}
+                                  </ListItemIcon>
+                                  <ListItemText primary={item.text} className="text-white font-semibold" />
+                              </ListItem>
+                          ))}
                     </List>
                 </nav>
             </aside>
 
-            <main className={`flex-1 p-8 bg-gradient-to-r from-pink-200 to-pink-400 ${showHeader ? 'mt-0' : 'mt-0'}`}>
+            {/* Main Content */}
+            <main className={`flex-1 p-8 ${showHeader ? 'pt-16' : ''} bg-gray-100 rounded-xl`}>
                 {showHeader && (
-                    <AppBar position="static" color="transparent" elevation={0} className="bg-pink-500 shadow-sm mb-6">
-                        <Toolbar className="flex justify-between">
-                            <div className="font-bold text-blue-500 text-4xl">
-                                <Typography variant="h5" className="font-extrabold text-xl h-8 text-pink-600">
-                                    Welcome, {name || "User"}
-                                </Typography>
-                            </div>
-                            <div className="flex items-center space-x-4 relative" ref={searchRef}>
+                    <AppBar position="static" color="transparent" elevation={0} className="sticky top-0 z-10">
+                        <Toolbar className="flex justify-between p-4">
+                            <Typography variant="h5" className="font-bold text-pink-600">
+                                Welcome, {name || "User"}
+                            </Typography>
+                            <div className="ml-auto relative w-1/4" ref={searchRef}>
                                 <TextField
                                     variant="outlined"
                                     size="small"
                                     placeholder="Search for friend"
-                                    className="bg-gray-200 border-8 rounded-lg w-80"
+                                    className="w-full bg-white rounded-lg shadow-lg"
                                     value={searchQuery}
                                     onChange={handleSearchChange}
                                     InputProps={{
                                         startAdornment: (
                                             <InputAdornment position="start">
-                                                <Search className="text-gray-400" />
+                                                <Search className="text-gray-500" />
                                             </InputAdornment>
                                         ),
                                     }}
                                 />
                                 {searchResults.length > 0 && (
-                                    <div className="absolute left-0 right-0 bg-white shadow-lg mt-72 rounded-md z-10 max-h-60 overflow-y-auto w-72 sm:w-80">
+                                    <div className="absolute top-12 left-0 right-0 bg-white shadow-xl rounded-lg max-h-72 overflow-y-auto z-10">
                                         {searchResults.map((user) => (
-                                            <Card key={user._id} className="mb-2">
+                                            <Card key={user._id} className="mb-4 hover:scale-105 transition-transform ease-in-out duration-300 shadow-lg">
                                                 <CardContent>
-                                                    <Typography variant="h6">{user.fullName}</Typography>
-                                                    <Typography variant="body2">{user.email}</Typography>
+                                                    <Typography variant="h6" className="font-semibold">{user.fullName}</Typography>
+                                                    <Typography variant="body2" className="text-gray-600">{user.email}</Typography>
                                                     <Button 
                                                         variant="contained" 
                                                         color="primary" 
                                                         fullWidth 
-                                                        className="mt-2"
+                                                        className="mt-4"
                                                         onClick={() => handleAddFriend(user.fireBaseId)}
                                                     >
                                                         Add Friend
@@ -166,7 +156,9 @@ const UserDashboard = () => {
                     </AppBar>
                 )}
 
-                <Outlet />
+                <div className="px-4 py-6">
+                    <Outlet />
+                </div>
             </main>
         </div>
     );

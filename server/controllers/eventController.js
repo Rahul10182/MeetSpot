@@ -13,24 +13,41 @@ export const getAllEvents = async (req, res) => {
 
 export const createEvent = async (req, res) => {
     try {
-        const {
-            eventName,
-            eventType,
-            status,
-            location,
-            photoUrl,
-            description,
-            beginDate,
-            beginTime,
-            endDate,
-            endTime,
-            firebaseID
-        } = req.body;
+        
+        const dataToSubmit = req.body;
 
-        if (!eventName || !location || !beginDate || !endDate || !firebaseID) {
+        const eventName = dataToSubmit.eventName;
+        const eventType = dataToSubmit.eventType;
+        const status = dataToSubmit.status;
+        const locationName = dataToSubmit.locationName;
+        const eventLocation = dataToSubmit.eventLocation;
+        const photoUrl = dataToSubmit.photoUrl;
+        const description = dataToSubmit.description;
+        const beginDate = dataToSubmit.beginDate;
+        const beginTime = dataToSubmit.beginTime;
+        const endDate = dataToSubmit.endDate;
+        const endTime = dataToSubmit.endTime;
+        const firebaseID = dataToSubmit.firebaseID;
+        if (
+            !eventName || 
+            !locationName || 
+            !eventLocation?.lat || 
+            !eventLocation?.lng || 
+            !beginDate || 
+            !endDate || 
+            !firebaseID
+        ) {
             return res.status(400).json({ message: 'Please provide all required fields.' });
         }
 
+        // Construct the location object
+        const location = {
+            name: locationName,
+            latitude: eventLocation.lat,  // Access lat
+            longitude: eventLocation.lng, // Access lng
+        };
+
+        // Create a new Event instance
         const newEvent = new Event({
             eventName,
             eventType,
@@ -45,7 +62,6 @@ export const createEvent = async (req, res) => {
             firebaseID,
         });
 
-        // Save the event to the database
         const savedEvent = await newEvent.save();
 
         res.status(201).json({
@@ -56,6 +72,7 @@ export const createEvent = async (req, res) => {
         res.status(500).json({ message: 'Error creating event', error });
     }
 };
+
 export const registerForEvent = async (req, res) => {
     const { eventId, userEmail, friendEmail } = req.body;
     console.log(eventId)
@@ -92,5 +109,82 @@ export const registerForEvent = async (req, res) => {
     } catch (error) {
       console.error("Error registering for event:", error);
       res.status(500).json({ message: "Error registering for event", error });
+    }
+  };
+
+
+export const getUserEvent = async (req, res) => {
+    const { firebaseID } = req.body;
+  
+    if (!firebaseID) {
+      return res.status(400).json({ message: 'Firebase ID is required' });
+    }
+  
+    try {
+      const events = await Event.find({ firebaseID });
+      if (events.length === 0) {
+        return res.status(404).json({ message: 'No events found for this Firebase ID' });
+      }
+      res.status(200).json(events);
+    } catch (error) {
+      res.status(500).json({ message: 'Error fetching events', error });
+    }
+  };
+
+  export const deleteEvent = async (req, res) => {
+    const { eventId } = req.params;
+  
+    try {
+      const deletedEvent = await Event.findByIdAndDelete(eventId);
+  
+      if (!deletedEvent) {
+        return res.status(404).json({ message: 'Event not found' });
+      }
+  
+      return res.status(200).json({ message: 'Event deleted successfully' });
+    } catch (error) {
+      console.error('Error deleting event:', error);
+      return res.status(500).json({ message: 'Server error, unable to delete event' });
+    }
+  };
+
+  export const getEventById = async (req, res) => {
+    const { eventId } = req.params;
+  
+    try {
+      const event = await Event.findById(eventId);
+  
+      if (!event) {
+        return res.status(404).json({ message: 'Event not found' });
+      }
+  
+      return res.status(200).json(event);
+    } catch (error) {
+      console.error('Error fetching event:', error);
+      return res.status(500).json({ message: 'Server error, unable to fetch event' });
+    }
+  };
+
+  export const updateEvent = async (req, res) => {
+    try {
+      const { eventId } = req.params; 
+      const updateData = req.body;  
+  
+      const updatedEvent = await Event.findByIdAndUpdate(eventId, updateData, { 
+        new: true,            
+        runValidators: true,         
+      });
+  
+      if (!updatedEvent) {
+        return res.status(404).json({ message: "Event not found" });
+      }
+  
+      res.status(200).json({
+        message: "Event updated successfully",
+        updatedEvent,
+      });
+    } catch (error) {
+      console.error("Error updating event:", error);
+      res.status(500).json({ message: "Internal server error", error: error.message });
     }
   };

@@ -104,3 +104,55 @@ export const sendMail = async (req, res) => {
   }
 };
 
+export const contactMail = async (req, res) => {
+  // Extract the email data from the request body
+  const formData = req.body;
+  console.log(formData);
+
+  // Check for required fields
+  if (!formData.firstName || !formData.email || !formData.phone || !formData.message) {
+    return res.status(400).json({ message: 'Missing required fields' });
+  }
+
+  // Configure the nodemailer transporter
+  const transporter = nodemailer.createTransport({
+    service: 'gmail', // Or another email service like Outlook, Yahoo
+    host: process.env.MAIL_HOST,
+      auth: {
+        user: process.env.MAIL_USER,
+        pass: process.env.MAIL_PASS,
+      },
+      secure: false,
+  });
+
+  // Construct the email body
+  const emailBody = `
+    You have received a new contact request from your website:
+
+    Name: ${formData.firstName} ${formData.lastName || ''}
+    Email: ${formData.email}
+    Phone: ${formData.phone}
+    Message: 
+    ${formData.message}
+
+    Regards,
+    MeetSpot Contact Form
+  `;
+
+  // Configure the email options
+  const mailOptions = {
+    from: `"MeetSpot Contact Form" <${process.env.MAIL_USER}>`, // Display name and sender's email
+    to: 'meetspot652882@gmail.com', // Recipient email
+    subject: `New Contact Request from ${formData.firstName}`, // Email subject
+    text: emailBody, // Plain text body
+  };
+
+  try {
+    // Send the email using nodemailer
+    await transporter.sendMail(mailOptions);
+    res.status(200).json({ message: 'Email sent successfully' });
+  } catch (error) {
+    console.error('Error sending email:', error);
+    res.status(500).json({ message: 'Failed to send email', error: error.message });
+  }
+};

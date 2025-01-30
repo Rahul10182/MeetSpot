@@ -18,6 +18,7 @@ import Chat from "./models/chatModel.js";
 import notificationRoutes from "./routes/notificationRoutes.js"
 import messageRoutes from "./routes/messageRoutes.js"
 import mailRoutes from "./routes/mailRoutes.js"
+import meetingRoutes from "./routes/meetingRoutes.js"
 
 dotenv.config();
 connectDB();
@@ -53,6 +54,7 @@ app.use('/api/v1/chat', chatRoutes);
 app.use("/notifications", notificationRoutes);
 app.use('/api/v1/mail', mailRoutes);
 app.use('/api/v1/message', messageRoutes);
+app.use('/api/v1/meeting', meetingRoutes);
 
 
 

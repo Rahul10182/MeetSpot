@@ -17,8 +17,6 @@ const venueSchema = new mongoose.Schema({
     },
   },
   address: { type: String, required: true, trim: true },
-  lastVisited: { type: Date, default: null },
-  // Adjust 'time' to store as Date if possible or use a more structured string
   
   photo: { 
     type: String, 
@@ -30,21 +28,24 @@ const venueSchema = new mongoose.Schema({
       message: 'Invalid URL format for photo',
     },
   },
-  // Use a Date field for `date`, which allows combining with `time` easily
-  date: { 
-    type: Date, 
-    required: true,
-    // Automatically handle date-time validation
-    set: function(value) {
-      // This can be customized based on how you're combining the date and time in the application
-      return new Date(value);
+  reviews: [
+    {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Review' // Reference to the Review model
     }
-  },
-  user: { type: String, ref: 'User', required: true },
-  friend: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+],
+meetings: [
+    {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Meeting' // Reference to the Meeting model
+    }
+],
+visitedBy: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User' // Reference to the User who visited
+}
 }, { timestamps: true });
 
 venueSchema.index({ location: '2dsphere' });
-venueSchema.index({ firebaseId: 1, friendFirebaseId: 1 }); // Compound index
 
 export default mongoose.model('Venue', venueSchema);

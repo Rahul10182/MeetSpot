@@ -22,13 +22,13 @@ const TouristPlaces = () => {
   useEffect(() => {
     const interval = setInterval(() => {
       setIndex((prevIndex) => (prevIndex + 1) % touristPlaces.length);
-    }, 7000); // Change image every 7 seconds for slower animation
+    }, 5000); // Change image every 5 seconds
     return () => clearInterval(interval);
   }, []);
 
   const variants = {
     hidden: { opacity: 0 },
-    visible: { opacity: 1, transition: { duration: 2.5, ease: "easeOut" } }, // Slower animation
+    visible: { opacity: 1, transition: { duration: 0.8, ease: "easeInOut" } }, // Faster transition
   };
 
   return (
@@ -63,7 +63,7 @@ const TouristPlaces = () => {
         />
 
         {/* Place Details */}
-        <Box className="relative z-10 text-center p-4 text-white w-full bottom-0 left-0  mb-10">
+        <Box className="relative z-10 text-center p-4 text-white w-full bottom-0 left-0 mb-10">
           <Typography
             variant="h3"
             className="font-bold"

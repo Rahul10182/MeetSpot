@@ -9,10 +9,10 @@ import isAuthenticated from '../middlewares/Auth.js';
 
 const router = express.Router();
 
-router.route("/create").post(isAuthenticated, createReview);
-router.route("/update/:reviewId").put(isAuthenticated, updateReview);
-router.route("/delete/:reviewId").delete(isAuthenticated, deleteReview);
+router.route("/create").post( createReview);
+router.route("/update").put( updateReview);
+router.route("/delete").delete( deleteReview);
 
-router.route("/get/:venueId/reviews").get(isAuthenticated, getVenueReviews);
+router.route("/get").get( getVenueReviews);
 
 export default router;

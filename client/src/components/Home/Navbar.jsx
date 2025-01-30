@@ -2,8 +2,16 @@ import React from "react";
 import { Box, IconButton, Typography } from "@mui/material";
 import NotificationsIcon from "@mui/icons-material/Notifications";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
+import { useNavigate } from "react-router-dom";
 
 const Navbar = ({ showChat, handleAccountIconClick }) => {
+
+  const navigate = useNavigate();
+
+  const handleClick = () => {
+    navigate("/home");
+  };
+
   return (
     
       <Box
@@ -23,9 +31,15 @@ const Navbar = ({ showChat, handleAccountIconClick }) => {
           },
         }}
       >
-        <Typography variant="h5" className="text-white font-bold">
+        <Typography
+          variant="h5"
+          className="text-white font-bold"
+          onClick={handleClick} // Attach the onClick handler
+          style={{ cursor: "pointer" }} // Optionally, add pointer cursor to indicate it's clickable
+        >
           MeetSpot
         </Typography>
+
 
         <Box sx={{ display: "flex", alignItems: "center" }}>
           {/* Notification Button */}

@@ -1,11 +1,21 @@
-import React, { useEffect, useRef, useState } from 'react'
-import { Link } from 'react-router-dom';
-import { userChats } from '../../api/ChatRequest'
-import Conversation from '../../components/Conversations/Conversation'
-import HomeIcon from '@mui/icons-material/Home';
-import {Box, Typography, Paper, List, ListItemButton, Avatar, Divider, IconButton,} from '@mui/material';
+import React, { useEffect, useRef, useState } from 'react';
+import { userChats } from '../../api/ChatRequest';
+import Conversation from '../../components/Conversations/Conversation';
 import ChatBox from '../../components/ChatBox/ChatBox';
 import io from 'socket.io-client';
+import {
+    Box,
+    Grid,
+    Typography,
+    Paper,
+    List,
+    ListItemButton,
+    Avatar,
+    Divider,
+    IconButton,
+    Badge,
+} from '@mui/material';
+import HomeIcon from '@mui/icons-material/Home';
 
 const Chatt = () => {
     const [chats, setChats] = useState([]);
@@ -15,62 +25,44 @@ const Chatt = () => {
     const [recieveMessage, setRecieveMessage] = useState(null);
     const socket = useRef();
 
-    //take the user from the local storage
     const user = JSON.parse(localStorage.getItem("user"));
-    //console.log(user);
     const firebaseId = user ? user.firebaseID : null;
-    //console.log(firebaseId);
 
-
-    //socket connection to the server
     useEffect(() => {
-        // Establish socket connection
         socket.current = io("http://localhost:8800");
 
         if (user && user.id) {
-            // console.log("Sending user ID:", user.id);
-            socket.current.emit("new-user-add", user.id); // Send user ID to server
+            socket.current.emit("new-user-add", user.id);
         }
 
-        // Listen for updates to the online users list
         socket.current.on("get-users", (users) => {
             setOnlineUsers(users);
-            // console.log("Online Users:", users);
         });
 
-        // Cleanup function to remove listeners on component unmount
         return () => {
             if (socket.current) {
-                socket.current.disconnect(); // Disconnect socket on unmount
+                socket.current.disconnect();
             }
         };
     }, [user.id]);
 
-    //send message to the socket server 
     useEffect(() => {
-        if(sendMessage !== null) {
-            console.log("Sending message:", sendMessage);
+        if (sendMessage !== null) {
             socket.current.emit("send-message", sendMessage);
         }
-    },[sendMessage]);
+    }, [sendMessage]);
 
-    //recieve message from the socketserver
     useEffect(() => {
         if (socket.current) {
             socket.current.on("recieve-message", (data) => {
-                console.log("Received message:", data);
                 setRecieveMessage(data);
             });
         }
     }, []);
 
     useEffect(() => {
-        // fetch all user chats
         const fetchChats = async () => {
             try {
-                const user = JSON.parse(localStorage.getItem("user"));
-                const firebaseId = user ? user.firebaseID : null;
-
                 if (!firebaseId) {
                     console.error("Firebase ID is missing");
                     return;
@@ -78,20 +70,17 @@ const Chatt = () => {
 
                 const response = await userChats(firebaseId);
 
-
                 if (!Array.isArray(response.data)) {
                     console.error("Chats data is not an array or is missing.");
                     return;
                 }
 
-                // Filter out duplicate chats
                 const uniqueChats = response.data.filter((chat, index, self) => {
                     const participantKey = chat.participants
                         .map(participant => participant._id)
-                        .sort() // Sort to ensure the same key for both orders
-                        .join('-'); // Combine into a single string as a unique key
+                        .sort()
+                        .join('-');
 
-                    // Find the first chat with this key
                     return (
                         index ===
                         self.findIndex(
@@ -104,11 +93,7 @@ const Chatt = () => {
                     );
                 });
 
-                // Update the chats state with unique chats
                 setChats(uniqueChats);
-                console.log("API Response:", uniqueChats);
-
-                // console.log("Unique Chats:", uniqueChats);
             } catch (error) {
                 console.error("Error fetching chats:", error);
             }
@@ -122,54 +107,92 @@ const Chatt = () => {
         const online = onlineUsers.find((user) => user.userId === chatMember._id);
         return online ? true : false;
     };
+
     return (
-        <Box display="flex" height="100vh" bgcolor="background.paper">
+        <Grid container height="100vh">
             {/* Sidebar */}
-            <Paper
-                elevation={3}
-                sx={{
-                    width: '25%',
-                    padding: 2,
-                    backgroundColor: 'grey.100',
-                    overflowY: 'auto',
-                }}
-            >
-                <Typography variant="h6" fontWeight="bold" gutterBottom>
-                    Chats
-                </Typography>
-                <Divider sx={{ mb: 2 }} />
-                <List>
-                    {chats.map((chat,index) => (
+            <Grid item xs={3} sx={{
+                backgroundColor: '#F4F4F6',
+                borderRight: '4px solid #E0E0E0',
+                overflowY: 'auto',
+            }}>
+                <Box padding={2}>
+                    <Typography variant="h5" fontWeight="bold" gutterBottom className=' flex justify-center text-pink-700'>
+                        Chats
+                    </Typography>
+                    <Divider sx={{ mb: 2 }} />
+                    <List>
+                    {chats.map((chat, index) => (
                         <ListItemButton
-                            key={chat.id || `chat-${index}`}
-                            onClick={() => setCurrentChat(chat)}
-                            sx={{
-                                borderRadius: 2,
-                                '&:hover': { backgroundColor: 'grey.200' },
-                            }}
+                        className="hover"
+                        key={chat.id || `chat-${index}`}
+                        onClick={() => setCurrentChat(chat)}
+                        sx={{
+                            borderRadius: 2,
+                            mb: 1,
+                            '&:hover': { backgroundColor: '#E2E8F0' },
+                            padding: 1, // Reduce padding to make buttons shorter
+                            minHeight: '48px', // Set a minimum height to reduce overall height
+                            display: 'flex',
+                            alignItems: 'center',
+                        }}
                         >
-                            <Conversation
-                                data={chat}
-                                currentUser={user.id}
-                                online={checkOnlineStatus(chat)}
-                            />
+                        <Conversation
+                            data={chat}
+                            currentUser={user.id}
+                            online={checkOnlineStatus(chat)}
+                            style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            textDecoration: 'none', // Remove any default underline/line styles
+                            }}
+                        />
                         </ListItemButton>
                     ))}
-                </List>
-            </Paper>
+                    </List>
+
+                </Box>
+            </Grid>
 
             {/* Chat Section */}
-            <Box flex={1} padding={3} display="flex" flexDirection="column">
-
-                <ChatBox
-                    chat={currentChat}
-                    currentUser={user.id}
-                    setSendMessage={setSendMessage}
-                    recieveMessage={recieveMessage}
-                />
-            </Box>
-        </Box>
+            <Grid item xs={9} display="flex" flexDirection="column" bgcolor="white">
+                {currentChat ? (
+                    <Box flex={1} display="flex" flexDirection="column" padding={3}>
+                        <ChatBox
+                            chat={currentChat}
+                            currentUser={user.id}
+                            setSendMessage={setSendMessage}
+                            recieveMessage={recieveMessage}
+                        />
+                    </Box>
+                ) : (
+                    <Box
+                        flex={1}
+                        display="flex"
+                        alignItems="center"
+                        justifyContent="center"
+                        flexDirection="column"
+                        bgcolor="#F4F4F6"
+                    >
+                        <Typography variant="h5" fontWeight="bold" color="textSecondary">
+                            Select a chat to start messaging
+                        </Typography>
+                        <Avatar
+                            sx={{
+                                width: 100,
+                                height: 100,
+                                backgroundColor: '#E0E7FF',
+                                mt: 2,
+                                fontSize: 50,
+                            }}
+                        >
+                            💬
+                        </Avatar>
+                    </Box>
+                )}
+            </Grid>
+        </Grid>
     );
-}
+};
 
 export default Chatt;
