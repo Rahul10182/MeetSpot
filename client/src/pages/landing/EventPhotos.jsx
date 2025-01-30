@@ -3,6 +3,7 @@ import Typewriter from "typewriter-effect";
 import { Container, Typography, Box, Grid } from "@mui/material";
 import { motion } from "framer-motion";
 
+// Sample event data
 const eventPhotos = [
   { name: "Concerts", src: "https://plus.unsplash.com/premium_photo-1681830630610-9f26c9729b75?q=80&w=2940&auto=format&fit=crop" },
   { name: "Festivals", src: "https://images.unsplash.com/photo-1728535196944-58deb0547cb3?q=80&w=2880&auto=format&fit=crop" },
@@ -17,15 +18,34 @@ const eventPhotos = [
 const Events = () => {
   return (
     <Container maxWidth="lg" className="py-20 relative">
-      <Box className="absolute inset-0 -z-10 bg-gradient-to-r from-indigo-900 via-purple-800 to-blue-600 opacity-40 blur-2xl" />
+      {/* Decorative Background */}
+      <Box className="absolute inset-0 -z-10 bg-gradient-to-r from-pink-300 via-purple-300 to-indigo-300 opacity-30 blur-3xl" />
 
       {/* Title Section */}
-      <Typography variant="h3" align="center" className="text-cyan-300 font-bold mb-10 neon-text">
-        <motion.div initial={{ opacity: 0, y: -30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 1 }}>
-          <Typewriter options={{
-            strings: ["Explore Events That Define the Future", "Concerts", "Festivals", "Sports Events"],
-            autoStart: true, loop: true, delay: 75, cursor: "█",
-          }} />
+      <Typography
+        variant="h3"
+        align="center"
+        className="text-pink-500 font-bold mb-6 relative"
+      >
+        <motion.div
+          initial={{ opacity: 0, y: -30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 1 }}
+        >
+          <Typewriter
+            options={{
+              strings: [
+                "Various Types Of Events Based On Your Interest",
+                "Concerts",
+                "Festivals",
+                "Sports Events",
+              ],
+              autoStart: true,
+              loop: true,
+              delay: 75,
+              cursor: "|",
+            }}
+          />
         </motion.div>
       </Typography>
 
@@ -40,23 +60,24 @@ const Events = () => {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.6, delay: index * 0.2 }}
-                className="relative p-4 backdrop-blur-lg bg-white/10 border border-cyan-300 rounded-xl shadow-lg hover:shadow-cyan-400 transform transition-transform duration-300"
               >
-                {/* Event Image */}
-                <motion.img
-                  src={event.src}
-                  alt={event.name}
-                  className="w-full h-40 object-cover rounded-lg shadow-md hover:shadow-xl"
-                  whileHover={{ scale: 1.05 }}
-                  transition={{ duration: 0.5 }}
-                />
-                {/* Event Name */}
-                <Typography
-                  variant="h6"
-                  className="font-semibold mt-4 text-center text-cyan-300 uppercase neon-text"
-                >
-                  {event.name}
-                </Typography>
+                <Box className="p-4 bg-white rounded-xl shadow-xl hover:shadow-2xl transform transition-transform duration-300">
+                  {/* Event Image */}
+                  <motion.img
+                    src={event.src}
+                    alt={event.name}
+                    className="w-full h-40 object-cover rounded-lg"
+                    whileHover={{ scale: 1.05 }}
+                    transition={{ duration: 0.5 }}
+                  />
+                  {/* Event Name */}
+                  <Typography
+                    variant="h6"
+                    className="font-semibold mt-4 text-center text-purple-700"
+                  >
+                    {event.name}
+                  </Typography>
+                </Box>
               </motion.div>
             </Grid>
           ))}
@@ -65,9 +86,13 @@ const Events = () => {
 
       {/* Footer Animation */}
       <Box className="mt-10 text-center">
-        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 1.5, delay: 0.5 }}>
-          <Typography variant="body1" className="text-gray-400 italic">
-            Step into the future. Experience the extraordinary.
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 1.5, delay: 0.5 }}
+        >
+          <Typography variant="body1" className="text-gray-600">
+            Discover your next favorite event and make unforgettable memories!
           </Typography>
         </motion.div>
       </Box>
