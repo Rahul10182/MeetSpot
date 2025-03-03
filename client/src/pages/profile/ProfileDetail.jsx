@@ -3,19 +3,8 @@ import {
     Avatar, Typography, TextField, Divider, AppBar, Toolbar, IconButton,
     List, ListItem, ListItemText, ListItemIcon, Card, CardContent, Button, InputAdornment
 } from '@mui/material';
-<<<<<<< HEAD
-<<<<<<< HEAD
-import { Settings, Dashboard, Notifications, AccountCircle, Event, Search, LocationOn } from '@mui/icons-material';
-import { useNavigate, Outlet } from 'react-router-dom';
-=======
-import CalendarTodayIcon from '@mui/icons-material/CalendarToday'; // Import new icon
-
-import { Settings, Dashboard, Notifications, AccountCircle, Event, Search, LocationOn } from '@mui/icons-material';
-=======
 import { CalendarToday, Settings, Dashboard, Notifications, AccountCircle, Event, Search, LocationOn } from '@mui/icons-material';
->>>>>>> origin/anshul4
 import { useNavigate, useLocation, Outlet } from 'react-router-dom';
->>>>>>> origin/newanshul
 import axios from 'axios';
 
 const UserDashboard = () => {
@@ -52,19 +41,11 @@ const UserDashboard = () => {
         try {
             const response = await axios.post('http://localhost:3000/friend/sendreq', {
                 firebaseID1: firebaseID1,
-<<<<<<< HEAD
-                firebaseID2 : userId
-=======
                 firebaseID2: userId
->>>>>>> origin/newanshul
             });
 
             if (response.status === 201) {
                 console.log(`Friend request sent to user with ID: ${userId}`);
-<<<<<<< HEAD
-                // Optionally remove user from searchResults after adding
-=======
->>>>>>> origin/newanshul
                 setSearchResults(prevResults => prevResults.filter(user => user._id !== userId));
             } else {
                 console.log(`Failed to send friend request: ${response.data.message}`);
@@ -100,41 +81,6 @@ const UserDashboard = () => {
                         MeetSpot
                     </button>
                 </div>
-<<<<<<< HEAD
-                <Divider className="my-4 border-indigo-400" />
-                <nav>
-<<<<<<< HEAD
-                    <List className=' cursor-pointer'>
-                        {[{ text: 'Dashboard', icon: <Dashboard />, path: '/profile/dashboard' },
-                          { text: 'Friends', icon: <AccountCircle />, path: '/profile/friends/old' },
-                          { text: 'Notifications', icon: <Notifications />, path: '/profile/notifications' },
-                          { text: 'Create Event', icon: <Event />, path: '/profile/createevent' },
-                          { text: 'Venues', icon: <LocationOn />, path: '/profile/venues' }]
-                          .map((item, index) => (
-=======
-                    <List className="cursor-pointer">
-                        {[
-                            { text: 'Dashboard', icon: <Dashboard />, path: '/profile/dashboard' },
-                            { text: 'Friends', icon: <AccountCircle />, path: '/profile/friends/old' },
-                            { text: 'Notifications', icon: <Notifications />, path: '/profile/notifications' },
-                            { text: 'Create Event', icon: <Event />, path: '/profile/createevent' },
-                            { text: 'Meetings', icon: <CalendarTodayIcon fontSize="medium" />, path: '/profile/ScheduledMeetings' },
-                            { text: 'Famous Events', icon: <LocationOn />, path: '/profile/famousEvents' }
-                        ].map((item, index) => (
->>>>>>> origin/newanshul
-                            <ListItem
-                                button
-                                key={index}
-                                className="mb-2 rounded-lg hover:bg-indigo-700 transition duration-150 ease-in-out"
-                                onClick={() => navigate(item.path)}
-                            >
-                                <ListItemIcon className="text-white">
-                                    {item.icon}
-                                </ListItemIcon>
-                                <ListItemText primary={item.text} className="text-white font-semibold" />
-                            </ListItem>
-                        ))}
-=======
                 <Divider className="my-4 border-white" />
                 <nav className="flex-1">
                     <List>
@@ -156,70 +102,12 @@ const UserDashboard = () => {
                                   <ListItemText primary={item.text} className="text-white font-semibold" />
                               </ListItem>
                           ))}
->>>>>>> origin/anshul4
                     </List>
                 </nav>
             </aside>
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-            <main className="flex-1 p-8">
-                <AppBar position="static" color="transparent" elevation={0} className="bg-blue-500 shadow-sm mb-6">
-                    <Toolbar className="flex justify-between">
-                        <div>
-                        <Typography variant="h5" className="font-semibold text-blue-800">
-                            Welcome, {name || "User"}
-                        </Typography>
-                        
-                        </div>
-                        <div className="flex items-center space-x-4 relative" ref={searchRef}>
-                            <TextField
-                                variant="outlined"
-                                size="small"
-                                placeholder="Search for friend"
-                                className="bg-gray-100 rounded w-80"
-                                value={searchQuery}
-                                onChange={handleSearchChange} 
-                                InputProps={{
-                                    startAdornment: (
-                                        <InputAdornment position="start">
-                                            <Search className="text-gray-400" />
-                                        </InputAdornment>
-                                    ),
-                                }}
-
-                            />
-                            
-                            {searchResults.length > 0 && (
-                                <div className="absolute left-0 right-0 bg-white shadow-lg mt-72 rounded-md z-10 max-h-60 overflow-y-auto w-72 sm:w-80">
-                                    {searchResults.map((user) => (
-                                        <Card key={user._id} className="mb-2">
-                                            <CardContent>
-                                                <Typography variant="h6">{user.fullName}</Typography>
-                                                <Typography variant="body2">{user.email}</Typography>
-                                                <Button 
-                                                    variant="contained" 
-                                                    color="primary" 
-                                                    fullWidth 
-                                                    className="mt-2"
-                                                    onClick={() => handleAddFriend(user.fireBaseId)}
-                                                >
-                                                    Add Friend
-                                                </Button>
-                                            </CardContent>
-                                        </Card>
-                                    ))}
-                                </div>
-                            )}
-                        </div>
-                    </Toolbar>
-                </AppBar>
-=======
-            <main className={`flex-1 p-8 bg-gradient-to-r from-pink-200 to-pink-400 ${showHeader ? 'mt-0' : 'mt-0'}`}>
-=======
             {/* Main Content */}
             <main className={`flex-1 p-8 ${showHeader ? 'pt-16' : ''} bg-gray-100 rounded-xl`}>
->>>>>>> origin/anshul4
                 {showHeader && (
                     <AppBar position="static" color="transparent" elevation={0} className="sticky top-0 z-10">
                         <Toolbar className="flex justify-between p-4">
@@ -267,7 +155,6 @@ const UserDashboard = () => {
                         </Toolbar>
                     </AppBar>
                 )}
->>>>>>> origin/newanshul
 
                 <div className="px-4 py-6">
                     <Outlet />

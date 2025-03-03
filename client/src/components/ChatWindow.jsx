@@ -1,12 +1,12 @@
-
 import React, { useState, useEffect } from 'react';
 import io from 'socket.io-client';
 import axios from 'axios';
 import { Box, Typography, TextField, Button, Paper, List, ListItem, ListItemText } from '@mui/material';
+import Namebar from './Namebar';
 
 const socket = io('http://localhost:3000');  // Initialize the socket connection
 
-const ChatWindow = ({ userfirebaseId, friendfirebaseId }) => {
+const ChatWindow = ({ userfirebaseId, friendfirebaseId, friendName, friendEmail }) => {
   const [messages, setMessages] = useState([]);
   const [message, setMessage] = useState('');
   const [chatId, setChatId] = useState("");
@@ -16,18 +16,18 @@ const ChatWindow = ({ userfirebaseId, friendfirebaseId }) => {
       axios.post('http://localhost:3000/api/v1/chat/get', { userfirebaseId, friendfirebaseId })
         .then(response => {
           console.log('Chat history response:', response.data);
-          setMessages(response.data.lastMessage ? [response.data.lastMessage] : []);
-          setChatId(response.data._id);  
+          setMessages(response.data.messages || []);
+          setChatId(response.data._id);
           socket.emit('joinChat', { chatId: response.data._id });
         })
         .catch(error => console.error('Error fetching chat history:', error));
 
       socket.on('newMessage', (msg) => {
-        setMessages(prevMessages => [...prevMessages, msg]);  
+        setMessages(prevMessages => [...prevMessages, msg]);
       });
 
       return () => {
-        socket.off('newMessage');  
+        socket.off('newMessage');
       };
     }
   }, [userfirebaseId, friendfirebaseId]);
@@ -41,7 +41,7 @@ const ChatWindow = ({ userfirebaseId, friendfirebaseId }) => {
         timestamp: new Date()
       };
 
-      socket.emit('chatMessage', msgObject); 
+      socket.emit('chatMessage', msgObject);
       setMessages(prevMessages => [...prevMessages, msgObject]);
       setMessage('');
     }
@@ -49,7 +49,9 @@ const ChatWindow = ({ userfirebaseId, friendfirebaseId }) => {
 
   return (
     <Paper elevation={3} sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
-      <Box sx={{ padding: 2, flex: '1 1 auto', overflowY: 'auto' }}>
+      <Namebar friendName={friendName} friendEmail={friendEmail} />
+
+      <Box sx={{ padding: 2, flex: '1 1 auto', overflowY: 'auto', maxHeight: 'calc(100vh - 200px)' }}>
         <Typography variant="h6" gutterBottom>Chat</Typography>
 
         <List>
@@ -58,9 +60,9 @@ const ChatWindow = ({ userfirebaseId, friendfirebaseId }) => {
               key={index}
               sx={{
                 display: 'flex',
-                flexDirection: 'row', 
+                flexDirection: 'row',
                 justifyContent: msg.senderId === userfirebaseId ? 'flex-end' : 'flex-start', 
-                marginBottom: 1, 
+                marginBottom: 1,
               }}
             >
               <Paper
@@ -68,7 +70,7 @@ const ChatWindow = ({ userfirebaseId, friendfirebaseId }) => {
                   padding: 1,
                   backgroundColor: msg.senderId === userfirebaseId ? '#e0f7fa' : '#fce4ec',
                   borderRadius: 2,
-                  maxWidth: '70%', 
+                  maxWidth: '70%',
                   wordBreak: 'break-word',
                 }}
               >
@@ -89,11 +91,12 @@ const ChatWindow = ({ userfirebaseId, friendfirebaseId }) => {
           value={message}
           onChange={(e) => setMessage(e.target.value)}
         />
-        <Button variant="contained" color="primary" onClick={sendMessage}>Send</Button>
+        <Button variant="contained" onClick={sendMessage} sx={{ backgroundColor: '#1E88E5' }}>
+          Send
+        </Button>
       </Box>
     </Paper>
   );
 };
-
 
 export default ChatWindow;

@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
@@ -17,10 +16,6 @@ import FriendRequest from './pages/profile/reqFriend';
 import FriendRequestSent from './pages/profile/FriendReqSent';
 import EventsPage from './pages/Eventpage';
 import Notifications from './pages/profile/Notifications';
-import MeetSpotPage from './pages/test/MeetSpotPage';
-import TestPage from './pages/test/testmeetpage';
-import DemoPage from './pages/test/demo';
-import NewPage from './pages/test/new';
 
 import ShowMeetings from './pages/ShowMeetings';
 import ScheduledMeetings from './pages/ScheduledMeetings';
@@ -99,7 +94,6 @@ const App = () => {
     <div className="flex flex-col overflow-hidden bg-white">
       <BrowserRouter>
         <Routes>
-          
           <Route path="/auth" element={<AuthLayout />}>
             <Route path="login" element={<AuthLogin />} />
             <Route path="register" element={<AuthRegister />} />
@@ -134,21 +128,6 @@ const App = () => {
               <Route path="famousEvents" element={<SearchEvents />}></Route>
               <Route path="notifications" element={<Notifications firebaseID = {firebaseId}/>} />
             </Route>
-<<<<<<< HEAD
-          </Route>
-          <Route path='/show-meet' element={<ShowMeetings></ShowMeetings>}></Route>
-          <Route path="/unauth-page" element={<UnauthPages />} />
-          <Route path="/" element={<Home />} />
-          <Route path="/meeting-point" element={<MeetingPoint />} />
-          <Route path="/chat" element={<ChatPage firebaseID={firebaseId} />} />
-          <Route path="/events" element={<EventsPage/>}  />
-          <Route path="/test" element={<MeetSpotPage firebaseID={firebaseId}/>}  />
-          <Route path="/testpage" element={<TestPage firebaseID={firebaseId}/>}  />
-          <Route path="/demo" element={<DemoPage/>}  />
-          <Route path="/new" element={<NewPage/>}  />
-
-=======
->>>>>>> origin/anshul4
           
           {/* <Route path='/show-meet' element={<ShowMeetings></ShowMeetings>}></Route> */}
           <Route path="/unauth-page" element={<UnauthPages />} />

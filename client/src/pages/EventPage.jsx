@@ -39,7 +39,6 @@ const EventsPage = () => {
     { name: 'Other', icon: <Event /> },
   ];
 
-  // Fetch events data from backend
   const fetchEvents = async () => {
     try {
       const response = await axios.get('http://localhost:3000/event/getall');
@@ -118,17 +117,6 @@ const EventsPage = () => {
   };
 
   const handleRegister = async () => {
-<<<<<<< HEAD
-    if (!userEmail || !friendEmail) {
-      alert("Both emails are required.");
-      return;
-    }
-
-    console.log(selectedEvent._id);
-    console.log(userEmail);
-    console.log(friendEmail);
-=======
->>>>>>> origin/anshul4
     try {
       await axios.post('http://localhost:3000/event/register', {
         eventId: selectedEvent._id,
@@ -139,7 +127,6 @@ const EventsPage = () => {
       handleCloseModal();
     } catch (error) {
       console.error('Error registering for event:', error);
-      alert('Registration failed.');
     }
   };
 
