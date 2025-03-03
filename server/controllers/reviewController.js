@@ -28,8 +28,7 @@ export const createReview = async (req, res) => {
 // Update a review
 export const updateReview = async (req, res) => {
     try {
-        const { reviewId } = req.params;
-        const { rating, comment } = req.body;
+        const {reviewId, rating, comment } = req.body;
 
         const review = await Review.findById(reviewId);
         if (!review) {

@@ -1,5 +1,6 @@
+import { User } from '../models/userModel.js';
+import mongoose from 'mongoose'; 
 
-import { User } from '../models/userModel.js'; 
 
 export const showFriends = async (req, res) => {
     try {
@@ -44,7 +45,7 @@ export const showFriendRequest = async (req, res) => {
 
 export const sendFriendRequest = async (req, res) => {
     try {
-        const { firebaseID1, firebaseID2 } = req.body;
+        const { firebaseID1, firebaseID2 } = req.body; 
 
         // Find both users based on their firebase IDs
         const user1 = await User.findOne({ fireBaseId: firebaseID1 });
@@ -106,13 +107,13 @@ export const sentFrienReqest = async (req, res) => {
         const { firebaseID } = req.body;
 
         const user = await User.findOne({
-            fireBaseId: firebaseID
+            fireBaseId : firebaseID
         }).populate('sentFriendRequests', 'fullName email fireBaseId');
 
         const friendsData = user.sentFriendRequests.map(friend => ({
             name: friend.fullName,
             email: friend.email,
-            firebaseID: friend.fireBaseId
+            firebaseID1 : friend.fireBaseId 
         }));
 
         res.json(friendsData);
@@ -137,14 +138,15 @@ export const acceptFriendRequest = async (req, res) => {
             return res.status(404).json({ message: "User not found." });
         }
 
-        // Check if they are already friends
-        if (user1.friends.includes(user2._id) || user2.friends.includes(user1._id)) {
-            return res.status(400).json({ message: "Already friends." });
-        }
+        const alreadyFriends1 = user1.friends.some(id => id.equals(user2._id));
+        const alreadyFriends2 = user2.friends.some(id => id.equals(user1._id));
 
-        // Add each other to friends list if not already there
-        user1.friends.push(user2._id);
-        user2.friends.push(user1._id);
+        if (!alreadyFriends1) {
+            user1.friends.push(user2._id);
+        }
+        if (!alreadyFriends2) {
+            user2.friends.push(user1._id);
+        }
 
         // Remove friend requests
         user2.friendRequests = user2.friendRequests.filter(id => !id.equals(user1._id));
@@ -168,19 +170,24 @@ export const rejectFriendRequest = async (req, res) => {
         const user1 = await User.findOne({ fireBaseId: firebaseID1 });
         const user2 = await User.findOne({ fireBaseId: firebaseID2 });
 
-        if (!user1 || !user2) {
-            return res.status(404).json({ message: "User not found." });
+        if (!user1) {
+            return res.status(404).json({ message: "User 1 not found." });
+        }
+        if (!user2) {
+            return res.status(404).json({ message: "User 2 not found." });
         }
 
-        user1.friendRequests = user1.friendRequests.filter(id => !id.equals(user2._id));
+        user1.friendRequests = user1.friendRequests.filter(id => id.toString() !== user2._id.toString());
+        user2.sentFriendRequests = user2.sentFriendRequests.filter(id => id.toString() !== user1._id.toString());
 
-        user2.sentFriendRequests = user2.sentFriendRequests.filter(id => !id.equals(user1._id));
+        console.log("After rejection:", user1.friendRequests, user2.sentFriendRequests);
 
         await user1.save();
         await user2.save();
 
         res.status(200).json({ message: "Friend request rejected." });
     } catch (error) {
+        console.error("Error rejecting friend request:", error);
         res.status(500).json({ error: error.message });
     }
 };

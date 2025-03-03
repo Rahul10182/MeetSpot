@@ -1,4 +1,3 @@
-// eventModel.js
 import mongoose from 'mongoose';
 
 const eventSchema = new mongoose.Schema({
@@ -18,9 +17,22 @@ const eventSchema = new mongoose.Schema({
     default: 'Planning',
   },
   location: {
-    type: String,
+    type: {
+      name: {
+        type: String,
+        required: true,
+        trim: true,
+      },
+      latitude: {
+        type: Number,
+        required: true,
+      },
+      longitude: {
+        type: Number,
+        required: true,
+      },
+    },
     required: true,
-    trim: true,
   },
   photoUrl: {
     type: String,

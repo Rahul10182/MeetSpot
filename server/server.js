@@ -14,7 +14,11 @@ import { Server } from "socket.io";
 import { createServer } from "http";
 import userSearch from "./routes/userSearchRoute.js";
 import Message from "./models/messageModel.js"; 
-import {Chat} from "./models/chatModel.js";
+import Chat from "./models/chatModel.js";
+import notificationRoutes from "./routes/notificationRoutes.js"
+import messageRoutes from "./routes/messageRoutes.js"
+import mailRoutes from "./routes/mailRoutes.js"
+import meetingRoutes from "./routes/meetingRoutes.js"
 
 dotenv.config();
 connectDB();
@@ -46,43 +50,11 @@ app.use('/eventRegister', eventRoutes);
 app.use('/friend', friendRoute);
 app.use('/api/v1/venue', venueRoutes);
 app.use('/api/v1/chat', chatRoutes);
-app.use("/notifications", notifcationRoutes);
+app.use("/notifications", notificationRoutes);
+app.use('/api/v1/mail', mailRoutes);
+app.use('/api/v1/message', messageRoutes);
+app.use('/api/v1/meeting', meetingRoutes);
 
-// Socket.io for real-time chat
-io.on('connection', (socket) => {
-  console.log('User connected', socket.id);
-
-  // Join specific chat rooms for a user
-  socket.on('joinChat', ({ chatId }) => {
-    socket.join(chatId);
-    // console.log(User joined chat: ${chatId});
-  });
-
-  // Listen for chat messages
-  socket.on('chatMessage', async ({ chatId, senderId, content, timestamp }) => {
-    try {
-      // Save the message to the database
-      const message = new Message({
-        chat: chatId,
-        sender: senderId,
-        content: content,
-        timestamp: timestamp,  // Now timestamp is passed correctly
-      });
-
-      await message.save();
-      await message.populate('sender', '_id name');
-
-      // Emit the message to the users in the same chat room
-      socket.to(chatId).emit('newMessage', message);  // Consistent event name 'newMessage'
-    } catch (error) {
-      console.error('Error sending message:', error);
-    }
-  });
-
-  socket.on('disconnect', () => {
-    console.log('User disconnected', socket.id);
-  });
-});
 
 server.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);

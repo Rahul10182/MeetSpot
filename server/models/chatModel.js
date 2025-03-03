@@ -1,30 +1,44 @@
 import mongoose from "mongoose";
 
-const chatSchema = new mongoose.Schema({
-  participants: [
-    { 
-      type: mongoose.Schema.Types.ObjectId, 
-      ref: "User",
-      required: true
+const chatSchema = new mongoose.Schema(
+  {
+    participants: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+        required: true,
+      },
+    ],
+    messages: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Message",
+      },
+    ],
+    type: {
+      type: String,
+      enum: ["single", "group"],
+      default: "single",
     },
-    { 
-      type: mongoose.Schema.Types.ObjectId, 
-      ref: "User",
-      required: true
-    }
-  ],  // Only two participants for a one-to-one chat
-  lastMessage: { 
-    type: mongoose.Schema.Types.ObjectId, 
-    ref: "Message" 
-  },  // Reference to the last message sent
-  createdAt: { 
-    type: Date, 
-    default: Date.now 
-  },  // When the chat was created'
-  updatedAt: { 
-    type: Date, 
-    default: Date.now 
-  },  // When the chat was last updated
-});
+    groupDetails: {
+      name: {
+        type: String,
+        trim: true,
+      },
+      avatar: {
+        type: String, 
+      },
+      createdBy: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+      },
+    },
+  },
+  {
+    timestamps: true,
+  }
+);
 
-export const Chat = mongoose.model("Chat", chatSchema);
+const Chat = mongoose.model("Chat", chatSchema);
+export default Chat;
+
