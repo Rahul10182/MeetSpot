@@ -1,4 +1,3 @@
-
 import { User } from "../models/userModel.js";
 import axios from "axios";
 import Venue from "../models/venueModel.js"
@@ -314,4 +313,139 @@ export const getUserVenues = async (req, res) => {
   }
 };
 
+//create venue 
+export const createVenue = async (req, res) => {
+  try {
+    const { name, type, location, address, photo } = req.body;
 
+    // Validate required fields
+    if (!name || !type || !location || !address) {
+      return res.status(400).json({ message: "All required fields must be provided." });
+    }
+
+    // Create a new venue
+    const newVenue = new Venue({
+      name,
+      type,
+      location,
+      address,
+      photo: photo || "", // Default photo if not provided
+    });
+
+    // Save the venue to the database
+    const savedVenue = await newVenue.save();
+
+    // Return the generated venue ID
+    res.status(201).json(savedVenue);
+  } catch (error) {
+    console.error("Error creating venue:", error);
+    res.status(500).json({ message: "An error occurred while creating the venue.", error });
+  }
+};
+
+//get top venues
+export const getTopVenues = async (req, res) => {
+  const { userId } = req.params; // Extract userId 
+
+  // Default values for sorting and pagination
+  const sortBy = "avgRating";
+  const order = "desc";
+  const limit = 10; // Default number of venues per page
+  const page = 1; // Default page number
+
+  try {
+      // Step 1: Fetch venues with reviews and calculate avgRating and reviewCount
+      const venues = await Venue.aggregate([
+          // Lookup reviews for each venue
+          {
+              $lookup: {
+                  from: "reviews",
+                  localField: "_id",
+                  foreignField: "venue",
+                  as: "reviews",
+              },
+          },
+          // Calculate avgRating and reviewCount
+          {
+              $addFields: {
+                  avgRating: { $avg: "$reviews.rating" },
+                  reviewCount: { $size: "$reviews" },
+              },
+          },
+          // Check if the user has visited the venue
+          {
+              $addFields: {
+                  userVisited: {
+                      $in: [userId, "$visitedBy"], // Check if userId is in the visitedBy array
+                  },
+              },
+          },
+          // Sort venues by userVisited first, then by avgRating
+          {
+              $sort: {
+                  userVisited: -1, // User-visited venues first
+                  [sortBy]: order === "asc" ? 1 : -1, // Sort by avgRating in descending order by default
+              },
+          },
+          // Pagination
+          {
+              $skip: (page - 1) * limit,
+          },
+          {
+              $limit: limit,
+          },
+          // Select the required fields
+          {
+              $project: {
+                  title: 1,
+                  type: 1,
+                  address: 1,
+                  location: 1,
+                  photo: 1,
+                  avgRating: 1,
+                  reviewCount: 1,
+                  userVisited: 1,
+              },
+          },
+      ]);
+
+      // Step 2: Send the response
+      res.status(200).json({
+          success: true,
+          data: venues,
+      });
+  } catch (error) {
+      res.status(500).json({
+          success: false,
+          message: "Failed to fetch venues",
+          error: error.message,
+      });
+  }
+};
+
+//find venue by id
+export const getVenueById = async (req, res) => {
+  const venueId = req.params;
+
+  try {
+    const venue = await Venue.findOne({ _id: venueId });
+    if (!venue) return res.status(404).json({ message: "Venue not found", success: false });
+
+    const venueData = {
+      name:venue.name,
+      address:venue.address,
+      location:venue.location
+    }
+    res.status(200).json({
+      success: true,
+      data: venueData,
+  });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Failed to fetch venue",
+      error: error.message,
+  });
+  }
+
+}

@@ -10,6 +10,26 @@ import { useLocation } from 'react-router-dom';
 import ChatBubbleIcon from '@mui/icons-material/ChatBubble';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import { useNavigate } from 'react-router-dom';
+import "leaflet/dist/leaflet.css";
+import L from 'leaflet';
+
+var greenIcon = new L.Icon({
+  iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-green.png',
+  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
+  iconSize: [25, 41],
+  iconAnchor: [12, 41],
+  popupAnchor: [1, -34],
+  shadowSize: [41, 41]
+});
+
+var redIcon = new L.Icon({
+  iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-red.png',
+  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
+  iconSize: [25, 41],
+  iconAnchor: [12, 41],
+  popupAnchor: [1, -34],
+  shadowSize: [41, 41]
+});
 
 const ShowMeetings = ({ coordinates ,friendEmail,venueName}) => {
   const [userLocation, setUserLocation] = useState(null);
@@ -234,6 +254,8 @@ const ShowMeetings = ({ coordinates ,friendEmail,venueName}) => {
   
     // Add the user's location marker
     const userMarker = new H.map.Marker(origin);
+    // const userMarker = L.marker(origin, { icon: greenIcon }).addTo(map);
+
     map.addObject(userMarker);
     
     
@@ -244,6 +266,8 @@ const ShowMeetings = ({ coordinates ,friendEmail,venueName}) => {
     const latitude = cleanedDestination[1];
     const validDestination = { lat: latitude, lng: longitude };
     const venueMarker = new H.map.Marker(validDestination);
+    // const venueMarker = L.marker(validDestination, { icon: redIcon }).addTo(map);
+
     map.addObject(venueMarker);
 
     // If route data is available, draw the route
@@ -396,10 +420,7 @@ const ShowMeetings = ({ coordinates ,friendEmail,venueName}) => {
   
     return (
       <Box sx={{ padding: 1 }}>
-        <Box component="header" className="bg-white shadow-md mx-auto flex justify-between items-center" sx={{ /* styles */ }}>
-          <Typography variant="h5" className="text-white font-bold">MeetSpot</Typography>
-          {/* Other Header Components */}
-        </Box>
+        
     
         <Grid container spacing={3}>
         <Grid item xs={12} md={4}>

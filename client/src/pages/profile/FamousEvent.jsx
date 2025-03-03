@@ -1,20 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { pink } from '@mui/material/colors'
-import {
-  Box,
-  AppBar,
-  Toolbar,
-  Typography,
-  InputBase,
-  Card,
-  CardContent,
-  CardMedia,
-  Grid,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  Button,
-} from '@mui/material';
+import { Box, Typography, InputBase, Card, CardContent, CardMedia, Grid, Dialog, DialogTitle, DialogContent, Button } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 
 const SearchEvents = () => {
@@ -75,150 +60,83 @@ const SearchEvents = () => {
   };
 
   return (
-    <Box sx={{ flexGrow: 1 }}>
+    <Box className="bg-gradient-to-r from-blue-200 to-purple-200 min-h-screen p-6">
       <header>
-        <AppBar position="static">
-          <Toolbar
-            className=' bg-pink-400'
-            position="static"
-            sx={{ bgcolor: 'dark-pink' }}
-          >
-            <Typography
-              variant="h6"
-              component="div"
-              sx={{ flexGrow: 1, textAlign: 'left',color:'',height:'' }}
-            >
-              Event Finder
-            </Typography>
-            <Box sx={{ display: 'flex', alignItems: 'center', color: 'black' }}>
-              <SearchIcon sx={{ mr: 1 }} />
-              <InputBase
-                placeholder="Search…"
-                inputProps={{ 'aria-label': 'search' }}
-                sx={{
-                  color: 'inherit',
-                  bgcolor: 'white',
-                  borderRadius: '4px',
-                  padding: '2px 8px',
-                  width: '200px',
-                }}
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter') handleSearch();
-                }}
-              />
-            </Box>
-          </Toolbar>
-        </AppBar>
+        <Box className="flex items-center justify-center mb-8">
+          <SearchIcon className=" text-gray-400 mr-2" />
+          <InputBase
+            placeholder="Search events…"
+            inputProps={{ 'aria-label': 'search' }}
+            className="bg-white text-black rounded-full py-2 px-4 w-64"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') handleSearch();
+            }}
+          />
+        </Box>
       </header>
 
-      <Box sx={{ padding: 4 }}>
-        <Typography
-          variant="h4"
-          sx={{ mb: 4, textAlign: 'left', fontWeight: 'bold' }}
-        >
+      <Box className="max-w-full mx-auto">
+        <Typography variant="h4" className="text-blue-400 font-bold text-center mb-6">
           Search Results
         </Typography>
 
-        <Grid
-          container
-          spacing={3}
-          sx={{
-            marginTop: 2,
-            maxHeight: '60vh',
-            overflowY: 'auto',
-          }}
-        >
+        <Grid container spacing={4} className="justify-center">
           {results.length > 0 ? (
             results.map((event) => (
               <Grid item xs={12} sm={6} md={4} key={event.id}>
                 <Card
-                    onClick={() => handleCardClick(event)} // Add onClick to the card
-                    sx={{
-                      maxWidth: 345,
-                      height: 400,
-                      boxShadow: '0 8px 16px rgba(0, 0, 0, 0.2)',
-                      transition: 'transform 0.3s ease, box-shadow 0.3s ease',
-                      borderRadius: '12px',
-                      background: 'linear-gradient(135deg, #f9f9f9, #fefefe)',
-                      '&:hover': {
-                        transform: 'scale(1.05)',
-                        cursor: 'pointer',
-                        boxShadow: '0 12px 24px rgba(0, 0, 0, 0.3)',
-                      },
-                      overflow: 'hidden',
-                      position: 'relative',
-                    }}
-                  >
-                    <CardMedia
-                      component="img"
-                      alt={event.name}
-                      height="140"
-                      image={event.image}
-                      sx={{
-                        transition: 'opacity 0.3s ease',
-                        '&:hover': { opacity: 0.85 },
-                      }}
-                    />
-                    <CardContent
-                      sx={{
-                        padding: '16px',
-                        textAlign: 'center',
-                      }}
+                  onClick={() => handleCardClick(event)} // Add onClick to the card
+                  className="bg-gradient-to-r from-blue-200 to-purple-200 hover:scale-105 transition-all duration-300 rounded-2xl shadow-lg transform"
+                  sx={{
+                    height: '450px', // Reduce card height for compact design
+                    boxShadow: '0 4px 8px rgba(0, 0, 0, 0.2)', // Softer shadow
+                    border: '1px solid #e0e0e0', // Light border
+                    overflow: 'hidden',
+                    position: 'relative',
+                  }}
+                >
+                  <CardMedia
+                    component="img"
+                    alt={event.name}
+                    height="100" // Set fixed height for images
+                    image={event.image}
+                    className="transition-opacity duration-300 hover:opacity-80"
+                  />
+                  <CardContent className="text-center p-4">
+                    <Typography
+                      variant="h6"
+                      className="font-semibold text-gray-800 mb-2"
                     >
-                      <Typography
-                        variant="h6"
-                        component="div"
-                        sx={{
-                          fontWeight: 'bold',
-                          fontSize: '18px',
-                          color: '#333',
-                        }}
-                      >
-                        {event.name}
-                      </Typography>
-                      <Typography
-                        variant="body2"
-                        sx={{
-                          color: '#555',
-                          fontSize: '14px',
-                          margin: '8px 0',
-                          lineHeight: 1.5,
-                        }}
-                      >
-                        {event.description}
-                      </Typography>
-                      <Typography
-                        variant="body2"
-                        sx={{
-                          color: '#777',
-                          fontSize: '13px',
-                          marginTop: '4px',
-                        }}
-                      >
-                        <strong>Date:</strong> {event.date}
-                      </Typography>
-                      <Typography
-                        variant="body2"
-                        sx={{
-                          color: '#777',
-                          fontSize: '13px',
-                          marginTop: '4px',
-                        }}
-                      >
-                        <strong>Venue:</strong> {event.venue}
-                      </Typography>
-                    </CardContent>
-                  </Card>
-
+                      {event.name}
+                    </Typography>
+                    <Typography
+                      variant="body2"
+                      className="text-gray-600 mb-2"
+                    >
+                      {event.description}
+                    </Typography>
+                    <Typography
+                      variant="body2"
+                      className="text-gray-600 text-sm"
+                    >
+                      <strong>Date:</strong> {event.date}
+                    </Typography>
+                    <Typography
+                      variant="body2"
+                      className="text-gray-600 text-sm"
+                    >
+                      <strong>Venue:</strong> {event.venue}
+                    </Typography>
+                  </CardContent>
+                </Card>
               </Grid>
             ))
           ) : (
             <Typography
               variant="body1"
-              color="textSecondary"
-              sx={{ mt: 4, textAlign: 'center', fontStyle: 'italic' }}
+              className="text-white text-center italic mt-4"
             >
               No results found. Try searching for an event.
             </Typography>
@@ -244,6 +162,7 @@ const SearchEvents = () => {
               variant="contained"
               sx={{ mt: 2 }}
               onClick={handleCloseDialog}
+              className="bg-blue-500 text-white"
             >
               Close
             </Button>
