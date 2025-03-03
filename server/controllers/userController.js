@@ -125,6 +125,3 @@ export const getEmailId = async (req, res) => {
   }
 };
 
-
-
->>>>>>> anshul4
