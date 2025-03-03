@@ -27,13 +27,19 @@ const HomePage = ({ showChat, handleAccountIconClick }) => {
         navigate("/home");
         break;
       case "events":
-        navigate("/home/events");
+        navigate("/events");
+        break;
+      case "meet":
+        navigate("/create-meeting");
         break;
       case "chat":
-        navigate("/home/chat");
+        navigate("/chat");
+        break;
+      case "famousEvent":
+        navigate("/famousEvent");
         break;
       case "contact":
-        navigate("/home/help");
+        navigate("/help");
         break;
       case "profile":
         navigate("/profile/dashboard");
@@ -58,7 +64,12 @@ const HomePage = ({ showChat, handleAccountIconClick }) => {
         </div>
 
         {/* Main Content */}
-        <div className="ml-16 flex-1 bg-white p-6">
+        <div
+          className="flex-1 bg-white p-6"
+          style={{
+            marginLeft: "4rem", // Adjust to match the sidebar's width
+          }}
+        >
           <Outlet /> {/* Outlet will render content based on route */}
         </div>
       </div>

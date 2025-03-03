@@ -1,0 +1,129 @@
+/* Sidebar */
+.sidebar {
+    width: 250px;
+    background: linear-gradient(to right, #ff7c7c, #ff5e5e);
+    padding: 20px;
+    color: white;
+    box-shadow: 4px 0 12px rgba(0, 0, 0, 0.2);
+}
+
+.sidebar-header {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.sidebar-logo {
+    font-size: 2rem;
+    font-weight: bold;
+    color: #fff;
+    transition: color 0.3s ease;
+}
+
+.sidebar-logo:hover {
+    color: #ff4081;
+}
+
+.sidebar-divider {
+    border-color: #fff;
+    margin-top: 10px;
+}
+
+.sidebar-list-item {
+    padding: 10px 15px;
+    border-radius: 8px;
+    transition: background 0.3s ease;
+}
+
+.sidebar-list-item:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+}
+
+.sidebar-icon {
+    color: white;
+}
+
+.sidebar-text {
+    font-weight: 600;
+}
+
+/* Main Content */
+.main-content {
+    flex: 1;
+    padding: 30px;
+    background: linear-gradient(to bottom, #ffebf0, #ffe0f0);
+    animation: fadeIn 1s ease-in-out;
+}
+
+.header-visible {
+    margin-top: 0;
+}
+
+.appbar {
+    background-color: transparent;
+    box-shadow: none;
+}
+
+.appbar-toolbar {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px 50px;
+}
+
+.appbar-title {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: #ff4081;
+}
+
+.search-container {
+    position: relative;
+    width: 80%;
+}
+
+.search-bar {
+    width: 100%;
+    border-radius: 8px;
+    background-color: #f0f0f0;
+}
+
+.search-icon {
+    color: #bdbdbd;
+}
+
+.search-results {
+    position: absolute;
+    top: 40px;
+    left: 0;
+    right: 0;
+    background-color: #fff;
+    box-shadow: 0px 8px 15px rgba(0, 0, 0, 0.2);
+    max-height: 300px;
+    overflow-y: auto;
+    border-radius: 8px;
+}
+
+.search-result-card {
+    margin-bottom: 10px;
+    border-radius: 8px;
+    transition: transform 0.2s ease-in-out;
+}
+
+.search-result-card:hover {
+    transform: translateY(-5px);
+}
+
+.add-friend-btn {
+    margin-top: 10px;
+}
+
+/* Animation */
+@keyframes fadeIn {
+    0% {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}

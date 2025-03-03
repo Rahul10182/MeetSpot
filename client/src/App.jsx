@@ -9,7 +9,7 @@ import UnauthPages from './pages/unauth-page';
 import UserDashboard from './pages/profile/ProfileDetail';
 import PrivateRoute from './pages/protectedRoute';
 import SetProfile from './pages/profile/SetProfile';
-import EventPlannerForm from './pages/profile/CreateEvent';
+import EventPlannerForm from './pages/event/CreatedEvents';
 import FriendPage from './pages/profile/friends';
 import FriendList from './pages/profile/oldFriend';
 import FriendRequest from './pages/profile/reqFriend';
@@ -25,6 +25,14 @@ import MeetspotLandingPage from './pages/landing/new';
 import HomePage from './pages/home/HomePage';
 import Contact from './pages/help_Contact/Contact';
 import Chatt from './pages/chat/Chat';
+import MainHome from './pages/home/MainHome';
+import CreateMeetingPage from './pages/Meeting Page/MeetPage';
+import FamousEvent from "./pages/profile/FamousEvent";
+import ShowMeetingPage from './pages/Meeting Page/Show Meetings/MainMeeting';
+import ShowMeetingDetails from "./pages/Meeting Page/Show Meetings/Meetings"
+import NewEvent from './pages/event/NewEvent';
+import UpdateEvent from './pages/event/UpdateEvent';
+import ManageEvent from './pages/event/ManageEvent';
 
 const App = () => {
   const [authenticated, setAuthenticated] = useState(false);
@@ -91,11 +99,27 @@ const App = () => {
             <Route path="register" element={<AuthRegister />} />
           </Route>
 
+          <Route path = "/" element ={<MeetspotLandingPage/>} />
+
           <Route element={<PrivateRoute authenticated={authenticated} />}>
             <Route path="/profile" element={<UserDashboard />}>
               <Route path="dashboard" element={<SetProfile />} />
               <Route path ="ScheduledMeetings" element={<ScheduledMeetings/>}></Route>
               <Route path="createevent" element={<EventPlannerForm />} />
+              <Route path="Event" element={<EventPlannerForm />} >
+                <Route path="create" element={<NewEvent />} />
+                <Route path="update/:eventId" element={<UpdateEvent />} />
+                <Route path="manage" element={<ManageEvent />} />
+              </Route>
+              <Route path="show-meet">
+                <Route path="user" element={<ShowMeetingPage />} />
+                <Route path=":meetingId/user" element={<ShowMeetingDetails />}> </Route>
+                <Route path=':meetingId/map/user' element={<ShowMeetings/>}></Route>
+                
+              </Route>
+
+
+
               <Route path="friends" element={<FriendPage />}>
                 <Route path="old" element={<FriendList />} />
                 <Route path="new" element={<FriendRequest />} />
@@ -109,17 +133,24 @@ const App = () => {
           <Route path="/unauth-page" element={<UnauthPages />} />
           {/* <Route path="/events" element={<EventsPage/>}  /> */}
           {/* <Route path = "/chat" element ={<ChatPage/>} /> */}
-          <Route path = "/landing" element ={<MeetspotLandingPage/>} />
           
-          <Route path = "/home" element ={<HomePage/>} >
+          
+          <Route path = "/" element ={<HomePage/>} >
             <Route path = "events" element ={<EventsPage/>} />
-            {/* <Route path = "meet" element ={<HomePage/>} /> */}
+            <Route element={<PrivateRoute authenticated={authenticated} />}>
+              <Route path = "home" element ={<MainHome/>} />
+            </Route>
+            <Route path="create-meeting" element={<CreateMeetingPage />} />
+            <Route path = "/famousEvent" element ={<FamousEvent/>} />
             {/* <Route path = "settings" element ={<Profile/>} /> */}
             <Route path = "chat" element ={<Chatt/>} />
             <Route path = "help" element ={<Contact></Contact>} />
             {/* <Route path = "help" element ={<HomePage/>} /> */}
           </Route>
         </Route>
+        
+
+
       
         </Routes>
       </BrowserRouter>

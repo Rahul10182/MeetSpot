@@ -37,7 +37,7 @@ const Conversation = ({ data, currentUser , online}) => {
             borderRadius={1}
             sx={{
                 backgroundColor:'transparent',
-                '&:hover': { backgroundColor: 'grey.200', cursor: 'pointer' },
+                '&:hover': { backgroundColor: '#E2E8F0', cursor: 'pointer' },
             }}
         >
             {online && (
@@ -56,13 +56,13 @@ const Conversation = ({ data, currentUser , online}) => {
             <Avatar
                 src={userData?.profilePicture || `https://avatar.iran.liara.run/username?username=${fname}`}
                 alt="User Profile"
-                sx={{ width: 50, height: 50, mr: 2 }}
+                sx={{ width: 45, height: 45, mr: 2 }}
             />
             <Typography variant="body1" fontWeight="bold">
                 {userData?.fullName || 'Unknown'}
             </Typography>
         </Box>
-        <hr style={{ width: '85%', border: '0.1 px solid #ecece' }} />
+        {/* <hr style={{ width: '85%', border: '0.1 px solid #ecece' }} /> */}
         </>
     );
 }

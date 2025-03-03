@@ -20,19 +20,30 @@ const Notifications = ({ firebaseID }) => {
 
   const handleDelete = async (notificationId) => {
     try {
-        await axios.delete(`http://localhost:3000/notifications/del/${notificationId}`);
-        setNotifications(notifications.filter(notification => notification._id !== notificationId));
+      await axios.delete(`http://localhost:3000/notifications/del/${notificationId}`);
+      setNotifications(notifications.filter(notification => notification._id !== notificationId));
     } catch (error) {
-        console.error("Error deleting notification:", error);
+      console.error("Error deleting notification:", error);
+    }
+  };
+
+  const handleMarkAsRead = async (notificationId) => {
+    try {
+      await axios.patch(`http://localhost:3000/notifications/read/${notificationId}`, { readStatus: true });
+      setNotifications(notifications.map(notification =>
+        notification._id === notificationId ? { ...notification, readStatus: true } : notification
+      ));
+    } catch (error) {
+      console.error("Error marking notification as read:", error);
     }
   };
 
   return (
-    <Box 
+    <Box
       className="flex items-center justify-center min-h-screen bg-gradient-to-r from-pink-200 to-pink-400"
     >
-      <Paper 
-        elevation={6} 
+      <Paper
+        elevation={6}
         className="notification-container mx-auto p-6 max-w-md w-full max-h-[80vh] overflow-y-auto shadow-lg rounded-lg"
         sx={{
           backgroundColor: '#ffffff',
@@ -43,17 +54,18 @@ const Notifications = ({ firebaseID }) => {
         <Typography variant="h5" align="center" className="mb-4 font-semibold text-blue-600">
           Notifications
         </Typography>
-        
+
         <Box>
           {notifications.length > 0 ? (
             notifications.map(notification => (
-              <Card 
-                key={notification._id} 
-                className={`notification-item mb-4 transition-transform ${notification.read ? 'bg-gray-100' : 'bg-white'} shadow-md`} 
+              <Card
+                key={notification._id}
+                className={`notification-item mb-4 transition-transform shadow-md`}
                 sx={{
                   borderRadius: '12px',
                   padding: '8px',
-                  borderLeft: notification.read ? '4px solid #a0aec0' : '4px solid #4299e1'
+                  backgroundColor: notification.readStatus ? '#d4f8e8' : '#ffffff',
+                  borderLeft: notification.readStatus ? '4px solid #38a169' : '4px solid #4299e1'
                 }}
               >
                 <CardContent>
@@ -62,9 +74,16 @@ const Notifications = ({ firebaseID }) => {
                   </Typography>
                 </CardContent>
                 <CardActions className="flex justify-end space-x-2">
-                  <Button 
-                    onClick={() => handleDelete(notification._id)} 
-                    startIcon={<Delete />} 
+                  <Button
+                    onClick={() => handleMarkAsRead(notification._id)}
+                    className="mark-read text-green-500"
+                    disabled={notification.readStatus}
+                  >
+                    {notification.readStatus ? "Read" : "Mark as Read"}
+                  </Button>
+                  <Button
+                    onClick={() => handleDelete(notification._id)}
+                    startIcon={<Delete />}
                     className="delete text-red-500"
                   >
                     Delete

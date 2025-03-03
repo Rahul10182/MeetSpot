@@ -1,6 +1,5 @@
 import React from "react";
-import Typewriter from 'typewriter-effect';
-
+import Typewriter from "typewriter-effect";
 import { Container, Typography, Box, Grid } from "@mui/material";
 import { motion } from "framer-motion";
 
@@ -18,35 +17,64 @@ const eventPhotos = [
 
 const Events = () => {
   return (
-    <Container maxWidth="lg" className="py-20">
-      <Typography variant="h3" align="center" className="text-pink-500 font-bold mb-6">
-      <Typewriter
-        options={{
-          strings: ['Various Types Of Events Based On Your Interest', 'Concerts', 'Festivals ....'],
-          autoStart: true,
-          loop: true,  
-          delay: 75,   
-          cursor: '|', 
-        }}
-      />
-    </Typography>
+    <Container maxWidth="lg" className="py-20 relative">
+      {/* Decorative Background */}
+      <Box className="absolute inset-0 -z-10 bg-gradient-to-r from-pink-300 via-purple-300 to-indigo-300 opacity-30 blur-3xl" />
+
+      {/* Title Section */}
+      <Typography
+        variant="h3"
+        align="center"
+        className="text-pink-500 font-bold mb-6 relative"
+      >
+        <motion.div
+          initial={{ opacity: 0, y: -30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 1 }}
+        >
+          <Typewriter
+            options={{
+              strings: [
+                "Various Types Of Events Based On Your Interest",
+                "Concerts",
+                "Festivals",
+                "Sports Events",
+              ],
+              autoStart: true,
+              loop: true,
+              delay: 75,
+              cursor: "|",
+            }}
+          />
+        </motion.div>
+      </Typography>
+
+      {/* Events Grid */}
       <Box className="overflow-auto max-h-[600px] py-4">
         <Grid container spacing={4}>
           {eventPhotos.map((event, index) => (
-            <Grid item xs={12} md={4} key={index}>
+            <Grid item xs={12} sm={6} md={4} lg={3} key={index}>
               <motion.div
-                whileHover={{ scale: 1.05 }}
+                whileHover={{ scale: 1.1, rotate: 2 }}
                 initial={{ opacity: 0, y: 50 }}
                 whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
                 transition={{ duration: 0.6, delay: index * 0.2 }}
               >
-                <Box className="p-4 bg-white rounded-lg shadow-lg">
-                  <img
+                <Box className="p-4 bg-white rounded-xl shadow-xl hover:shadow-2xl transform transition-transform duration-300">
+                  {/* Event Image */}
+                  <motion.img
                     src={event.src}
                     alt={event.name}
-                    className="w-full h-40 object-cover rounded-t-lg"
+                    className="w-full h-40 object-cover rounded-lg"
+                    whileHover={{ scale: 1.05 }}
+                    transition={{ duration: 0.5 }}
                   />
-                  <Typography variant="h6" className="font-semibold mt-4 text-center">
+                  {/* Event Name */}
+                  <Typography
+                    variant="h6"
+                    className="font-semibold mt-4 text-center text-purple-700"
+                  >
                     {event.name}
                   </Typography>
                 </Box>
@@ -54,6 +82,19 @@ const Events = () => {
             </Grid>
           ))}
         </Grid>
+      </Box>
+
+      {/* Footer Animation */}
+      <Box className="mt-10 text-center">
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 1.5, delay: 0.5 }}
+        >
+          <Typography variant="body1" className="text-gray-600">
+            Discover your next favorite event and make unforgettable memories!
+          </Typography>
+        </motion.div>
       </Box>
     </Container>
   );

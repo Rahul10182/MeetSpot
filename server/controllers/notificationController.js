@@ -17,7 +17,7 @@ export const sendNotification = async (firebaseID, message, type = 'other') => {
 
 export const getUserNotifications = async (req, res) => {
     try {
-        const firebaseID = req.query.firebaseId; // Use query parameter
+        const { firebaseID } = req.params;
 
         const notifications = await Notification.find({ firebaseID }).sort({ timestamp: -1 });
 
@@ -31,6 +31,7 @@ export const getUserNotifications = async (req, res) => {
         res.status(500).json({ message: 'Error fetching notifications', error });
     }
 };
+
 
 export const markAsRead = async (req, res) => {
     try {
@@ -57,5 +58,23 @@ export const deleteNotification = async (req, res) => {
     } catch (error) {
       console.error('Error deleting notification:', error);
       res.status(500).json({ message: 'Error deleting notification', error });
+    }
+  };
+
+  export const markNotificationAsRead = async (req, res) => {
+    try {
+      const { id } = req.params;
+      const { readStatus } = req.body;
+  
+      const notification = await Notification.findByIdAndUpdate(id, { readStatus }, { new: true });
+  
+      if (!notification) {
+        return res.status(404).json({ message: 'Notification not found' });
+      }
+  
+      res.status(200).json({ message: 'Notification marked as read', notification });
+    } catch (error) {
+      console.error('Error updating notification:', error);
+      res.status(500).json({ message: 'Error updating notification', error });
     }
   };

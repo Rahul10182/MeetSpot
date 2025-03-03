@@ -6,13 +6,14 @@ const FriendPage = () => {
   const navigate = useNavigate();
 
   return (
-    <div className="bg-gradient-to-r from-pink-200 to-pink-400 min-h-screen flex justify-center items-center p-8">
-      <div className="w-full max-w-xl bg-white shadow-lg rounded-lg p-8">
-        <div className="flex justify-around mb-8">
+    <div className="bg-gradient-to-r bg-gray-50 min-h-screen flex justify-center items-center py-12 px-4">
+      <div className="w-full max-w-4xl bg-white shadow-2xl rounded-xl p-10 space-y-8">
+        {/* Navigation Buttons */}
+        <div className="flex justify-between gap-4">
           <Button 
             variant="contained" 
             color="primary" 
-            className="w-1/3 py-3 text-lg" 
+            className="w-full sm:w-auto py-3 text-lg rounded-lg shadow-md transition duration-200 ease-in-out transform hover:scale-105" 
             sx={{ backgroundColor: '#3b82f6', '&:hover': { backgroundColor: '#2563eb' } }}
             onClick={() => navigate('/profile/friends/old')}
           >
@@ -22,7 +23,7 @@ const FriendPage = () => {
           <Button 
             variant="contained" 
             color="secondary" 
-            className="w-1/3 py-3 text-lg" 
+            className="w-full sm:w-auto py-3 text-lg rounded-lg shadow-md transition duration-200 ease-in-out transform hover:scale-105" 
             sx={{ backgroundColor: '#f97316', '&:hover': { backgroundColor: '#ea580c' } }}
             onClick={() => navigate('/profile/friends/new')}
           >
@@ -32,7 +33,7 @@ const FriendPage = () => {
           <Button 
             variant="contained" 
             color="success" 
-            className="w-1/3 py-3 text-lg" 
+            className="w-full sm:w-auto py-3 text-lg rounded-lg shadow-md transition duration-200 ease-in-out transform hover:scale-105" 
             sx={{ backgroundColor: '#34d399', '&:hover': { backgroundColor: '#10b981' } }}
             onClick={() => navigate('/profile/friends/sentreq')}
           >
@@ -40,7 +41,8 @@ const FriendPage = () => {
           </Button>
         </div>
 
-        <div className="bg-gray-50 h-96 rounded-lg flex items-center justify-center">
+        {/* Content Area */}
+        <div className="bg-gray-50 h-96 rounded-lg flex items-center justify-center shadow-inner">
           <Outlet />
         </div>
       </div>

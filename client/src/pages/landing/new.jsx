@@ -7,6 +7,9 @@ import "tailwindcss/tailwind.css";
 import TouristPlaces from "./TouristPlaces";
 import { Link as ScrollLink, Element } from "react-scroll";
 import { useNavigate } from "react-router-dom";
+import AboutUs from "./AboutUs";
+import Footer from "../../components/Home/Footer";
+import Header from "../home/Header";
 
 const eventPhotos = [
   { name: "Concerts", src: "https://plus.unsplash.com/premium_photo-1681830630610-9f26c9729b75?q=80&w=2940&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" },
@@ -46,47 +49,7 @@ const MeetspotLandingPage = () => {
           flexDirection: "column",
         }}
       >
-        <Box
-          sx={{
-            position: "absolute",
-            top: 20,
-            right: 20,
-            display: "flex",
-            gap: 2,
-            zIndex: 10,
-          }}
-        >
-          <Button
-            variant="outlined"
-            color="secondary"
-            onClick={() => handleNavigation("/auth/login")}
-            sx={{
-              fontWeight: "bold",
-              borderColor: "#fff",
-              color: "#fff",
-              ":hover": {
-                backgroundColor: "#ec4899",
-                color: "#fff",
-              },
-            }}
-          >
-            Login
-          </Button>
-          <Button
-            variant="contained"
-            color="secondary"
-            onClick={() => handleNavigation("/auth/register")}
-            sx={{
-              fontWeight: "bold",
-              backgroundColor: "#ec4899",
-              ":hover": {
-                backgroundColor: "#d946ef",
-              },
-            }}
-          >
-            Sign Up
-          </Button>
-        </Box>
+        <Header className="absolute top-0 left-0 w-full z-10"></Header>
 
         <Box
           sx={{
@@ -128,7 +91,7 @@ const MeetspotLandingPage = () => {
               <Button
                 variant="contained"
                 color="primary"
-                onClick={() => handleNavigation("/meeting-point")}
+                onClick={() => handleNavigation("/home")}
                 sx={{
                   padding: "10px 20px",
                   borderRadius: "8px",
@@ -197,35 +160,68 @@ const MeetspotLandingPage = () => {
 
       {/* Tourist Places Section */}
       <Element name="touristPlaces">
-        <div className="bg-indigo-50 py-20">
           <TouristPlaces />
-        </div>
       </Element>
 
-      {/* Call to Action */}
-      <Element name="cta">
-        <div className="bg-purple-800 h-screen flex flex-col justify-center items-center text-center">
-          <motion.div
-            initial={{ opacity: 0, y: 50 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 1 }}
-          >
-            <Typography
-              variant="h3"
-              className="text-white font-bold mb-6"
-            >
-              Ready to Meet?
-            </Typography>
-            <Button
-              variant="contained"
-              color="secondary"
-              className="rounded-full py-3 px-8 font-semibold text-lg"
-            >
-              Sign Up Now
-            </Button>
-          </motion.div>
+      <div>
+            <AboutUs></AboutUs>
         </div>
-      </Element>
+
+      {/* Call to Action */}
+        <Element name="cta">
+          <div className="bg-gradient-to-br from-purple-700 via-purple-800 to-indigo-900 h-screen flex flex-col justify-center items-center text-center">
+            <motion.div
+              initial={{ opacity: 0, y: 50 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 1 }}
+              className="space-y-6"
+            >
+              {/* Heading */}
+              <Typography
+                variant="h3"
+                className="text-white font-extrabold text-4xl md:text-5xl tracking-wide animate-bounce"
+              >
+                Ready to Meet?
+              </Typography>
+
+              {/* Subheading */}
+              <Typography
+                variant="body1"
+                className="text-gray-300 text-lg md:text-xl max-w-2xl mx-auto leading-relaxed"
+              >
+                Discover the easiest way to organize meetups and find perfect locations. 
+                Join us today to make every meetup memorable!
+              </Typography>
+
+              {/* Button */}
+              <Button
+                variant="contained"
+                color="secondary"
+                onClick={() => handleNavigation("/auth/register")}
+                className="rounded-full py-4 px-12 font-semibold text-lg text-white bg-gradient-to-r from-purple-500 to-indigo-500 hover:from-purple-400 hover:to-indigo-400 shadow-lg transform transition-all hover:scale-105"
+              >
+                Sign Up Now
+              </Button>
+            </motion.div>
+
+            {/* Decorative Floating Elements */}
+            <motion.div
+              initial={{ scale: 0 }}
+              animate={{ scale: 1 }}
+              transition={{ duration: 1.5, delay: 0.5 }}
+              className="absolute top-10 left-10 w-16 h-16 bg-purple-600 rounded-full filter blur-lg opacity-50"
+            ></motion.div>
+            <motion.div
+              initial={{ scale: 0 }}
+              animate={{ scale: 1 }}
+              transition={{ duration: 1.5, delay: 0.8 }}
+              className="absolute bottom-20 right-20 w-24 h-24 bg-indigo-700 rounded-full filter blur-lg opacity-50"
+            ></motion.div>
+          </div>
+        </Element>
+
+        <Footer/>
+
     </div>
   );
 };
