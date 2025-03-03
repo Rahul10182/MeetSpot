@@ -1,7 +1,3 @@
-<<<<<<< HEAD
-# MeetSpot
-Here we are making a demo readme
-=======
 # MeetSpot
 MeetSpot is a location-based web application designed to help users find a central meeting spot between two people. By utilizing geolocation data, it suggests convenient places (restaurants, cafes, hotels) between users and provides a real-time chat for seamless planning. With MeetSpot, users can also manage friends to streamline connections and future meetups.
 
@@ -42,4 +38,3 @@ Special thanks to:
 
 - Webster, MNNIT Prayagraj for organizing the hackathon and providing a platform for this project.
 - GoMapsPro for their reliable geolocation services and mapping data.
->>>>>>> anshul4
